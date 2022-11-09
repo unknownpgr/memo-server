@@ -9,3 +9,15 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+model Memo {
+  id      Int    @id @default(autoincrement())
+  content String
+  tags    Tag[]
+}
+
+model Tag {
+  id    Int    @id @default(autoincrement())
+  value String
+  memos Memo[]
+}

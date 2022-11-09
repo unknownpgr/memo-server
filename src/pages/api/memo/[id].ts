@@ -9,6 +9,8 @@ export default async function handler(
   res: NextApiResponse<Memo>
 ) {
   let { id } = req.query;
+
+  // Validation
   if (!id) {
     res.status(404).end();
     return;
@@ -16,7 +18,9 @@ export default async function handler(
   let _id;
   if (Array.isArray(id)) _id = +id[0];
   else _id = +id;
+
+  // Find memo
   const memo = await prisma.memo.findUnique({ where: { id: _id } });
   if (memo) res.status(200).json(memo);
-  else res.status(404).end;
+  else res.status(404).end();
 }

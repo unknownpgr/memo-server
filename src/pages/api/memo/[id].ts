@@ -4,6 +4,12 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 const prisma = new PrismaClient();
 
+async function clearUnrelatedTags() {
+  return await prisma.tag.deleteMany({
+    where: { memos: { none: { NOT: [{ id: -1 }] } } },
+  });
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Memo>
@@ -64,6 +70,8 @@ export default async function handler(
         },
       });
 
+      await clearUnrelatedTags();
+
       if (memo) res.status(200).end();
       else res.status(500).end();
       break;
@@ -71,6 +79,9 @@ export default async function handler(
 
     case "DELETE": {
       const memo = await prisma.memo.delete({ where: { id: nid } });
+
+      await clearUnrelatedTags();
+
       if (memo) res.status(200).end();
       else res.status(500).end();
       break;

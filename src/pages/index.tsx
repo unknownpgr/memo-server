@@ -35,6 +35,14 @@ export default function Home() {
     mutateTagList();
   }
 
+  async function onDeleteMemo(id: number) {
+    if (!confirm(`Do you really want to delete memo ${id}`)) return;
+    await fetch(`/api/memo/${id}`, {
+      method: "delete",
+    });
+    mutateMemo();
+  }
+
   if (err1 || err2) return <h1>Error</h1>;
   if (!memos || !tagList) return <h1>Loading</h1>;
 
@@ -59,7 +67,7 @@ export default function Home() {
         <Tag key={id} value={value}></Tag>
       ))}
       <hr />
-      <MemoList memos={memos} />
+      <MemoList memos={memos} onDeleteMemo={onDeleteMemo} />
     </div>
   );
 }

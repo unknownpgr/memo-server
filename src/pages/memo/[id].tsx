@@ -1,9 +1,9 @@
-import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import Tags from "../../components/tags";
+import Tags from "../../components/taginput";
 import useJSON from "../../hooks/useJSON";
 import { MemoWithTags } from "../../types";
+import memoStyles from "../../styles/memo.module.css";
 
 export default function View() {
   const router = useRouter();
@@ -13,8 +13,10 @@ export default function View() {
     `/api/memo/${id}`
   );
 
+  const [isChanged, setIsChanged] = useState(false);
   const [content, setContent] = useState("");
   const [tags, setTags] = useState<string[]>([]);
+
   useEffect(() => {
     if (!data || isValidating) return;
     setContent(data.content);
@@ -22,6 +24,7 @@ export default function View() {
   }, [data, isValidating]);
 
   async function updateMemo() {
+    setIsChanged(false);
     await fetch(`/api/memo/${id}`, {
       method: "put",
       headers: {
@@ -38,20 +41,29 @@ export default function View() {
   if (error) return <div>Error : {`${error}`}</div>;
   return (
     <div>
-      <div>
-        <Link href="/">←</Link>
-      </div>
-      <h1>Memo #{id}</h1>
+      <h1>
+        Memo #{id}{" "}
+        <button onClick={updateMemo} disabled={!isChanged || isValidating}>
+          update
+        </button>
+      </h1>
       <textarea
+        className={memoStyles.content}
         disabled={isValidating}
         value={content}
-        onChange={(e) => setContent(e.target.value)}
+        onChange={(e) => {
+          setContent(e.target.value);
+          setIsChanged(true);
+        }}
       ></textarea>
-      <div>
-        <button onClick={updateMemo}>update</button>
-      </div>
       <h2>Tags</h2>
-      <Tags tags={tags} setTags={setTags}></Tags>
+      <Tags
+        tags={tags}
+        setTags={(v) => {
+          setTags(v);
+          setIsChanged(true);
+        }}
+      ></Tags>
     </div>
   );
 }

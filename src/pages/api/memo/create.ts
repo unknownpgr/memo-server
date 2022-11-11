@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<number>
+  res: NextApiResponse<Memo>
 ) {
   const { content, tags } = req.body;
 

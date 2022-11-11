@@ -1,6 +1,6 @@
 import React, { KeyboardEvent, useState } from "react";
 
-export default function Tags({
+export default function TagInput({
   tags,
   setTags,
 }: {

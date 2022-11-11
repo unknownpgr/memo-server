@@ -1,15 +1,25 @@
 import Head from "next/head";
-import Link from "next/link";
-import { useRouter } from "next/router";
 import { useState } from "react";
 import useJSON from "../hooks/useJSON";
 import { MemoWithTags } from "../types";
-import styles from "../styles/index.module.css";
-import Tags from "../components/tags";
+import memoStyles from "../styles/memo.module.css";
+import TagInput from "../components/taginput";
+import { Tag as ITag } from "@prisma/client";
+import MemoList from "../components/memolist";
+import Tag from "../components/tag";
 
 export default function Home() {
-  const { data, isValidating, mutate } = useJSON<MemoWithTags[]>("/api/memo");
-  const router = useRouter();
+  const {
+    data: memos,
+    mutate: mutateMemo,
+    error: err1,
+  } = useJSON<MemoWithTags[]>("/api/memo");
+  const {
+    data: tagList,
+    mutate: mutateTagList,
+    error: err2,
+  } = useJSON<ITag[]>("/api/tag");
+
   const [tags, setTags] = useState<string[]>([]);
   const [content, setContent] = useState("");
 
@@ -21,8 +31,12 @@ export default function Home() {
     });
     setTags([]);
     setContent("");
-    mutate();
+    mutateMemo();
+    mutateTagList();
   }
+
+  if (err1 || err2) return <h1>Error</h1>;
+  if (!memos || !tagList) return <h1>Loading</h1>;
 
   return (
     <div>
@@ -33,34 +47,19 @@ export default function Home() {
       </Head>
       <h1>Memo</h1>
       <textarea
-        className={styles.content}
+        className={memoStyles.content}
         value={content}
         onChange={(e) => setContent(e.target.value)}
       ></textarea>
       <h2>Tags</h2>
-      <Tags tags={tags} setTags={setTags}></Tags>
+      <TagInput tags={tags} setTags={setTags}></TagInput>
       <button onClick={onCreateMemo}>Create Memo</button>
       <hr />
-      {data ? (
-        <ol>
-          {data.map((data) => (
-            <li key={data.id}>
-              <div>
-                <Link href={`/memo/${data.id}`}>
-                  {data.content || "NO CONTENT"}
-                </Link>
-              </div>
-              <div>
-                {data.tags.map((tag) => (
-                  <span key={tag.id}>[{tag.value}]</span>
-                ))}
-              </div>
-            </li>
-          ))}
-        </ol>
-      ) : (
-        <strong>No data exists</strong>
-      )}
+      {tagList.map(({ id, value }) => (
+        <Tag key={id} value={value}></Tag>
+      ))}
+      <hr />
+      <MemoList memos={memos} />
     </div>
   );
 }

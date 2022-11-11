@@ -12,7 +12,17 @@ export default async function handler(
 
   switch (method) {
     case "GET":
-      const memos = await prisma.memo.findMany({ include: { tags: true } });
+      const { tag } = req.query;
+      const memos = await prisma.memo.findMany({
+        where: tag
+          ? {
+              tags: {
+                some: { value: `${tag}` },
+              },
+            }
+          : undefined,
+        include: { tags: true },
+      });
       res.status(200).json(memos);
       break;
     case "PUT":

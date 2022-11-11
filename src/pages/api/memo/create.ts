@@ -8,6 +8,23 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<number>
 ) {
-  const memo = await prisma.memo.create({ data: { content: "" } });
-  res.status(200).json(memo.id);
+  const { content, tags } = req.body;
+
+  const tagIds = await Promise.all(
+    tags.map(async (tag: string) => {
+      return (
+        await prisma.tag.upsert({
+          where: { value: tag },
+          create: { value: tag },
+          update: { value: tag },
+        })
+      ).id;
+    })
+  );
+
+  const memo = await prisma.memo.create({
+    data: { content, tags: { connect: tagIds.map((id) => ({ id })) } },
+  });
+
+  res.status(200).json(memo);
 }

@@ -1,4 +1,5 @@
 import React, { KeyboardEvent, useState } from "react";
+import styles from "../styles/taginput.module.css";
 
 export default function TagInput({
   tags,
@@ -24,8 +25,9 @@ export default function TagInput({
   }
 
   return (
-    <div>
+    <div className={styles.taginput}>
       <input
+        className={styles.input}
         type="text"
         value={currentTag}
         onChange={(e) => setCurrentTag(e.target.value)}

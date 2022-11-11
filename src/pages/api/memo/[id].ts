@@ -35,6 +35,7 @@ export default async function handler(
 
       const { content, tags } = req.body;
 
+      // Upsert tags
       const tagIds = await Promise.all(
         tags.map(async (tag: string) => {
           return (
@@ -47,8 +48,13 @@ export default async function handler(
         })
       );
 
-      console.log(tags);
+      // Disconnect all tags
+      await prisma.memo.update({
+        where: { id: nid },
+        data: { tags: { set: [] } },
+      });
 
+      // Update content and tags
       const memo = await prisma.memo.update({
         where: { id: nid },
         data: {

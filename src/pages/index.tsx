@@ -14,6 +14,7 @@ export default function Home() {
     data: memos,
     mutate: mutateMemo,
     error: err1,
+    isValidating,
   } = useJSON<MemoWithTags[]>("/api/memo");
   const {
     data: tagList,
@@ -25,13 +26,14 @@ export default function Home() {
   const [content, setContent] = useState("");
 
   async function createMemo() {
+    setContent("");
+    // Tags are not initialzed because same tags can be used for multiple memo.
+
     await fetch("/api/memo/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ content, tags }),
     });
-    // Tags are not initialzed because same tags can be used for multiple memo.
-    setContent("");
     mutateMemo();
     mutateTagList();
   }
@@ -47,6 +49,7 @@ export default function Home() {
   async function onKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === "Enter" && e.shiftKey) {
       createMemo();
+      e.preventDefault();
     }
   }
 
@@ -62,7 +65,7 @@ export default function Home() {
       </Head>
       <h1>
         Memo{" "}
-        <button disabled={!content} onClick={createMemo}>
+        <button disabled={!content || isValidating} onClick={createMemo}>
           [ Create Memo ]
         </button>
       </h1>

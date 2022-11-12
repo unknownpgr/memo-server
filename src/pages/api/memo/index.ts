@@ -21,6 +21,7 @@ export default async function handler(
             }
           : undefined,
         include: { tags: true },
+        orderBy: { updatedAt: "desc" },
       });
       res.status(200).json(memos);
       break;

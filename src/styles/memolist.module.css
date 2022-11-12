@@ -1,5 +1,5 @@
 .item {
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .row {
@@ -24,6 +24,10 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   margin-right: 1rem;
+}
+
+.tags {
+  display: flex;
 }
 
 .delete {

@@ -1,9 +1,9 @@
 .tag {
   margin-right: 0.5rem;
-  height: 1.5rem;
+  margin-bottom: 0.25rem;
+  height: 1rem;
   vertical-align: middle;
   display: inline-flex;
   align-items: center;
   font-size: 75%;
-  margin-top: 0.25rem;
 }

@@ -17,7 +17,7 @@
 }
 
 .preview {
-  display: inline-flexbox;
+  display: flexbox;
   align-items: center;
   flex-grow: 1;
   overflow: hidden;
@@ -26,5 +26,6 @@
   margin-right: 1rem;
 }
 
-.tags {
+.delete {
+  flex-shrink: 0;
 }

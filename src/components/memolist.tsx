@@ -1,6 +1,6 @@
 import Link from "next/link";
-import React from "react";
 import { MemoWithTags } from "../types";
+import React from "react";
 import Tag from "../components/tag";
 import styles from "../styles/memolist.module.css";
 
@@ -20,7 +20,9 @@ export default function MemoList({
             <Link className={styles.preview} href={`/memo/${id}`}>
               {content || "NO CONTENT"}
             </Link>
-            <button onClick={() => onDeleteMemo(id)}>X</button>
+            <button className={styles.delete} onClick={() => onDeleteMemo(id)}>
+              [ X ]
+            </button>
           </div>
           <div className={styles.tags}>
             {tags.map(({ id, value }) => (

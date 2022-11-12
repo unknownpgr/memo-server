@@ -1,12 +1,13 @@
-import Head from "next/head";
 import { KeyboardEvent, useState } from "react";
-import useJSON from "../hooks/useJSON";
-import { MemoWithTags } from "../types";
-import memoStyles from "../styles/memo.module.css";
-import TagInput from "../components/taginput";
+
+import Head from "next/head";
 import { Tag as ITag } from "@prisma/client";
 import MemoList from "../components/memolist";
+import { MemoWithTags } from "../types";
 import Tag from "../components/tag";
+import TagInput from "../components/taginput";
+import memoStyles from "../styles/memo.module.css";
+import useJSON from "../hooks/useJSON";
 
 export default function Home() {
   const {
@@ -59,21 +60,24 @@ export default function Home() {
         <meta name="description" content="Memo server" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <h1>Memo</h1>
+      <h1>
+        Memo{" "}
+        <button disabled={!content} onClick={createMemo}>
+          [ Create Memo ]
+        </button>
+      </h1>
       <textarea
         className={memoStyles.content}
         value={content}
         onChange={(e) => setContent(e.target.value)}
         onKeyDown={onKeyDown}
       ></textarea>
-      <h2>Tags</h2>
       <TagInput tags={tags} setTags={setTags}></TagInput>
-      <button onClick={createMemo}>Create Memo</button>
-      <hr />
+      <div>- - - - - - - - </div>
       {tagList.map(({ id, value }) => (
         <Tag key={id} value={value}></Tag>
       ))}
-      <hr />
+      <div>- - - - - - - - </div>
       <MemoList memos={memos} onDeleteMemo={onDeleteMemo} />
     </div>
   );

@@ -1,9 +1,10 @@
-import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import Tags from "../../components/taginput";
-import useJSON from "../../hooks/useJSON";
+
 import { MemoWithTags } from "../../types";
+import Tags from "../../components/taginput";
 import memoStyles from "../../styles/memo.module.css";
+import useJSON from "../../hooks/useJSON";
+import { useRouter } from "next/router";
 
 export default function View() {
   const router = useRouter();
@@ -44,7 +45,7 @@ export default function View() {
       <h1>
         Memo #{id}{" "}
         <button onClick={updateMemo} disabled={!isChanged || isValidating}>
-          update
+          [ update ]
         </button>
       </h1>
       <textarea
@@ -56,7 +57,6 @@ export default function View() {
           setIsChanged(true);
         }}
       ></textarea>
-      <h2>Tags</h2>
       <Tags
         tags={tags}
         setTags={(v) => {

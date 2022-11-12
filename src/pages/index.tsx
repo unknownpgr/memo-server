@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { useState } from "react";
+import { KeyboardEvent, useState } from "react";
 import useJSON from "../hooks/useJSON";
 import { MemoWithTags } from "../types";
 import memoStyles from "../styles/memo.module.css";
@@ -23,13 +23,13 @@ export default function Home() {
   const [tags, setTags] = useState<string[]>([]);
   const [content, setContent] = useState("");
 
-  async function onCreateMemo() {
+  async function createMemo() {
     await fetch("/api/memo/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ content, tags }),
     });
-    setTags([]);
+    // Tags are not initialzed because same tags can be used for multiple memo.
     setContent("");
     mutateMemo();
     mutateTagList();
@@ -41,6 +41,12 @@ export default function Home() {
       method: "delete",
     });
     mutateMemo();
+  }
+
+  async function onKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key === "Enter" && e.shiftKey) {
+      createMemo();
+    }
   }
 
   if (err1 || err2) return <h1>Error</h1>;
@@ -58,10 +64,11 @@ export default function Home() {
         className={memoStyles.content}
         value={content}
         onChange={(e) => setContent(e.target.value)}
+        onKeyDown={onKeyDown}
       ></textarea>
       <h2>Tags</h2>
       <TagInput tags={tags} setTags={setTags}></TagInput>
-      <button onClick={onCreateMemo}>Create Memo</button>
+      <button onClick={createMemo}>Create Memo</button>
       <hr />
       {tagList.map(({ id, value }) => (
         <Tag key={id} value={value}></Tag>

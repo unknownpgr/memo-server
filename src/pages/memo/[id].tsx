@@ -14,15 +14,17 @@ export default function View() {
     `/api/memo/${id}`
   );
 
+  const [isLoading, setIsLoading] = useState(true);
   const [isChanged, setIsChanged] = useState(false);
   const [content, setContent] = useState("");
   const [tags, setTags] = useState<string[]>([]);
 
   useEffect(() => {
-    if (!data || isValidating) return;
+    if (!data) return;
     setContent(data.content);
     setTags(data.tags.map((tag) => tag.value));
-  }, [data, isValidating]);
+    setIsLoading(false);
+  }, [data]);
 
   async function updateMemo() {
     setIsChanged(false);
@@ -39,7 +41,9 @@ export default function View() {
     mutate();
   }
 
+  if (!data || isLoading) return <div>Loading...</div>;
   if (error) return <div>Error : {`${error}`}</div>;
+
   return (
     <div>
       <h1>

@@ -11,6 +11,10 @@ body {
   font-family: "Noto Sans KR", sans-serif;
 }
 
+body::-webkit-scrollbar {
+  display: none;
+}
+
 input,
 textarea,
 button,

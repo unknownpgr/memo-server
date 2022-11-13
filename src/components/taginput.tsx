@@ -3,6 +3,17 @@ import Tag from "../components/tag";
 
 import styles from "../styles/taginput.module.css";
 
+function parseTagString(tagString: string) {
+  return tagString
+    .split(",")
+    .map((x) => x.trim())
+    .filter((x) => x.length);
+}
+
+function normalizeTagString(tagString: string) {
+  return parseTagString(tagString).join(", ");
+}
+
 export default function TagInput({
   tags,
   setTags,
@@ -13,18 +24,13 @@ export default function TagInput({
   const [tagString, setTagString] = useState("");
 
   useEffect(() => {
-    if (
-      tagString
-        .split(",")
-        .map((x) => x.trim())
-        .join(", ") !== tags.join(", ")
-    )
+    if (normalizeTagString(tagString) !== tags.join(", "))
       setTagString(tags.join(", "));
   }, [tags, tagString]);
 
   function onTagStringChange(tagString: string) {
     setTagString(tagString);
-    setTags(tagString.split(",").map((x) => x.trim()));
+    setTags(parseTagString(tagString));
   }
 
   return (
@@ -36,11 +42,9 @@ export default function TagInput({
         value={tagString}
         onChange={(e) => onTagStringChange(e.target.value)}
       />
-      {tags
-        .filter((tag) => tag.length)
-        .map((tag) => (
-          <Tag key={tag} value={tag}></Tag>
-        ))}
+      {tags.map((tag) => (
+        <Tag key={tag} value={tag}></Tag>
+      ))}
     </div>
   );
 }

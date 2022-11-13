@@ -3,16 +3,13 @@ import React, { ReactNode } from "react";
 import Link from "next/link";
 import styles from "../styles/layout.module.css";
 import { useRouter } from "next/router";
+import { post } from "../api";
 
 export default function Layout({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   async function logout() {
-    await fetch("/api/login", {
-      method: "post",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password: "" }),
-    });
+    await post("/api/login", { password: "" });
     router.push("/");
   }
 

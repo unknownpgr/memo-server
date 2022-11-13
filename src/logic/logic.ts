@@ -7,11 +7,20 @@ export function clearUnrelatedTags() {
   });
 }
 
-export function findMemo(id: number) {
-  return prisma.memo.findUnique({
+export async function findMemo(id: number) {
+  const _memo = await prisma.memo.findUnique({
     where: { id },
     include: { tags: true },
   });
+  if (!_memo) return null;
+  const { createdAt, updatedAt, ...memo } = _memo;
+  return {
+    ...memo,
+    tags: memo.tags.map((_tag) => {
+      const { createdAt, updatedAt, ...tag } = _tag;
+      return tag;
+    }),
+  };
 }
 
 export async function upsertMemo(content: string, tags: string[], id?: number) {

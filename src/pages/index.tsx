@@ -9,7 +9,7 @@ import TagInput from "../components/taginput";
 import memoStyles from "../styles/memo.module.css";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { listMemo, listTags } from "../logic/logic";
-import { get } from "../hooks/get";
+import { del, get, post } from "../api";
 
 interface IHomeProps {
   initialMemos: Omit<MemoWithTags, "createdAt" | "updatedAt">[];
@@ -50,19 +50,13 @@ export default function Home({
 
   async function createMemo() {
     setContent("");
-    await fetch("/api/memo/create", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content, tags }),
-    });
+    await post("/api/memo/create", { content, tags });
     update();
   }
 
   async function onDeleteMemo(id: number) {
     if (!confirm(`Do you really want to delete memo ${id}?`)) return;
-    await fetch(`/api/memo/${id}`, {
-      method: "delete",
-    });
+    await del(`/api/memo/${id}`);
     update();
   }
 

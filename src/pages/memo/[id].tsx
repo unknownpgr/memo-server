@@ -3,58 +3,69 @@ import React, { useEffect, useState } from "react";
 import { MemoWithTags } from "../../types";
 import Tags from "../../components/taginput";
 import memoStyles from "../../styles/memo.module.css";
-import useJSON from "../../hooks/useJSON";
 import { useRouter } from "next/router";
+import { get, put } from "../../api";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import { findMemo } from "../../logic/logic";
 
-export default function View() {
+interface IViewProps {
+  initialMemo: MemoWithTags | null;
+}
+
+export const getServerSideProps: GetServerSideProps<IViewProps> = async (
+  context
+) => {
+  const { id } = context.query;
+
+  let nid = new Number(id);
+
+  const initialMemo = await findMemo(+nid);
+  return {
+    props: {
+      initialMemo,
+    },
+  };
+};
+
+export default function View({
+  initialMemo,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
   const { id } = router.query;
-
-  const { data, error, isValidating, mutate } = useJSON<MemoWithTags>(
-    `/api/memo/${id}`
+  const [isLoading, setIsLoading] = useState(false);
+  const [isChanged, setIsChanged] = useState(false);
+  const [content, setContent] = useState(initialMemo?.content || "");
+  const [tags, setTags] = useState<string[]>(
+    initialMemo?.tags.map((x) => x.value) || []
   );
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [isChanged, setIsChanged] = useState(false);
-  const [content, setContent] = useState("");
-  const [tags, setTags] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (!data) return;
-    setContent(data.content);
-    setTags(data.tags.map((tag) => tag.value));
+  async function update() {
+    const memo = await get<MemoWithTags>(`/api/memo/${id}`);
+    setContent(memo.content);
+    setTags(memo.tags.map((x) => x.value));
     setIsLoading(false);
-  }, [data]);
+  }
 
   async function updateMemo() {
     setIsChanged(false);
-    await fetch(`/api/memo/${id}`, {
-      method: "put",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        content,
-        tags,
-      }),
+    await put(`/api/memo/${id}`, {
+      content,
+      tags,
     });
-    mutate();
+    update();
   }
-
-  if (!data || isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error : {`${error}`}</div>;
 
   return (
     <div>
       <h1>
         Memo #{id}{" "}
-        <button onClick={updateMemo} disabled={!isChanged || isValidating}>
+        <button onClick={updateMemo} disabled={!isChanged}>
           [ update ]
         </button>
       </h1>
       <textarea
         className={memoStyles.content}
-        disabled={isValidating}
+        disabled={isLoading}
         value={content}
         onChange={(e) => {
           setContent(e.target.value);

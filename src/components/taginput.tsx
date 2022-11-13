@@ -35,7 +35,6 @@ export default function TagInput({
 
   return (
     <div className={styles.taginput}>
-      <h2>Tags</h2>
       <input
         className={styles.input}
         type="text"

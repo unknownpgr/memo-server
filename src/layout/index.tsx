@@ -7,6 +7,7 @@ import { post } from "../api";
 
 export default function Layout({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const isHome = router.pathname === "/";
 
   async function logout() {
     await post("/api/login", { password: "" });
@@ -16,7 +17,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   return (
     <>
       <nav className={styles.nav}>
-        <Link href="/">[ Home ]</Link>
+        {isHome ? <span></span> : <Link href="/">[ Home ]</Link>}
         <button onClick={logout}>[ Logout ]</button>
       </nav>
       <main className={styles.frame}>{children}</main>

@@ -53,6 +53,14 @@ export default function Home() {
     }
   }
 
+  function onTagSelected(tag: string) {
+    if (tags.indexOf(tag) >= 0) {
+      setTags((tags) => tags.filter((x) => x !== tag));
+    } else {
+      setTags((tags) => [...tags, tag]);
+    }
+  }
+
   if (err1 || err2) return <h1>Error</h1>;
   if (!memos || !tagList) return <h1>Loading</h1>;
 
@@ -78,7 +86,12 @@ export default function Home() {
       <TagInput tags={tags} setTags={setTags}></TagInput>
       <div>- - - - - - - - </div>
       {tagList.map(({ id, value }) => (
-        <Tag key={id} value={value}></Tag>
+        <Tag
+          key={id}
+          value={value}
+          onClick={() => onTagSelected(value)}
+          disabled={tags.indexOf(value) >= 0}
+        ></Tag>
       ))}
       <div>- - - - - - - - </div>
       <MemoList memos={memos} onDeleteMemo={onDeleteMemo} />

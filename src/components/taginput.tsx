@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Tag from "../components/tag";
 
 import styles from "../styles/taginput.module.css";
@@ -10,10 +10,20 @@ export default function TagInput({
   tags: string[];
   setTags: React.Dispatch<React.SetStateAction<string[]>>;
 }) {
-  const [currentTags, setCurrentTags] = useState(tags.join(", "));
+  const [tagString, setTagString] = useState("");
+
+  useEffect(() => {
+    if (
+      tagString
+        .split(",")
+        .map((x) => x.trim())
+        .join(", ") !== tags.join(", ")
+    )
+      setTagString(tags.join(", "));
+  }, [tags, tagString]);
 
   function onTagStringChange(tagString: string) {
-    setCurrentTags(tagString);
+    setTagString(tagString);
     setTags(tagString.split(",").map((x) => x.trim()));
   }
 
@@ -23,7 +33,7 @@ export default function TagInput({
       <input
         className={styles.input}
         type="text"
-        value={currentTags}
+        value={tagString}
         onChange={(e) => onTagStringChange(e.target.value)}
       />
       {tags

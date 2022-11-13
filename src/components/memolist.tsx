@@ -16,12 +16,12 @@ export default function MemoList({
       {memos.map(({ id, content, tags }) => (
         <div key={id} className={styles.item}>
           <div>
+            <strong>#{id}.</strong>
+            <button onClick={() => onDeleteMemo(id)}>[ X ]</button>
+            {tags.map(({ id, value }) => (
+              <Tag key={id} value={value}></Tag>
+            ))}
             <Link href={`/memo/${id}`}>
-              <strong>#{id}.</strong>
-              <button onClick={() => onDeleteMemo(id)}>[ X ]</button>
-              {tags.map(({ id, value }) => (
-                <Tag key={id} value={value}></Tag>
-              ))}
               <div style={{ whiteSpace: "pre-wrap" }}>
                 {content || "NO CONTENT"}
               </div>

@@ -2,34 +2,6 @@
   margin-bottom: 0.5rem;
 }
 
-.row {
-  display: flex;
-}
-
-.row > * {
-  vertical-align: middle;
-}
-
-.id {
-  display: flex;
-  align-items: center;
-  margin-right: 0.25rem;
-}
-
-.preview {
-  display: flexbox;
-  align-items: center;
-  flex-grow: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  margin-right: 1rem;
-}
-
-.tags {
-  display: flex;
-}
-
 .delete {
   flex-shrink: 0;
 }

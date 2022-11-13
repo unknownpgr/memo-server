@@ -15,19 +15,20 @@ export default function MemoList({
     <div>
       {memos.map(({ id, content, tags }) => (
         <div key={id} className={styles.item}>
-          <div className={styles.row}>
-            <span className={styles.id}>#{id}.</span>
-            <Link className={styles.preview} href={`/memo/${id}`}>
-              {content || "NO CONTENT"}
+          <div>
+            <Link href={`/memo/${id}`}>
+              <span>#{id}.</span>
+              <button
+                className={styles.delete}
+                onClick={() => onDeleteMemo(id)}
+              >
+                [ X ]
+              </button>
+              {tags.map(({ id, value }) => (
+                <Tag key={id} value={value}></Tag>
+              ))}
+              <div>{content || "NO CONTENT"}</div>
             </Link>
-            <button className={styles.delete} onClick={() => onDeleteMemo(id)}>
-              [ X ]
-            </button>
-          </div>
-          <div className={styles.tags}>
-            {tags.map(({ id, value }) => (
-              <Tag key={id} value={value}></Tag>
-            ))}
           </div>
         </div>
       ))}

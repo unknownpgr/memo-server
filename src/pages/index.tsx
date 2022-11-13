@@ -94,7 +94,15 @@ export default function Home() {
         ></Tag>
       ))}
       <div>- - - - - - - - </div>
-      <MemoList memos={memos} onDeleteMemo={onDeleteMemo} />
+      <MemoList
+        memos={memos.filter((memo) => {
+          if (tags.length === 0) return true;
+          const memoTags = new Set(memo.tags.map((x) => x.value));
+          for (const tag of tags) if (!memoTags.has(tag)) return false;
+          return true;
+        })}
+        onDeleteMemo={onDeleteMemo}
+      />
     </div>
   );
 }

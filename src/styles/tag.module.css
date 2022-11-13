@@ -6,6 +6,9 @@
   display: inline-flex;
   align-items: center;
   font-size: 75%;
+}
+
+.clickable {
   cursor: pointer;
 }
 

@@ -1,4 +1,3 @@
-import { Memo } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import {
   clearUnrelatedTags,
@@ -17,7 +16,7 @@ export default async function handler(
   // Validation
   const nid = Number.parseInt(`${id}`);
   if (isNaN(nid) || typeof nid !== "number") {
-    res.status(422).end();
+    res.status(422).json(null);
     return;
   }
 

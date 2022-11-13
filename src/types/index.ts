@@ -1,8 +1,10 @@
-export type MemoWithTags = {
+export type ITag = {
+  id: number;
+  value: string;
+};
+
+export type IMemo = {
   id: number;
   content: string;
-  tags: {
-    id: number;
-    value: string;
-  }[];
+  tags: ITag[];
 };

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { MemoWithTags } from "../../types";
+import { IMemo } from "../../types";
 import Tags from "../../components/taginput";
 import memoStyles from "../../styles/memo.module.css";
 import { useRouter } from "next/router";
@@ -9,16 +9,14 @@ import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { findMemo } from "../../logic/logic";
 
 interface IViewProps {
-  initialMemo: MemoWithTags | null;
+  initialMemo: IMemo | null;
 }
 
 export const getServerSideProps: GetServerSideProps<IViewProps> = async (
   context
 ) => {
   const { id } = context.query;
-
   let nid = new Number(id);
-
   const initialMemo = await findMemo(+nid);
   return {
     props: {
@@ -40,7 +38,7 @@ export default function View({
   );
 
   async function update() {
-    const memo = await get<MemoWithTags>(`/api/memo/${id}`);
+    const memo = await get<IMemo>(`/api/memo/${id}`);
     setContent(memo.content);
     setTags(memo.tags.map((x) => x.value));
     setIsLoading(false);

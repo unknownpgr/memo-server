@@ -1,9 +1,8 @@
 import { KeyboardEvent, useState } from "react";
 
 import Head from "next/head";
-import { Tag as ITag } from "@prisma/client";
 import MemoList from "../components/memolist";
-import { MemoWithTags } from "../types";
+import { IMemo, ITag } from "../types";
 import Tag from "../components/tag";
 import TagInput from "../components/taginput";
 import memoStyles from "../styles/memo.module.css";
@@ -12,8 +11,8 @@ import { listMemo, listTags } from "../logic/logic";
 import { del, get, post } from "../api";
 
 interface IHomeProps {
-  initialMemos: Omit<MemoWithTags, "createdAt" | "updatedAt">[];
-  initialTags: Omit<ITag, "createdAt" | "updatedAt">[];
+  initialMemos: IMemo[];
+  initialTags: ITag[];
 }
 
 export const getServerSideProps: GetServerSideProps<IHomeProps> = async () => {
@@ -41,8 +40,8 @@ export default function Home({
 
   async function update() {
     const [memos, tags] = await Promise.all([
-      get("/api/memo"),
-      get("/api/tag"),
+      get<IMemo[]>("/api/memo"),
+      get<ITag[]>("/api/tag"),
     ]);
     setMemos(memos);
     setTagList(tags);

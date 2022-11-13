@@ -7,20 +7,15 @@ export function clearUnrelatedTags() {
   });
 }
 
-export async function findMemo(id: number) {
-  const _memo = await prisma.memo.findUnique({
+export function findMemo(id: number) {
+  return prisma.memo.findUnique({
     where: { id },
-    include: { tags: true },
+    select: {
+      id: true,
+      content: true,
+      tags: { select: { id: true, value: true } },
+    },
   });
-  if (!_memo) return null;
-  const { createdAt, updatedAt, ...memo } = _memo;
-  return {
-    ...memo,
-    tags: memo.tags.map((_tag) => {
-      const { createdAt, updatedAt, ...tag } = _tag;
-      return tag;
-    }),
-  };
 }
 
 export async function upsertMemo(content: string, tags: string[], id?: number) {
@@ -77,29 +72,24 @@ export function deleteMemo(id: number) {
   return prisma.memo.delete({ where: { id } });
 }
 
-export async function listMemo(tags?: string[]) {
-  return (
-    await prisma.memo.findMany({
-      where: tags
-        ? {
-            tags: {
-              some: { value: { in: tags } },
-            },
-          }
-        : undefined,
-      include: { tags: { select: { id: true, value: true } } },
-      orderBy: { updatedAt: "desc" },
-    })
-  ).map((memo) => {
-    const { createdAt, updatedAt, ...others } = memo;
-    return others;
+export function listMemo(tags?: string[]) {
+  return prisma.memo.findMany({
+    where: tags
+      ? {
+          tags: {
+            some: { value: { in: tags } },
+          },
+        }
+      : undefined,
+    select: {
+      id: true,
+      content: true,
+      tags: { select: { id: true, value: true } },
+    },
+    orderBy: { updatedAt: "desc" },
   });
 }
 
-export async function listTags() {
-  return (await prisma.tag.findMany()).map((tag) => {
-    const { createdAt, updatedAt, ...others } = tag;
-    console.log(others);
-    return others;
-  });
+export function listTags() {
+  return prisma.tag.findMany({ select: { id: true, value: true } });
 }

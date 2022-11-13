@@ -1,12 +1,13 @@
 import { PrismaClient, Tag } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { listTags } from "../../../logic/logic";
+import { ITag } from "../../../types";
 
 const prisma = new PrismaClient();
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Omit<Tag, "createdAt" | "updatedAt">[]>
+  res: NextApiResponse<ITag[]>
 ) {
   const { method } = req;
 
@@ -17,6 +18,6 @@ export default async function handler(
       break;
     default:
       res.setHeader("Allow", ["GET"]);
-      res.status(405).end(`Method ${method} Not Allowed`);
+      res.status(405).json([]);
   }
 }

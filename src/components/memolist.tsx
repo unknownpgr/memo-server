@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MemoWithTags } from "../types";
+import { IMemo } from "../types";
 import React from "react";
 import Tag from "../components/tag";
 import styles from "../styles/memolist.module.css";
@@ -8,7 +8,7 @@ export default function MemoList({
   memos,
   onDeleteMemo,
 }: {
-  memos: MemoWithTags[];
+  memos: IMemo[];
   onDeleteMemo: (id: number) => void;
 }) {
   return (

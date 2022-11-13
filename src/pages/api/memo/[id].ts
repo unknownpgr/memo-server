@@ -6,10 +6,11 @@ import {
   findMemo,
   upsertMemo,
 } from "../../../logic/logic";
+import { IMemo } from "../../../types";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<any>
+  res: NextApiResponse<IMemo | null>
 ) {
   let { id } = req.query;
 
@@ -24,7 +25,7 @@ export default async function handler(
     case "GET": {
       const memo = await findMemo(nid);
       if (memo) res.status(200).json(memo);
-      else res.status(404).json({});
+      else res.status(404).json(null);
       break;
     }
 
@@ -32,16 +33,16 @@ export default async function handler(
       const { content, tags } = req.body;
       const memo = await upsertMemo(content, tags, nid);
       await clearUnrelatedTags();
-      if (memo) res.status(200).json({});
-      else res.status(500).json({});
+      if (memo) res.status(200).json(null);
+      else res.status(500).json(null);
       break;
     }
 
     case "DELETE": {
       const memo = await deleteMemo(nid);
       await clearUnrelatedTags();
-      if (memo) res.status(200).json({});
-      else res.status(500).json({});
+      if (memo) res.status(200).json(null);
+      else res.status(500).json(null);
       break;
     }
   }

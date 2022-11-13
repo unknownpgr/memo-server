@@ -1,12 +1,13 @@
-import { Memo, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { listMemo, upsertMemo } from "../../../logic/logic";
+import { IMemo } from "../../../types";
 
 const prisma = new PrismaClient();
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Memo[]>
+  res: NextApiResponse<IMemo[]>
 ) {
   const { method } = req;
 

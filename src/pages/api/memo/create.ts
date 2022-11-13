@@ -1,10 +1,10 @@
-import { Memo } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { upsertMemo } from "../../../logic/logic";
+import { IMemo } from "../../../types";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Memo>
+  res: NextApiResponse<IMemo>
 ) {
   const { content, tags } = req.body;
   const memo = await upsertMemo(content, tags);

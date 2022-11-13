@@ -68,20 +68,29 @@ export function deleteMemo(id: number) {
   return prisma.memo.delete({ where: { id } });
 }
 
-export function listMemo(tags?: string[]) {
-  return prisma.memo.findMany({
-    where: tags
-      ? {
-          tags: {
-            some: { value: { in: tags } },
-          },
-        }
-      : undefined,
-    include: { tags: true },
-    orderBy: { updatedAt: "desc" },
+export async function listMemo(tags?: string[]) {
+  return (
+    await prisma.memo.findMany({
+      where: tags
+        ? {
+            tags: {
+              some: { value: { in: tags } },
+            },
+          }
+        : undefined,
+      include: { tags: { select: { id: true, value: true } } },
+      orderBy: { updatedAt: "desc" },
+    })
+  ).map((memo) => {
+    const { createdAt, updatedAt, ...others } = memo;
+    return others;
   });
 }
 
-export function listTags() {
-  return prisma.tag.findMany();
+export async function listTags() {
+  return (await prisma.tag.findMany()).map((tag) => {
+    const { createdAt, updatedAt, ...others } = tag;
+    console.log(others);
+    return others;
+  });
 }

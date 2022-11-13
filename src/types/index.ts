@@ -1,5 +1,8 @@
-import { Memo, Tag } from "@prisma/client";
-
-export type MemoWithTags = Memo & {
-  tags: Tag[];
+export type MemoWithTags = {
+  id: number;
+  content: string;
+  tags: {
+    id: number;
+    value: string;
+  }[];
 };

@@ -7,43 +7,63 @@ import { MemoWithTags } from "../types";
 import Tag from "../components/tag";
 import TagInput from "../components/taginput";
 import memoStyles from "../styles/memo.module.css";
-import useJSON from "../hooks/useJSON";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import { listMemo, listTags } from "../logic/logic";
+import { get } from "../hooks/get";
 
-export default function Home() {
-  const {
-    data: memos,
-    mutate: mutateMemo,
-    error: err1,
-    isValidating,
-  } = useJSON<MemoWithTags[]>("/api/memo");
-  const {
-    data: tagList,
-    mutate: mutateTagList,
-    error: err2,
-  } = useJSON<ITag[]>("/api/tag");
+interface IHomeProps {
+  initialMemos: Omit<MemoWithTags, "createdAt" | "updatedAt">[];
+  initialTags: Omit<ITag, "createdAt" | "updatedAt">[];
+}
+
+export const getServerSideProps: GetServerSideProps<IHomeProps> = async () => {
+  const [initialMemos, initialTags] = await Promise.all([
+    listMemo(),
+    listTags(),
+  ]);
+  return {
+    props: {
+      initialMemos,
+      initialTags,
+    },
+  };
+};
+
+export default function Home({
+  initialMemos,
+  initialTags,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const [memos, setMemos] = useState(initialMemos);
+  const [tagList, setTagList] = useState(initialTags);
 
   const [tags, setTags] = useState<string[]>([]);
   const [content, setContent] = useState("");
 
+  async function update() {
+    const [memos, tags] = await Promise.all([
+      get("/api/memo"),
+      get("/api/tag"),
+    ]);
+    setMemos(memos);
+    setTagList(tags);
+  }
+
   async function createMemo() {
     setContent("");
-    // Tags are not initialzed because same tags can be used for multiple memo.
-
     await fetch("/api/memo/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ content, tags }),
     });
-    mutateMemo();
-    mutateTagList();
+    update();
   }
 
   async function onDeleteMemo(id: number) {
-    if (!confirm(`Do you really want to delete memo ${id}`)) return;
+    if (!confirm(`Do you really want to delete memo ${id}?`)) return;
     await fetch(`/api/memo/${id}`, {
       method: "delete",
     });
-    mutateMemo();
+    update();
   }
 
   async function onKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
@@ -61,7 +81,6 @@ export default function Home() {
     }
   }
 
-  if (err1 || err2) return <h1>Error</h1>;
   if (!memos || !tagList) return <h1>Loading</h1>;
 
   return (
@@ -73,7 +92,7 @@ export default function Home() {
       </Head>
       <h1>
         Memo{" "}
-        <button disabled={!content || isValidating} onClick={createMemo}>
+        <button disabled={!content} onClick={createMemo}>
           [ Create Memo ]
         </button>
       </h1>

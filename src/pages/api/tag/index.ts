@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Tag[]>
+  res: NextApiResponse<Omit<Tag, "createdAt" | "updatedAt">[]>
 ) {
   const { method } = req;
 

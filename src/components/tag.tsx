@@ -5,7 +5,7 @@ import styles from "../styles/tag.module.css";
 export default function tag({ value }: { value: string }) {
   return (
     <Link className={styles.tag} href={`/tag/${value}`}>
-      <span>#{value}</span>
+      <span>@{value}</span>
     </Link>
   );
 }

@@ -1,4 +1,5 @@
-import React, { KeyboardEvent, useState } from "react";
+import React, { useState } from "react";
+import Tag from "../components/tag";
 
 import styles from "../styles/taginput.module.css";
 
@@ -25,13 +26,11 @@ export default function TagInput({
         value={currentTags}
         onChange={(e) => onTagStringChange(e.target.value)}
       />
-      <ul>
-        {tags
-          .filter((x) => x.trim().length)
-          .map((tag) => (
-            <li key={tag}>{tag}</li>
-          ))}
-      </ul>
+      {tags
+        .filter((tag) => tag.length)
+        .map((tag) => (
+          <Tag key={tag} value={tag}></Tag>
+        ))}
     </div>
   );
 }

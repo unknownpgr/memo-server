@@ -1,3 +1,8 @@
 .input {
   margin-right: 0.5rem;
 }
+
+.label {
+  font-size: 75%;
+  margin-right: 0.5rem;
+}

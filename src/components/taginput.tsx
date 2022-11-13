@@ -42,6 +42,7 @@ export default function TagInput({
         value={tagString}
         onChange={(e) => onTagStringChange(e.target.value)}
       />
+      <span className={styles.label}>Tags:</span>
       {tags.map((tag) => (
         <Tag key={tag} value={tag}></Tag>
       ))}

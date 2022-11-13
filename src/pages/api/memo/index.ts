@@ -1,5 +1,6 @@
 import { Memo, PrismaClient } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { listMemo, upsertMemo } from "../../../logic/logic";
 
 const prisma = new PrismaClient();
 
@@ -12,26 +13,12 @@ export default async function handler(
   switch (method) {
     case "GET":
       const { tag } = req.query;
-      const memos = await prisma.memo.findMany({
-        where: tag
-          ? {
-              tags: {
-                some: { value: `${tag}` },
-              },
-            }
-          : undefined,
-        include: { tags: true },
-        orderBy: { updatedAt: "desc" },
-      });
+      const memos = await listMemo(tag ? [`${tag}`] : undefined);
       res.status(200).json(memos);
       break;
     case "PUT":
-      const { id, content, tags } = req.body;
-      const memo = await prisma.memo.upsert({
-        where: { id },
-        update: { content, tags },
-        create: { id, content, tags },
-      });
+      const { content, tags } = req.body;
+      const memo = await upsertMemo(content, tags);
       res.status(200).json([memo]);
       break;
     default:

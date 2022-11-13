@@ -1,29 +1,12 @@
-import { Memo, PrismaClient } from "@prisma/client";
+import { Memo } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
-
-const prisma = new PrismaClient();
+import { upsertMemo } from "../../../logic/logic";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Memo>
 ) {
   const { content, tags } = req.body;
-
-  const tagIds = await Promise.all(
-    tags.map(async (tag: string) => {
-      return (
-        await prisma.tag.upsert({
-          where: { value: tag },
-          create: { value: tag },
-          update: { value: tag },
-        })
-      ).id;
-    })
-  );
-
-  const memo = await prisma.memo.create({
-    data: { content, tags: { connect: tagIds.map((id) => ({ id })) } },
-  });
-
+  const memo = await upsertMemo(content, tags);
   res.status(200).json(memo);
 }

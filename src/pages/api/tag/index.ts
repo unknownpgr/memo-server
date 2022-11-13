@@ -1,5 +1,6 @@
 import { PrismaClient, Tag } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { listTags } from "../../../logic/logic";
 
 const prisma = new PrismaClient();
 
@@ -11,14 +12,11 @@ export default async function handler(
 
   switch (method) {
     case "GET":
-      const tags = await prisma.tag.findMany();
+      const tags = await listTags();
       res.status(200).json(tags);
       break;
-    case "PUT":
-      res.status(200).json([]);
-      break;
     default:
-      res.setHeader("Allow", ["GET", "PUT"]);
+      res.setHeader("Allow", ["GET"]);
       res.status(405).end(`Method ${method} Not Allowed`);
   }
 }

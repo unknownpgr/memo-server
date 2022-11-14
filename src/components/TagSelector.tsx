@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Tag from "../components/tag";
+import Tag from "./Tag";
 
 import styles from "../styles/taginput.module.css";
 
@@ -14,7 +14,7 @@ function normalizeTagString(tagString: string) {
   return parseTagString(tagString).join(", ");
 }
 
-export default function TagInput({
+export default function TagSelector({
   tags,
   setTags,
 }: {

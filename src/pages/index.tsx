@@ -1,10 +1,10 @@
 import { KeyboardEvent, useState } from "react";
 
 import Head from "next/head";
-import MemoList from "../components/memolist";
+import MemoList from "../components/MemoList";
 import { IMemo, ITag } from "../types";
-import Tag from "../components/tag";
-import TagInput from "../components/taginput";
+import Tag from "../components/Tag";
+import TagSelector from "../components/TagSelector";
 import memoStyles from "../styles/memo.module.css";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { listMemo, listTags } from "../logic/logic";
@@ -95,7 +95,7 @@ export default function Home({
         onChange={(e) => setContent(e.target.value)}
         onKeyDown={onKeyDown}
       ></textarea>
-      <TagInput tags={tags} setTags={setTags}></TagInput>
+      <TagSelector tags={tags} setTags={setTags}></TagSelector>
       <div>- - - - - - - - </div>
       {tagList.map(({ id, value }) => (
         <Tag

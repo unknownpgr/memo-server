@@ -1,6 +1,6 @@
 import React, { memo, useState } from "react";
 import { put } from "../api";
-import Tag from "../components/tag";
+import Tag from "../components/Tag";
 
 interface IMemo {
   id: number;

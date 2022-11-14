@@ -1,4 +1,4 @@
-import { getIronSession, IronSessionOptions } from "iron-session/edge";
+import { IronSessionOptions } from "iron-session/edge";
 
 declare module "iron-session" {
   interface IronSessionData {

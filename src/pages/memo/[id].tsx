@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import { IMemo } from "../../types";
-import Tags from "../../components/taginput";
+import Tags from "../../components/TagSelector";
 import memoStyles from "../../styles/memo.module.css";
 import { useRouter } from "next/router";
 import { get, put } from "../../api";

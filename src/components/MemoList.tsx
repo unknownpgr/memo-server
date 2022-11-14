@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { IMemo } from "../types";
 import React from "react";
-import Tag from "../components/tag";
+import Tag from "./Tag";
 import styles from "../styles/memolist.module.css";
 
 export default function MemoList({

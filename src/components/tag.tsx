@@ -2,7 +2,7 @@ import Link from "next/link";
 import React from "react";
 import styles from "../styles/tag.module.css";
 
-export default function tag({
+export default function Tag({
   value,
   onClick,
   disabled = false,

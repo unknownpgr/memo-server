@@ -8,8 +8,8 @@ export default function Login() {
   const router = useRouter();
 
   async function login() {
-    const response = await post("/api/login", { password });
-    if (response.status === 200) router.push("/");
+    const res = await post("/api/login", { password });
+    if (res) router.push("/");
     else setPassword("");
   }
 

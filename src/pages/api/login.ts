@@ -7,10 +7,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       if (req.body.password === process.env.PASSWORD) {
         req.session.user = { isLoggedIn: true };
         await req.session.save();
-        res.status(200).json(null);
+        res.status(200).json(true);
       } else {
         req.session.destroy();
-        res.status(401).json(null);
+        res.status(401).json(false);
       }
       break;
     case "GET":

@@ -1,24 +1,37 @@
-import { KeyboardEvent, useState } from "react";
+import { KeyboardEvent, useEffect, useState } from "react";
 
 import Head from "next/head";
 import MemoList from "../components/MemoList";
-import { IMemo, ITag } from "../types";
+import { IMemo, ITag } from "../global";
 import Tag from "../components/Tag";
 import TagSelector from "../components/TagSelector";
 import memoStyles from "../styles/memo.module.css";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import { InferGetServerSidePropsType } from "next";
 import { listMemo, listTags } from "../logic/logic";
-import { del, get, post } from "../api";
+import { onListMemo, onListTags, onUpsertMemo } from "./index.telefunc";
+import { withSession } from "../session/withSession";
+import { onGetUser } from "./login.telefunc";
 
-interface IHomeProps {
+// If IHomeProps is an interface, not a type, It occurrs error.
+// I don't know why.
+type IHomeProps = {
   initialMemos: IMemo[];
   initialTags: ITag[];
-}
+};
 
-export const getServerSideProps: GetServerSideProps<IHomeProps> = async () => {
+const getHomeProps = (): { props: IHomeProps } => ({
+  props: {
+    initialMemos: [],
+    initialTags: [],
+  },
+});
+
+export const getServerSideProps = withSession(async (context) => {
+  const { user } = context.req.session;
+  if (!user) return getHomeProps();
   const [initialMemos, initialTags] = await Promise.all([
-    listMemo(),
-    listTags(),
+    listMemo(user.id),
+    listTags(user.id),
   ]);
   return {
     props: {
@@ -26,7 +39,7 @@ export const getServerSideProps: GetServerSideProps<IHomeProps> = async () => {
       initialTags,
     },
   };
-};
+});
 
 export default function Home({
   initialMemos,
@@ -38,24 +51,27 @@ export default function Home({
   const [tags, setTags] = useState<string[]>([]);
   const [content, setContent] = useState("");
 
+  useEffect(() => {
+    (async () => {
+      console.log(await onGetUser());
+    })();
+  }, []);
+
   async function update() {
-    const [memos, tags] = await Promise.all([
-      get<IMemo[]>("/api/memo"),
-      get<ITag[]>("/api/tag"),
-    ]);
+    const [memos, tags] = await Promise.all([onListMemo(), onListTags()]);
     setMemos(memos);
     setTagList(tags);
   }
 
   async function createMemo() {
     setContent("");
-    await post("/api/memo/create", { content, tags });
+    await onUpsertMemo(content, tags);
     update();
   }
 
   async function onDeleteMemo(id: number) {
     if (!confirm(`Do you really want to delete memo ${id}?`)) return;
-    await del(`/api/memo/${id}`);
+    await onDeleteMemo(id);
     update();
   }
 
@@ -84,7 +100,6 @@ export default function Home({
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <h1>
-        Memo{" "}
         <button disabled={!content} onClick={createMemo}>
           [ Create Memo ]
         </button>

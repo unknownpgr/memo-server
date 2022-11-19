@@ -7,8 +7,9 @@ export async function middleware(request: NextRequest) {
   const response = NextResponse.next();
   if (request.url.includes("/login")) return response;
   const session = await getSession(request, response);
-  if (!session.user?.isLoggedIn)
+  if (!session.user)
     return NextResponse.redirect(new URL("/login", request.url));
+  console.log(request);
   return response;
 }
 

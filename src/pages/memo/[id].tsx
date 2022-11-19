@@ -1,23 +1,35 @@
 import React, { useState } from "react";
 
-import { IMemo } from "../../types";
+import { IMemo } from "../../global";
 import Tags from "../../components/TagSelector";
 import memoStyles from "../../styles/memo.module.css";
 import { useRouter } from "next/router";
-import { get, put } from "../../api";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { findMemo } from "../../logic/logic";
+import { onGetMemo, onUpsertMemo } from "../index.telefunc";
+import int from "../../tools/num";
 
 interface IViewProps {
   initialMemo: IMemo | null;
 }
 
+const getViewProps = (message: string): { props: IViewProps } => ({
+  props: {
+    initialMemo: {
+      id: -1,
+      content: message,
+      tags: [],
+    },
+  },
+});
+
 export const getServerSideProps: GetServerSideProps<IViewProps> = async (
   context
 ) => {
   const { id } = context.query;
-  let nid = new Number(id);
-  const initialMemo = await findMemo(+nid);
+  const { user } = context.req.session;
+  if (!user) return getViewProps("");
+  const initialMemo = await findMemo(user.id, int(id));
   return {
     props: {
       initialMemo,
@@ -38,7 +50,8 @@ export default function View({
   );
 
   async function update() {
-    const memo = await get<IMemo>(`/api/memo/${id}`);
+    const memo = await onGetMemo(int(id));
+    if (!memo) return;
     setContent(memo.content);
     setTags(memo.tags.map((x) => x.value));
     setIsLoading(false);
@@ -46,10 +59,7 @@ export default function View({
 
   async function updateMemo() {
     setIsChanged(false);
-    await put(`/api/memo/${id}`, {
-      content,
-      tags,
-    });
+    onUpsertMemo(content, tags, int(id));
     update();
   }
 

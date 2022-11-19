@@ -2,7 +2,13 @@ import { getContext } from "telefunc";
 import { addUser, verifyUser } from "../logic/logic";
 
 export async function onSignUp(username: string, password: string) {
-  return await addUser(username, password);
+  const { session } = getContext();
+  if (session.user) return null;
+  try {
+    return await addUser(username, password);
+  } catch {
+    return null;
+  }
 }
 
 export async function onSignIn(username: string, password: string) {

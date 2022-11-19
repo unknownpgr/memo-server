@@ -19,9 +19,9 @@ export default function Login() {
     setIsLoading(true);
     const user = await onSignUp(username, password);
     if (user) {
-      log(`User ${user.username}(#${user.id}) registered.`);
+      log(`User ${user.username} signed up.`);
     } else {
-      log(`Failed to create user.`);
+      log(`Failed to sign up.`);
     }
     setIsLoading(false);
   }

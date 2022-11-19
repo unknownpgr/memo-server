@@ -11,7 +11,7 @@ export default function Login() {
   const router = useRouter();
 
   function log(message: string) {
-    setLogs((logs) => [message, ...logs]);
+    setLogs((logs) => [`#${logs.length + 1}. ${message}`, ...logs]);
   }
 
   async function signUp() {
@@ -35,6 +35,8 @@ export default function Login() {
     setIsLoading(false);
   }
 
+  const isUserValid = username.length > 0 && password.length > 0;
+
   return (
     <div>
       <input
@@ -55,12 +57,14 @@ export default function Login() {
       />
       <br />
       <br />
-      <button onClick={signIn} disabled={isLoading}>
+      <button onClick={signIn} disabled={isLoading || !isUserValid}>
         [ Sign In ]
       </button>{" "}
-      <button onClick={signUp} disabled={isLoading}>
+      <button onClick={signUp} disabled={isLoading || !isUserValid}>
         [ Sign Up ]
       </button>
+      <br />
+      <br />
       <div>
         {logs.map((log, i) => (
           <div key={i}>{log}</div>

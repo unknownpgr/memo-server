@@ -19,7 +19,7 @@ type IHomeProps = {
   initialTags: ITag[];
 };
 
-export const getServerSideProps = withSession(async (context) => {
+export const getServerSideProps = withSession<IHomeProps>(async (context) => {
   const { user } = context.req.session;
   if (!user)
     return {

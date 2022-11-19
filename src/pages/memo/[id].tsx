@@ -4,18 +4,17 @@ import { IMemo } from "../../global";
 import Tags from "../../components/TagSelector";
 import memoStyles from "../../styles/memo.module.css";
 import { useRouter } from "next/router";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import { InferGetServerSidePropsType } from "next";
 import { findMemo } from "../../logic/logic";
 import { onGetMemo, onUpsertMemo } from "../index.telefunc";
 import int from "../../tools/num";
+import { withSession } from "../../session/withSession";
 
-interface IViewProps {
+type IViewProps = {
   initialMemo: IMemo | null;
-}
+};
 
-export const getServerSideProps: GetServerSideProps<IViewProps> = async (
-  context
-) => {
+export const getServerSideProps = withSession<IViewProps>(async (context) => {
   const { id } = context.query;
   const { user } = context.req.session;
   if (!user)
@@ -31,7 +30,7 @@ export const getServerSideProps: GetServerSideProps<IViewProps> = async (
       initialMemo,
     },
   };
-};
+});
 
 export default function View({
   initialMemo,

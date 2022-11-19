@@ -41,14 +41,20 @@ export default function Login() {
         type="text"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
+        disabled={isLoading}
       />
       <input
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        disabled={isLoading}
       />
-      <button onClick={login}>[ login ]</button>
-      <button onClick={signIn}>[ sign in ]</button>
+      <button onClick={login} disabled={isLoading}>
+        [ login ]
+      </button>
+      <button onClick={signIn} disabled={isLoading}>
+        [ sign in ]
+      </button>
       <div>
         {logs.map((log, i) => (
           <div key={i}>{log}</div>

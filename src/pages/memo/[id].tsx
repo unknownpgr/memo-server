@@ -13,22 +13,18 @@ interface IViewProps {
   initialMemo: IMemo | null;
 }
 
-const getViewProps = (message: string): { props: IViewProps } => ({
-  props: {
-    initialMemo: {
-      id: -1,
-      content: message,
-      tags: [],
-    },
-  },
-});
-
 export const getServerSideProps: GetServerSideProps<IViewProps> = async (
   context
 ) => {
   const { id } = context.query;
   const { user } = context.req.session;
-  if (!user) return getViewProps("");
+  if (!user)
+    return {
+      redirect: {
+        permanent: false,
+        destination: "/login",
+      },
+    };
   const initialMemo = await findMemo(user.id, int(id));
   return {
     props: {

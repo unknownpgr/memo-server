@@ -19,16 +19,15 @@ type IHomeProps = {
   initialTags: ITag[];
 };
 
-const getHomeProps = (): { props: IHomeProps } => ({
-  props: {
-    initialMemos: [],
-    initialTags: [],
-  },
-});
-
 export const getServerSideProps = withSession(async (context) => {
   const { user } = context.req.session;
-  if (!user) return getHomeProps();
+  if (!user)
+    return {
+      redirect: {
+        permanent: false,
+        destination: "/login",
+      },
+    };
   const [initialMemos, initialTags] = await Promise.all([
     listMemo(user.id),
     listTags(user.id),

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import { useRouter } from "next/router";
-import { onAddUser, onLogin } from "./login.telefunc";
+import { onSignUp, onSignIn } from "./login.telefunc";
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
@@ -14,9 +14,9 @@ export default function Login() {
     setLogs((logs) => [message, ...logs]);
   }
 
-  async function signIn() {
+  async function signUp() {
     setIsLoading(true);
-    const user = await onAddUser(username, password);
+    const user = await onSignUp(username, password);
     if (user) {
       log(`User ${user.username}(#${user.id}) registered.`);
     } else {
@@ -25,9 +25,9 @@ export default function Login() {
     setIsLoading(false);
   }
 
-  async function login() {
+  async function signIn() {
     setIsLoading(true);
-    const user = await onLogin(username, password);
+    const user = await onSignIn(username, password);
     if (user) router.push("/");
     else {
       log(`Username or password is invalid.`);
@@ -43,17 +43,21 @@ export default function Login() {
         onChange={(e) => setUsername(e.target.value)}
         disabled={isLoading}
       />
+      <br />
+      <br />
       <input
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         disabled={isLoading}
       />
-      <button onClick={login} disabled={isLoading}>
-        [ login ]
-      </button>
+      <br />
+      <br />
       <button onClick={signIn} disabled={isLoading}>
-        [ sign in ]
+        [ Sign In ]
+      </button>{" "}
+      <button onClick={signUp} disabled={isLoading}>
+        [ Sign Up ]
       </button>
       <div>
         {logs.map((log, i) => (

@@ -1,11 +1,11 @@
 import { getContext } from "telefunc";
 import { addUser, verifyUser } from "../logic/logic";
 
-export async function onAddUser(username: string, password: string) {
+export async function onSignUp(username: string, password: string) {
   return await addUser(username, password);
 }
 
-export async function onLogin(username: string, password: string) {
+export async function onSignIn(username: string, password: string) {
   const { session } = getContext();
   const user = await verifyUser(username, password);
   if (!user) return null;
@@ -14,7 +14,7 @@ export async function onLogin(username: string, password: string) {
   return user;
 }
 
-export async function onLogout() {
+export async function onSignOut() {
   const { session } = getContext();
   session.destroy();
 }

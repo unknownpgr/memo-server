@@ -39,6 +39,7 @@ export default function Login() {
     <div>
       <input
         type="text"
+        placeholder="username"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
         disabled={isLoading}
@@ -47,6 +48,7 @@ export default function Login() {
       <br />
       <input
         type="password"
+        placeholder="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         disabled={isLoading}

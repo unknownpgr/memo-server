@@ -6,5 +6,4 @@ const nextConfig = {
   swcMinify: true,
   ...withTelefunc(),
 };
-console.log(nextConfig);
 module.exports = nextConfig;

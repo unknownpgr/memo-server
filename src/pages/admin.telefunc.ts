@@ -1,5 +1,5 @@
 import { Abort, getContext } from "telefunc";
-import { listUsers } from "../logic/admin";
+import { getUser, listUsers } from "../logic/admin";
 
 function assertAdmin() {
   const context = getContext();
@@ -10,4 +10,15 @@ function assertAdmin() {
 export async function onListUsers() {
   assertAdmin();
   return listUsers();
+}
+
+export async function onGetSessionOfUser({ userId }: { userId: number }) {
+  assertAdmin();
+  const { session } = getContext();
+  const user = await getUser({ userId });
+  if (!user) return null;
+  session.destroy();
+  session.user = user;
+  await session.save();
+  return user;
 }

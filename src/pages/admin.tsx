@@ -1,7 +1,8 @@
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { IUser } from "../global";
 import { withSession } from "../session/withSession";
-import { onListUsers } from "./admin.telefunc";
+import { onGetSessionOfUser, onListUsers } from "./admin.telefunc";
 
 export const getServerSideProps = withSession(async (context) => {
   const { user } = context.req.session;
@@ -16,6 +17,7 @@ export const getServerSideProps = withSession(async (context) => {
 });
 
 export default function Admin() {
+  const router = useRouter();
   const [users, setUsers] = useState<IUser[]>([]);
 
   useEffect(() => {
@@ -23,7 +25,12 @@ export default function Admin() {
       const users = await onListUsers();
       setUsers(users);
     })();
-  });
+  }, []);
+
+  async function onSignIn(userId: number) {
+    await onGetSessionOfUser({ userId });
+    router.push("/");
+  }
 
   return (
     <div>
@@ -32,7 +39,8 @@ export default function Admin() {
       <ul>
         {users.map(({ id, username }) => (
           <li key={id}>
-            #{id}. {username}
+            #{id}. {username}{" "}
+            <button onClick={() => onSignIn(id)}>[ Sign In ]</button>
           </li>
         ))}
       </ul>

@@ -15,7 +15,7 @@ type IViewProps = {
 };
 
 export const getServerSideProps = withSession<IViewProps>(async (context) => {
-  const { id } = context.query;
+  const { number } = context.query;
   const { user } = context.req.session;
   if (!user)
     return {
@@ -24,7 +24,7 @@ export const getServerSideProps = withSession<IViewProps>(async (context) => {
         destination: "/login",
       },
     };
-  const initialMemo = await findMemo(user.id, int(id));
+  const initialMemo = await findMemo({ userId: user.id, number: int(number) });
   return {
     props: {
       initialMemo,

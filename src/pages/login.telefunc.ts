@@ -5,7 +5,7 @@ export async function onSignUp(username: string, password: string) {
   const { session } = getContext();
   if (session.user) return null;
   try {
-    return await addUser(username, password);
+    return await addUser({ username, password });
   } catch {
     return null;
   }
@@ -13,7 +13,7 @@ export async function onSignUp(username: string, password: string) {
 
 export async function onSignIn(username: string, password: string) {
   const { session } = getContext();
-  const user = await verifyUser(username, password);
+  const user = await verifyUser({ username, password });
   if (!user) return null;
   session.user = user;
   await session.save();

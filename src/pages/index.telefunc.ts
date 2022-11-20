@@ -17,33 +17,33 @@ function auth() {
 
 export async function onListMemo(tags?: string[]) {
   const user = auth();
-  return listMemo(user.id, tags);
+  return listMemo({ userId: user.id, tags });
 }
 
 export async function onListTags() {
   const user = auth();
-  return listTags(user.id);
+  return listTags({ userId: user.id });
 }
 
-export async function onGetMemo(id: number) {
+export async function onGetMemo(number: number) {
   const user = auth();
-  return findMemo(user.id, id);
+  return findMemo({ userId: user.id, number });
 }
 
 export async function onUpsertMemo(
   content: string,
   tags: string[],
-  id?: number
+  number?: number
 ) {
   const user = auth();
-  const memo = await upsertMemo(user.id, content, tags, id);
-  await clearUnrelatedTags(user.id);
+  const memo = await upsertMemo({ userId: user.id, content, tags, number });
+  await clearUnrelatedTags({ userId: user.id });
   return memo;
 }
 
-export async function onDeleteMemo(id: number) {
+export async function onDeleteMemo(number: number) {
   const user = auth();
-  const memo = await deleteMemo(user.id, id);
-  await clearUnrelatedTags(user.id);
+  const memo = await deleteMemo({ userId: user.id, number });
+  await clearUnrelatedTags({ userId: user.id });
   return memo;
 }

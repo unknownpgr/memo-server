@@ -9,19 +9,19 @@ export default function MemoList({
   onDeleteMemo,
 }: {
   memos: IMemo[];
-  onDeleteMemo: (id: number) => void;
+  onDeleteMemo: (number: number) => void;
 }) {
   return (
     <div>
-      {memos.map(({ id, content, tags }) => (
-        <div key={id} className={styles.item}>
+      {memos.map(({ number, content, tags }) => (
+        <div key={number} className={styles.item}>
           <div>
-            <strong>#{id}.</strong>{" "}
-            <button onClick={() => onDeleteMemo(id)}>[ X ]</button>{" "}
+            <strong>#{number}.</strong>{" "}
+            <button onClick={() => onDeleteMemo(number)}>[ X ]</button>{" "}
             {tags.map(({ id, value }) => (
               <Tag key={id} value={value}></Tag>
             ))}
-            <Link href={`/memo/${id}`}>
+            <Link href={`/memo/${number}`}>
               <div style={{ whiteSpace: "pre-wrap" }}>
                 {content || "NO CONTENT"}
               </div>

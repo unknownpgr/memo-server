@@ -8,7 +8,12 @@ import TagSelector from "../components/TagSelector";
 import memoStyles from "../styles/memo.module.css";
 import { InferGetServerSidePropsType } from "next";
 import { listMemo, listTags } from "../logic/logic";
-import { onListMemo, onListTags, onUpsertMemo } from "./index.telefunc";
+import {
+  onDeleteMemo,
+  onListMemo,
+  onListTags,
+  onUpsertMemo,
+} from "./index.telefunc";
 import { withSession } from "../session/withSession";
 import { onGetUser } from "./login.telefunc";
 
@@ -29,8 +34,8 @@ export const getServerSideProps = withSession<IHomeProps>(async (context) => {
       },
     };
   const [initialMemos, initialTags] = await Promise.all([
-    listMemo(user.id),
-    listTags(user.id),
+    listMemo({ userId: user.id }),
+    listTags({ userId: user.id }),
   ]);
   return {
     props: {
@@ -68,9 +73,9 @@ export default function Home({
     update();
   }
 
-  async function onDeleteMemo(id: number) {
-    if (!confirm(`Do you really want to delete memo ${id}?`)) return;
-    await onDeleteMemo(id);
+  async function deleteMemo(number: number) {
+    if (!confirm(`Do you really want to delete memo ${number}?`)) return;
+    await onDeleteMemo(number);
     update();
   }
 
@@ -127,7 +132,7 @@ export default function Home({
           for (const tag of tags) if (!memoTags.has(tag)) return false;
           return true;
         })}
-        onDeleteMemo={onDeleteMemo}
+        onDeleteMemo={deleteMemo}
       />
     </div>
   );

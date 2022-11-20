@@ -6,7 +6,7 @@ import memoStyles from "../../styles/memo.module.css";
 import { useRouter } from "next/router";
 import { InferGetServerSidePropsType } from "next";
 import { findMemo } from "../../logic/logic";
-import { onGetMemo, onUpsertMemo } from "../index.telefunc";
+import { onGetMemo, onUpsertMemo } from "../../telefunc/index.telefunc";
 import int from "../../tools/num";
 import { withSession } from "../../session/withSession";
 

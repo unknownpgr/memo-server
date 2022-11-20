@@ -3,7 +3,7 @@ import React, { ReactNode } from "react";
 import Link from "next/link";
 import styles from "../styles/layout.module.css";
 import { useRouter } from "next/router";
-import { onSignOut } from "../pages/login.telefunc";
+import { onSignOut } from "../telefunc/login.telefunc";
 import { InferGetServerSidePropsType } from "next";
 
 export default function Layout({ children }: { children: ReactNode }) {

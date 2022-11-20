@@ -13,9 +13,9 @@ import {
   onListMemo,
   onListTags,
   onUpsertMemo,
-} from "./index.telefunc";
+} from "../telefunc/index.telefunc";
 import { withSession } from "../session/withSession";
-import { onGetUser } from "./login.telefunc";
+import { onGetUser } from "../telefunc/login.telefunc";
 
 // If IHomeProps is an interface, not a type, It occurrs error.
 // I don't know why.

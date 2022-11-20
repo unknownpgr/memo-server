@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { IUser } from "../global";
 import { withSession } from "../session/withSession";
-import { onGetSessionOfUser, onListUsers } from "./admin.telefunc";
+import { onGetSessionOfUser, onListUsers } from "../telefunc/admin.telefunc";
 
 export const getServerSideProps = withSession(async (context) => {
   const { user } = context.req.session;

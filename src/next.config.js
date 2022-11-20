@@ -1,11 +1,10 @@
-// /** @type {import('next').NextConfig} */
-// const nextConfig = {
-//   reactStrictMode: true,
-//   swcMinify: true,
-// }
-
-// module.exports = nextConfig
+/** @type {import('next').NextConfig} */
 
 const withTelefunc = require("telefunc/next").default;
-
-module.exports = withTelefunc();
+const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+  ...withTelefunc(),
+};
+console.log(nextConfig);
+module.exports = nextConfig;

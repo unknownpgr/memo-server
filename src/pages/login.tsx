@@ -1,7 +1,7 @@
 import React, { KeyboardEvent, useRef, useState } from "react";
 
 import { useRouter } from "next/router";
-import { onSignUp, onSignIn } from "./login.telefunc";
+import { onSignUp, onSignIn } from "../telefunc/login.telefunc";
 import { withSession } from "../session/withSession";
 
 const MIN_PASSWORD_LENGTH = 8;

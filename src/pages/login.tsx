@@ -31,19 +31,23 @@ export default function Login() {
   }
 
   async function signUp() {
+    if (username.length === 0 || password.length === 0) {
+      log(
+        `To sign up, please enter both username and password, and click sign up button.`
+      );
+      return;
+    }
     if (password.length < MIN_PASSWORD_LENGTH) {
       log(
         `Password is too short. It must be at least ${MIN_PASSWORD_LENGTH} characters long`
       );
       return;
     }
+
     setIsLoading(true);
     const user = await onSignUp(username, password);
-    if (user) {
-      log(`User ${user.username} signed up.`);
-    } else {
-      log(`Failed to sign up.`);
-    }
+    if (user) log(`User ${user.username} signed up.`);
+    else log(`Failed to sign up.`);
     setIsLoading(false);
   }
 
@@ -51,9 +55,7 @@ export default function Login() {
     setIsLoading(true);
     const user = await onSignIn(username, password);
     if (user) router.push("/");
-    else {
-      log(`Username or password is invalid.`);
-    }
+    else log(`Username or password is invalid.`);
     setIsLoading(false);
   }
 
@@ -94,7 +96,7 @@ export default function Login() {
       <button onClick={signIn} disabled={isLoading || !isUserValid}>
         [ Sign In ]
       </button>{" "}
-      <button onClick={signUp} disabled={isLoading || !isUserValid}>
+      <button onClick={signUp} disabled={isLoading}>
         [ Sign Up ]
       </button>
       <br />

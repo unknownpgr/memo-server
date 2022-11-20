@@ -4,6 +4,8 @@ import { useRouter } from "next/router";
 import { onSignUp, onSignIn } from "./login.telefunc";
 import { withSession } from "../session/withSession";
 
+const MIN_PASSWORD_LENGTH = 8;
+
 export const getServerSideProps = withSession(async (context) => {
   const { user } = context.req.session;
   if (user)
@@ -29,6 +31,12 @@ export default function Login() {
   }
 
   async function signUp() {
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      log(
+        `Password is too short. It must be at least ${MIN_PASSWORD_LENGTH} characters long`
+      );
+      return;
+    }
     setIsLoading(true);
     const user = await onSignUp(username, password);
     if (user) {

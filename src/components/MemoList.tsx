@@ -22,9 +22,7 @@ export default function MemoList({
               <Tag key={id} value={value}></Tag>
             ))}
             <Link href={`/memo/${number}`}>
-              <div style={{ whiteSpace: "pre-wrap" }}>
-                {content || "NO CONTENT"}
-              </div>
+              <div className={styles.content}>{content || "NO CONTENT"}</div>
             </Link>
           </div>
         </div>

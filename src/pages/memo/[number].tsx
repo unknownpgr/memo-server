@@ -36,7 +36,7 @@ export default function View({
   initialMemo,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
-  const { id } = router.query;
+  const { number } = router.query;
   const [isLoading, setIsLoading] = useState(false);
   const [isChanged, setIsChanged] = useState(false);
   const [content, setContent] = useState(initialMemo?.content || "");
@@ -45,7 +45,7 @@ export default function View({
   );
 
   async function update() {
-    const memo = await onGetMemo(int(id));
+    const memo = await onGetMemo(int(number));
     if (!memo) return;
     setContent(memo.content);
     setTags(memo.tags.map((x) => x.value));
@@ -54,14 +54,14 @@ export default function View({
 
   async function updateMemo() {
     setIsChanged(false);
-    onUpsertMemo(content, tags, int(id));
+    onUpsertMemo(content, tags, int(number));
     update();
   }
 
   return (
     <div>
       <h1>
-        Memo #{id}{" "}
+        Memo #{number}{" "}
         <button onClick={updateMemo} disabled={!isChanged}>
           [ update ]
         </button>

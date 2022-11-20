@@ -4,27 +4,6 @@ import crypto from "crypto";
 
 const prisma = new PrismaClient();
 
-async function tmp() {
-  const users = await prisma.user.findMany({
-    include: { memos: { orderBy: { createdAt: "asc" } } },
-  });
-  for (const user of users) {
-    console.log(user.username);
-    for (let i = 0; i < user.memos.length; i++) {
-      // const updatedMemo = await prisma.memo.update({
-      //   where: { id: user.memos[i].id },
-      //   data: {
-      //     number: i + 1,
-      //   },
-      // });
-      // console.log(user.username, updatedMemo.number);
-      const memo = user.memos[i];
-      console.log(memo.id, memo.number, memo.content.substring(0, 10));
-    }
-  }
-  console.log("FIN");
-}
-
 export function clearUnrelatedTags({ userId }: { userId: number }) {
   return prisma.tag.deleteMany({
     where: {

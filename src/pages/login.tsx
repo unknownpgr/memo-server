@@ -2,6 +2,19 @@ import React, { KeyboardEvent, useRef, useState } from "react";
 
 import { useRouter } from "next/router";
 import { onSignUp, onSignIn } from "./login.telefunc";
+import { withSession } from "../session/withSession";
+
+export const getServerSideProps = withSession(async (context) => {
+  const { user } = context.req.session;
+  if (user)
+    return {
+      redirect: {
+        permanent: false,
+        destination: "/",
+      },
+    };
+  return { props: {} };
+});
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);

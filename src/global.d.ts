@@ -4,7 +4,6 @@ export interface ITag {
 }
 
 export interface IMemo {
-  id: number;
   number: number;
   content: string;
   tags: ITag[];

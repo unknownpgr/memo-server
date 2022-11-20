@@ -115,16 +115,17 @@ export default function Home({
         onKeyDown={onKeyDown}
       ></textarea>
       <TagSelector tags={tags} setTags={setTags}></TagSelector>
-      <div>- - - - - - - - </div>
-      {tagList.map(({ id, value }) => (
-        <Tag
-          key={id}
-          value={value}
-          onClick={() => onTagSelected(value)}
-          disabled={tags.indexOf(value) >= 0}
-        ></Tag>
-      ))}
-      <div>- - - - - - - - </div>
+      <div>
+        {tagList.map(({ id, value }) => (
+          <Tag
+            key={id}
+            value={value}
+            onClick={() => onTagSelected(value)}
+            disabled={tags.indexOf(value) >= 0}
+          ></Tag>
+        ))}
+      </div>
+      <br />
       <MemoList
         memos={memos.filter((memo) => {
           if (tags.length === 0) return true;

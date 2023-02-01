@@ -1,11 +1,12 @@
 import { Abort, getContext } from "telefunc";
 import {
   clearUnrelatedTags,
+  createMemo,
   deleteMemo,
   findMemo,
   listMemo,
   listTags,
-  upsertMemo,
+  updateMemo,
 } from "../logic/logic";
 
 function auth() {
@@ -30,13 +31,20 @@ export async function onGetMemo(number: number) {
   return findMemo({ userId: user.id, number });
 }
 
-export async function onUpsertMemo(
+export async function onCreateMemo(content: string, tags: string[]) {
+  const user = auth();
+  const memo = await createMemo({ userId: user.id, content, tags });
+  await clearUnrelatedTags({ userId: user.id });
+  return memo;
+}
+
+export async function onUpdateMemo(
   content: string,
   tags: string[],
-  number?: number
+  number: number
 ) {
   const user = auth();
-  const memo = await upsertMemo({ userId: user.id, content, tags, number });
+  const memo = await updateMemo({ userId: user.id, content, tags, number });
   await clearUnrelatedTags({ userId: user.id });
   return memo;
 }

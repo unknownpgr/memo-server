@@ -1,21 +1,20 @@
-import { KeyboardEvent, useEffect, useState } from "react";
-
-import Head from "next/head";
-import MemoList from "../components/MemoList";
+import { KeyboardEvent, useState } from "react";
 import { IMemo, ITag } from "../global";
-import Tag from "../components/Tag";
-import TagSelector from "../components/TagSelector";
-import memoStyles from "../styles/memo.module.css";
-import { InferGetServerSidePropsType } from "next";
 import { listMemo, listTags } from "../logic/logic";
 import {
+  onCreateMemo,
   onDeleteMemo,
   onListMemo,
   onListTags,
-  onUpsertMemo,
 } from "../telefunc/index.telefunc";
+
+import { InferGetServerSidePropsType } from "next";
+import Head from "next/head";
+import MemoList from "../components/MemoList";
+import Tag from "../components/Tag";
+import TagSelector from "../components/TagSelector";
 import { withSession } from "../session/withSession";
-import { onGetUser } from "../telefunc/login.telefunc";
+import memoStyles from "../styles/memo.module.css";
 
 // If IHomeProps is an interface, not a type, It occurrs error.
 // I don't know why.
@@ -55,13 +54,7 @@ export default function Home({
   const [tags, setTags] = useState<string[]>([]);
   const [content, setContent] = useState("");
 
-  useEffect(() => {
-    (async () => {
-      console.log(await onGetUser());
-    })();
-  }, []);
-
-  async function update() {
+  async function refresh() {
     const [memos, tags] = await Promise.all([onListMemo(), onListTags()]);
     setMemos(memos);
     setTagList(tags);
@@ -69,14 +62,14 @@ export default function Home({
 
   async function createMemo() {
     setContent("");
-    await onUpsertMemo(content, tags);
-    update();
+    await onCreateMemo(content, tags);
+    refresh();
   }
 
   async function deleteMemo(number: number) {
     if (!confirm(`Do you really want to delete memo ${number}?`)) return;
     await onDeleteMemo(number);
-    update();
+    refresh();
   }
 
   async function onKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {

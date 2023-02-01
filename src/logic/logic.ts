@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import { IMemo, IUser } from "../global";
 import crypto from "crypto";
+import { IMemo, IUser } from "../global";
 
 const prisma = new PrismaClient();
 
@@ -31,7 +31,20 @@ export function findMemo({
   });
 }
 
-export async function upsertMemo({
+async function getNextNumber(userId: number) {
+  // Calculate next number
+  const aggregations = await prisma.memo.aggregate({
+    where: {
+      userId,
+    },
+    _max: {
+      number: true,
+    },
+  });
+  return (aggregations._max.number || 0) + 1;
+}
+
+export async function updateMemo({
   userId,
   content,
   tags,
@@ -40,7 +53,7 @@ export async function upsertMemo({
   userId: number;
   content: string;
   tags: string[];
-  number?: number;
+  number: number;
 }): Promise<IMemo> {
   // Upsert tags
   const tagIds = await Promise.all(
@@ -55,51 +68,56 @@ export async function upsertMemo({
     })
   );
 
-  // Disconnect all tags
-  if (number) {
-    await prisma.memo.update({
-      where: { userId_number: { userId, number } },
-      data: { tags: { set: [] } },
-    });
-  }
-
-  // Calculate next number
-  const aggregations = await prisma.memo.aggregate({
-    where: {
-      userId,
+  const memo = await prisma.memo.update({
+    where: { userId_number: { userId, number } },
+    data: {
+      content,
+      tags: {
+        set: tagIds.map((id) => ({ id })),
+      },
     },
-    _max: {
-      number: true,
+    include: {
+      tags: true,
     },
   });
-  const nextNumber = (aggregations._max.number || 0) + 1;
 
-  // Upsert new memo
-  const query = {
-    userId,
-    content,
-    number: nextNumber,
-    tags: { connect: tagIds.map((id) => ({ id })) },
-  };
+  return memo;
+}
 
-  let memo;
-  if (number) {
-    memo = await prisma.memo.upsert({
-      where: { userId_number: { userId, number } },
-      create: query,
-      update: query,
-      include: {
-        tags: true,
-      },
-    });
-  } else {
-    memo = await prisma.memo.create({
-      data: query,
-      include: {
-        tags: true,
-      },
-    });
-  }
+export async function createMemo({
+  userId,
+  content,
+  tags,
+}: {
+  userId: number;
+  content: string;
+  tags: string[];
+}): Promise<IMemo> {
+  // Upsert tags
+  const tagIds = await Promise.all(
+    tags.map(async (value: string) => {
+      return (
+        await prisma.tag.upsert({
+          where: { userId_value: { userId, value } },
+          create: { userId, value },
+          update: { value },
+        })
+      ).id;
+    })
+  );
+
+  const number = await getNextNumber(userId);
+  const memo = await prisma.memo.create({
+    data: {
+      userId,
+      content,
+      tags: { connect: tagIds.map((id) => ({ id })) },
+      number,
+    },
+    include: {
+      tags: true,
+    },
+  });
 
   return memo;
 }

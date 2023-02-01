@@ -1,17 +1,17 @@
-import React, { useState } from "react";
+import { onGetMemo, onUpdateMemo } from "../../telefunc/index.telefunc";
 
-import { IMemo } from "../../global";
-import Tags from "../../components/TagSelector";
-import memoStyles from "../../styles/memo.module.css";
-import { useRouter } from "next/router";
 import { InferGetServerSidePropsType } from "next";
+import { useState } from "react";
+import Tags from "../../components/TagSelector";
+import { IMemo } from "../../global";
 import { findMemo } from "../../logic/logic";
-import { onGetMemo, onUpsertMemo } from "../../telefunc/index.telefunc";
-import int from "../../tools/num";
 import { withSession } from "../../session/withSession";
+import memoStyles from "../../styles/memo.module.css";
+import int from "../../tools/num";
 
 type IViewProps = {
   initialMemo: IMemo | null;
+  number: number;
 };
 
 export const getServerSideProps = withSession<IViewProps>(async (context) => {
@@ -28,15 +28,15 @@ export const getServerSideProps = withSession<IViewProps>(async (context) => {
   return {
     props: {
       initialMemo,
+      number: int(number),
     },
   };
 });
 
 export default function View({
   initialMemo,
+  number,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const router = useRouter();
-  const { number } = router.query;
   const [isLoading, setIsLoading] = useState(false);
   const [isChanged, setIsChanged] = useState(false);
   const [content, setContent] = useState(initialMemo?.content || "");
@@ -44,7 +44,7 @@ export default function View({
     initialMemo?.tags.map((x) => x.value) || []
   );
 
-  async function update() {
+  async function refresh() {
     const memo = await onGetMemo(int(number));
     if (!memo) return;
     setContent(memo.content);
@@ -53,9 +53,10 @@ export default function View({
   }
 
   async function updateMemo() {
+    setIsLoading(true);
+    await onUpdateMemo(content, tags, int(number));
+    await refresh();
     setIsChanged(false);
-    onUpsertMemo(content, tags, int(number));
-    update();
   }
 
   return (
@@ -72,14 +73,14 @@ export default function View({
         value={content}
         onChange={(e) => {
           setContent(e.target.value);
-          setIsChanged(true);
+          if (!isChanged) setIsChanged(true);
         }}
       ></textarea>
       <Tags
         tags={tags}
         setTags={(v) => {
           setTags(v);
-          setIsChanged(true);
+          if (!isChanged) setIsChanged(true);
         }}
       ></Tags>
     </div>

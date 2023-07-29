@@ -56,9 +56,10 @@ export default function View({
 
   return (
     <div>
-      <h1>
-        Memo #{number} {isSaving && "Saving"}
-      </h1>
+      This is memo number {number}.{" "}
+      {isSaving
+        ? "It's being saved, so please wait."
+        : "This memo is safely stored."}
       <textarea
         className={memoStyles.content}
         value={content}

@@ -1,8 +1,7 @@
-@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400&display=swap");
-
 @font-face {
   font-family: "Nanum";
-  src: url("NanumBarunGothic.otf") format("opentype");
+  src: url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400&display=swap")
+    format("opentype");
   font-weight: normal;
   font-style: normal;
 }
@@ -16,6 +15,7 @@ body {
   padding: 0;
   margin: 0;
   font-family: "Nanum", sans-serif;
+  line-height: 160%;
 }
 
 body::-webkit-scrollbar {

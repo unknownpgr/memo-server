@@ -16,15 +16,15 @@ export default function Layout({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <nav className={styles.nav}>
-        {isLogin ? <span></span> : <Link href="/">[ Home ]</Link>}
-        {isLogin ? (
-          <span></span>
-        ) : (
-          <button onClick={signOut}>[ Sign Out ]</button>
+      <div className={styles.frame}>
+        {!isLogin && (
+          <>
+            You can go <Link href="/">{"'home'"}</Link> or{" "}
+            <button onClick={signOut}>{"'sign out.'"}</button>
+          </>
         )}
-      </nav>
-      <main className={styles.frame}>{children}</main>
+        {children}
+      </div>
     </>
   );
 }

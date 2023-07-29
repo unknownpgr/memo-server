@@ -1,8 +1,6 @@
 .input {
-  margin-right: 0.5rem;
-}
-
-.label {
-  font-size: 75%;
-  margin-right: 0.5rem;
+  max-width: 100%;
+  border: none;
+  background-color: #00000008;
+  padding: 0;
 }

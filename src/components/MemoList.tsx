@@ -16,15 +16,25 @@ export default function MemoList({
       {memos.map(({ number, content, tags }) => (
         <div key={number} className={styles.item}>
           <div>
-            <strong>#{number}.</strong>{" "}
-            <button onClick={() => onDeleteMemo(number)}>[ X ]</button>{" "}
-            {tags.map(({ id, value }) => (
-              <Tag key={id} value={value}></Tag>
+            Memo Number {number}, with tags{" "}
+            {tags.map(({ id, value }, i) => (
+              <>
+                <Tag key={id} value={value}></Tag>
+                {i < tags.length - 1 && ", "}
+              </>
             ))}
+            . Click
+            <button onClick={() => onDeleteMemo(number)}>
+              {"'delete'"}
+            </button>{" "}
+            to delete this memo.{" "}
             <Link href={`/memo/${number}`}>
-              <div className={styles.content}>{content || "NO CONTENT"}</div>
+              <span className={styles.content}>
+                {content || "This memo has no content at all."}
+              </span>
             </Link>
           </div>
+          <br />
         </div>
       ))}
     </div>

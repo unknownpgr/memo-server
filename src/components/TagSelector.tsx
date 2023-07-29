@@ -36,15 +36,12 @@ export default function TagSelector({
   return (
     <div className={styles.taginput}>
       <input
-        className={styles.input}
         type="text"
+        className={styles.input}
         value={tagString}
+        placeholder="You can write tags here. Tags are comma-separted."
         onChange={(e) => onTagStringChange(e.target.value)}
       />
-      <span className={styles.label}>Tags:</span>
-      {tags.map((tag) => (
-        <Tag key={tag} value={tag}></Tag>
-      ))}
     </div>
   );
 }

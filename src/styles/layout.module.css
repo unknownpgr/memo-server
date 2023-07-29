@@ -3,12 +3,3 @@
   padding: 2rem;
   margin: 0 auto;
 }
-
-.nav {
-  max-width: 50rem;
-  margin: 0 auto;
-  padding: 0 2rem;
-  display: flex;
-  justify-content: space-between;
-  margin-top: 2rem;
-}

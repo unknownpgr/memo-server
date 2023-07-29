@@ -1,20 +1,19 @@
-import { KeyboardEvent, useState } from "react";
+import { InferGetServerSidePropsType } from "next";
+import Head from "next/head";
+import { useState } from "react";
+import MemoList from "../components/MemoList";
+import Tag from "../components/Tag";
+import TagSelector from "../components/TagSelector";
 import { IMemo, ITag } from "../global";
 import { listMemo, listTags } from "../logic/logic";
+import { withSession } from "../session/withSession";
 import {
   onCreateMemo,
   onDeleteMemo,
   onListMemo,
   onListTags,
 } from "../telefunc/index.telefunc";
-
-import { InferGetServerSidePropsType } from "next";
-import Head from "next/head";
-import MemoList from "../components/MemoList";
-import Tag from "../components/Tag";
-import TagSelector from "../components/TagSelector";
-import { withSession } from "../session/withSession";
-import memoStyles from "../styles/memo.module.css";
+import { useRouter } from "next/router";
 
 // If IHomeProps is an interface, not a type, It occurrs error.
 // I don't know why.
@@ -50,9 +49,8 @@ export default function Home({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [memos, setMemos] = useState(initialMemos);
   const [tagList, setTagList] = useState(initialTags);
-
-  const [tags, setTags] = useState<string[]>([]);
-  const [content, setContent] = useState("");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const router = useRouter();
 
   async function refresh() {
     const [memos, tags] = await Promise.all([onListMemo(), onListTags()]);
@@ -61,9 +59,8 @@ export default function Home({
   }
 
   async function createMemo() {
-    setContent("");
-    await onCreateMemo(content, tags);
-    refresh();
+    const newMemo = await onCreateMemo("", selectedTags);
+    router.push(`/memo/${newMemo.number}`);
   }
 
   async function deleteMemo(number: number) {
@@ -72,62 +69,57 @@ export default function Home({
     refresh();
   }
 
-  async function onKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === "Enter" && e.shiftKey) {
-      createMemo();
-      e.preventDefault();
-    }
-  }
-
   function onTagSelected(tag: string) {
-    if (tags.indexOf(tag) >= 0) {
-      setTags((tags) => tags.filter((x) => x !== tag));
+    if (selectedTags.indexOf(tag) >= 0) {
+      setSelectedTags((tags) => tags.filter((x) => x !== tag));
     } else {
-      setTags((tags) => [...tags, tag]);
+      setSelectedTags((tags) => [...tags, tag]);
     }
   }
 
   if (!memos || !tagList) return <h1>Loading</h1>;
 
+  const mergedTags = Array.from(
+    new Set([...tagList.map((x) => x.value), ...selectedTags])
+  );
+
   return (
-    <div>
+    <>
       <Head>
         <title>Memo</title>
         <meta name="description" content="Memo server" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <h1>
-        <button disabled={!content} onClick={createMemo}>
-          [ Create Memo ]
-        </button>
-      </h1>
-      <textarea
-        className={memoStyles.content}
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        onKeyDown={onKeyDown}
-      ></textarea>
-      <TagSelector tags={tags} setTags={setTags}></TagSelector>
-      <div>
-        {tagList.map(({ id, value }) => (
+      Press <button onClick={createMemo}>{"'create memo'"}</button> to crate
+      memo.
+      <TagSelector tags={selectedTags} setTags={setSelectedTags}></TagSelector>
+      Below is examples of tags. You can click tags {"("}
+      {mergedTags.map((value, i) => (
+        <>
           <Tag
-            key={id}
+            key={i}
             value={value}
             onClick={() => onTagSelected(value)}
-            disabled={tags.indexOf(value) >= 0}
+            disabled={selectedTags.indexOf(value) >= 0}
           ></Tag>
-        ))}
-      </div>
+          {i < mergedTags.length - 1 && ", "}
+        </>
+      ))}
+      {") "} to toggle it, and below is a list of notes
+      {selectedTags.length === 0
+        ? "."
+        : " with tags " + selectedTags.map((x) => `'${x}'`).join(", ")}
+      <br />
       <br />
       <MemoList
         memos={memos.filter((memo) => {
-          if (tags.length === 0) return true;
+          if (selectedTags.length === 0) return true;
           const memoTags = new Set(memo.tags.map((x) => x.value));
-          for (const tag of tags) if (!memoTags.has(tag)) return false;
+          for (const tag of selectedTags) if (!memoTags.has(tag)) return false;
           return true;
         })}
         onDeleteMemo={deleteMemo}
       />
-    </div>
+    </>
   );
 }

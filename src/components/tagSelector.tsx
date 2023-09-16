@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Tag from "./Tag";
-
-import styles from "../styles/taginput.module.css";
+import styles from "./tagSelector.module.css";
 
 function parseTagString(tagString: string) {
   return tagString
@@ -41,6 +39,7 @@ export default function TagSelector({
         value={tagString}
         placeholder="You can write tags here. Tags are comma-separted."
         onChange={(e) => onTagStringChange(e.target.value)}
+        spellCheck="false"
       />
     </div>
   );

@@ -1,8 +1,7 @@
-import { ReactNode } from "react";
-
 import Link from "next/link";
 import { useRouter } from "next/router";
-import styles from "../styles/layout.module.css";
+import { ReactNode } from "react";
+import styles from "./layout.module.css";
 import { onSignOut } from "../telefunc/login.telefunc";
 
 export default function Layout({ children }: { children: ReactNode }) {
@@ -15,16 +14,22 @@ export default function Layout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <>
-      <div className={styles.frame}>
-        {!isLogin && (
-          <>
-            You can go <Link href="/">{"'home'"}</Link> or{" "}
-            <button onClick={signOut}>{"'sign out.'"}</button>
-          </>
-        )}
-        {children}
-      </div>
-    </>
+    <div className={styles.container}>
+      {!isLogin && (
+        <>
+          <header className={styles.header}>
+            <h1 className={styles.title}>Memo</h1>
+            <Link className={styles.button} href="/">
+              Home
+            </Link>
+            <button className={styles.button} onClick={signOut}>
+              Sign out
+            </button>
+          </header>
+          <br />
+        </>
+      )}
+      {children}
+    </div>
   );
 }

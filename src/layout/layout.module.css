@@ -1,0 +1,21 @@
+.container {
+  max-width: 50rem;
+  padding: 2rem;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+}
+
+.title {
+  margin-right: auto;
+}
+
+.button {
+  margin-left: 1rem;
+  display: flex;
+  align-items: center;
+  line-height: normal;
+}

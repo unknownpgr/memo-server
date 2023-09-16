@@ -1,10 +1,4 @@
-@font-face {
-  font-family: "Nanum";
-  src: url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400&display=swap")
-    format("opentype");
-  font-weight: normal;
-  font-style: normal;
-}
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400;500;600;700;900&display=swap");
 
 * {
   box-sizing: border-box;
@@ -14,8 +8,7 @@ html,
 body {
   padding: 0;
   margin: 0;
-  font-family: "Nanum", sans-serif;
-  line-height: 160%;
+  font-family: "Noto Serif KR", sans-serif;
 }
 
 body::-webkit-scrollbar {
@@ -35,8 +28,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "Nanum", sans-serif;
-  font-size: 1rem;
+  font-family: "Noto Serif KR", serif;
 }
 
 input,
@@ -46,6 +38,7 @@ textarea {
   outline: none;
   border-radius: 0;
   width: 100%;
+  font-size: 1rem;
 }
 
 a {
@@ -54,8 +47,28 @@ a {
 }
 
 button {
-  background-color: #fff;
+  background-color: transparent;
   border: none;
   cursor: pointer;
+  margin: 0;
   padding: 0;
+  font-size: 1rem;
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 480px) {
+  html {
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
 }

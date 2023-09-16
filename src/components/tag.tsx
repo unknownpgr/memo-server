@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "../styles/tag.module.css";
+import styles from "./tag.module.css";
 
 export default function Tag({
   value,
@@ -15,7 +15,7 @@ export default function Tag({
   if (onClick) classes.push(styles.clickable);
   return (
     <span className={classes.join(" ")} onClick={onClick}>
-      <span>@{value}</span>
+      <span>{value}</span>
     </span>
   );
 }

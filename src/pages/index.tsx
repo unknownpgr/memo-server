@@ -1,9 +1,9 @@
 import { InferGetServerSidePropsType } from "next";
 import Head from "next/head";
 import { useState } from "react";
-import MemoList from "../components/MemoList";
-import Tag from "../components/Tag";
-import TagSelector from "../components/TagSelector";
+import MemoList from "../components/memolist";
+import Tag from "../components/tag";
+import TagSelector from "../components/tagSelector";
 import { IMemo, ITag } from "../global";
 import { listMemo, listTags } from "../logic/logic";
 import { withSession } from "../session/withSession";
@@ -14,6 +14,7 @@ import {
   onListTags,
 } from "../telefunc/index.telefunc";
 import { useRouter } from "next/router";
+import styles from "./index.module.css";
 
 // If IHomeProps is an interface, not a type, It occurrs error.
 // I don't know why.
@@ -90,25 +91,27 @@ export default function Home({
         <meta name="description" content="Memo server" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      Press <button onClick={createMemo}>{"'create memo'"}</button> to crate
-      memo.
+      <div>
+        <button onClick={createMemo}>Create new memo</button>
+      </div>
+      <br />
+      <h2>Tags</h2>
+      <div>
+        {mergedTags.map((value, i) => (
+          <>
+            <Tag
+              key={i}
+              value={value}
+              onClick={() => onTagSelected(value)}
+              disabled={selectedTags.indexOf(value) >= 0}
+            ></Tag>
+            {i < mergedTags.length - 1 && ", "}
+          </>
+        ))}
+      </div>
+      <br />
       <TagSelector tags={selectedTags} setTags={setSelectedTags}></TagSelector>
-      Below is examples of tags. You can click tags {"("}
-      {mergedTags.map((value, i) => (
-        <>
-          <Tag
-            key={i}
-            value={value}
-            onClick={() => onTagSelected(value)}
-            disabled={selectedTags.indexOf(value) >= 0}
-          ></Tag>
-          {i < mergedTags.length - 1 && ", "}
-        </>
-      ))}
-      {") "} to toggle it, and below is a list of notes
-      {selectedTags.length === 0
-        ? "."
-        : " with tags " + selectedTags.map((x) => `'${x}'`).join(", ")}
+
       <br />
       <br />
       <MemoList
@@ -120,6 +123,7 @@ export default function Home({
         })}
         onDeleteMemo={deleteMemo}
       />
+      <footer className={styles.footer}>© 2023 Copyright : Unknownpgr</footer>
     </>
   );
 }

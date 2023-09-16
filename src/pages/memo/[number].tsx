@@ -2,11 +2,11 @@ import { onGetMemo, onUpdateMemo } from "../../telefunc/index.telefunc";
 
 import { InferGetServerSidePropsType } from "next";
 import { useEffect, useRef, useState } from "react";
-import Tags from "../../components/TagSelector";
+import Tags from "../../components/tagSelector";
 import { IMemo } from "../../global";
 import { findMemo } from "../../logic/logic";
 import { withSession } from "../../session/withSession";
-import memoStyles from "../../styles/memo.module.css";
+import memoStyles from "./memo.module.css";
 import int from "../../tools/num";
 
 type IViewProps = {

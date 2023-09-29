@@ -1,0 +1,15 @@
+.header {
+  display: flex;
+  flex-direction: row;
+}
+
+.title {
+  margin-right: auto;
+}
+
+.button {
+  margin-left: 1rem;
+  display: flex;
+  align-items: center;
+  line-height: normal;
+}

@@ -1,0 +1,378 @@
+{
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"Memo": {
+				"properties": {
+					"number": {
+						"type": "number",
+						"format": "double"
+					},
+					"content": {
+						"type": "string"
+					},
+					"tags": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"createdAt": {
+						"type": "string"
+					},
+					"updatedAt": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"number",
+					"content",
+					"tags",
+					"createdAt",
+					"updatedAt"
+				],
+				"type": "object",
+				"additionalProperties": false
+			}
+		},
+		"securitySchemes": {}
+	},
+	"info": {
+		"title": "backend",
+		"version": "1.0.0",
+		"license": {
+			"name": "MIT"
+		},
+		"contact": {}
+	},
+	"openapi": "3.0.0",
+	"paths": {
+		"/login": {
+			"post": {
+				"operationId": "Login",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"password": {
+										"type": "string"
+									},
+									"username": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"password",
+									"username"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/logout": {
+			"delete": {
+				"operationId": "Logout",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "authorization",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/register": {
+			"post": {
+				"operationId": "Register",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"password": {
+										"type": "string"
+									},
+									"username": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"password",
+									"username"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/memo/{number}": {
+			"get": {
+				"operationId": "FindMemo",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Memo"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "number",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "header",
+						"name": "authorization",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "UpdateMemo",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Memo"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "number",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "header",
+						"name": "authorization",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"tags": {
+										"items": {
+											"type": "string"
+										},
+										"type": "array"
+									},
+									"content": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"tags",
+									"content"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteMemo",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "number",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "header",
+						"name": "authorization",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/memo": {
+			"get": {
+				"operationId": "ListMemo",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"memos": {
+											"items": {
+												"$ref": "#/components/schemas/Memo"
+											},
+											"type": "array"
+										},
+										"tags": {
+											"items": {
+												"type": "string"
+											},
+											"type": "array"
+										}
+									},
+									"required": [
+										"memos",
+										"tags"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "authorization",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "CreateMemo",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Memo"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "authorization",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"tags": {
+										"items": {
+											"type": "string"
+										},
+										"type": "array"
+									},
+									"content": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"tags",
+									"content"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "/api"
+		}
+	]
+}

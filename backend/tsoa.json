@@ -1,0 +1,18 @@
+{
+  "entryFile": "main.ts",
+  "noImplicitAdditionalProperties": "throw-on-extras",
+  "controllerPathGlobs": [
+    "**/controller.ts"
+  ],
+  "spec": {
+    "outputDirectory": ".",
+    "specVersion": 3,
+    "basePath": "/api",
+    "specFileBaseName": "openapi"
+  },
+  "routes": {
+    "basePath": "/api",
+    "routesDir": "router",
+    "middleware": "koa"
+  }
+}

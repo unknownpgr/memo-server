@@ -33,10 +33,9 @@ h6 {
 
 input,
 textarea {
-  border: solid 1px #000;
-  padding: 0.5rem;
+  border: none;
+  padding: 0;
   outline: none;
-  border-radius: 0;
   width: 100%;
   font-size: 1rem;
 }

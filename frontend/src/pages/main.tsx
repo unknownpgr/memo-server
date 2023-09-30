@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Memo } from "../api";
 import { Header } from "../components/header";
@@ -8,42 +8,72 @@ import TagSelector from "../components/tagSelector";
 import { MemoService } from "../service";
 import styles from "./main.module.css";
 
+function isHttpResponseError(
+  error: unknown
+): error is { response: { status: number } } {
+  if (typeof error !== "object" || error === null) return false;
+  const response = (error as { response: unknown }).response;
+  if (typeof response !== "object" || response === null) return false;
+  const status = (response as { status: unknown }).status;
+  if (typeof status !== "number") return false;
+  return true;
+}
+
 export default function Home({ service }: { service: MemoService }) {
   const [memos, setMemos] = useState<Memo[]>([]);
   const [tagList, setTagList] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const naviate = useNavigate();
+  const navigate = useNavigate();
+
+  const refresh = useCallback(async () => {
+    if (!service.isLoggedIn()) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const res = await service.listMemo();
+      const { memos, tags } = res;
+      setMemos(memos);
+      setTagList(tags);
+    } catch (error: unknown) {
+      if (isHttpResponseError(error) && error.response.status === 401) {
+        navigate("/login");
+      } else {
+        alert("Unexpected error occurred");
+        console.error(error);
+      }
+    }
+  }, [navigate, service]);
+
+  const createMemo = useCallback(async () => {
+    const newMemo = await service.createMemo("This is a new memo", []);
+    navigate(`/memo/${newMemo.number}`);
+  }, [service, navigate]);
+
+  const deleteMemo = useCallback(
+    async (number: number) => {
+      if (!confirm(`Do you really want to delete memo ${number}?`)) return;
+      await service.deleteMemo(number);
+      refresh();
+    },
+    [service, refresh]
+  );
+
+  const onTagSelected = useCallback(
+    (tag: string) => {
+      if (selectedTags.includes(tag)) {
+        setSelectedTags((tags) => tags.filter((x) => x !== tag));
+      } else {
+        setSelectedTags((tags) => [...tags, tag]);
+      }
+    },
+    [selectedTags]
+  );
 
   useEffect(() => {
     refresh();
-  }, []);
-
-  async function refresh() {
-    console.log("refresh");
-    const res = await service.listMemo();
-    const { memos, tags } = res;
-    setMemos(memos);
-    setTagList(tags);
-  }
-
-  async function createMemo() {
-    const newMemo = await service.createMemo("This is a new memo", []);
-    naviate(`/memo/${newMemo.number}`);
-  }
-
-  async function deleteMemo(number: number) {
-    if (!confirm(`Do you really want to delete memo ${number}?`)) return;
-    await service.deleteMemo(number);
-    refresh();
-  }
-
-  function onTagSelected(tag: string) {
-    if (selectedTags.indexOf(tag) >= 0) {
-      setSelectedTags((tags) => tags.filter((x) => x !== tag));
-    } else {
-      setSelectedTags((tags) => [...tags, tag]);
-    }
-  }
+  }, [refresh]);
 
   if (!memos || !tagList) return <h1>Loading</h1>;
 
@@ -84,7 +114,7 @@ export default function Home({ service }: { service: MemoService }) {
         })}
         onDeleteMemo={deleteMemo}
       />
-      <footer className={styles.footer}>© 2023 Copyright : Unknownpgr</footer>
+      <footer className={styles.footer}>© 2023 Copyright : UnknownPgr</footer>
     </div>
   );
 }

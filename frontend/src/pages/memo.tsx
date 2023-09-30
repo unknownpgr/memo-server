@@ -21,7 +21,7 @@ class MemoEditorService {
   private listeners: (() => void)[] = [];
   private content: string = "";
   private tags: string[] = [];
-  private debouncer: number | null = null;
+  private debounce: number | null = null;
   private editor: EasyMDE | null = null;
   private viewMode: "preview" | "edit" = "preview";
 
@@ -54,11 +54,11 @@ class MemoEditorService {
   private async save() {
     this.isSaving = true;
     this.notify();
-    if (this.debouncer !== null) {
-      clearTimeout(this.debouncer);
+    if (this.debounce !== null) {
+      clearTimeout(this.debounce);
     }
-    this.debouncer = setTimeout(async () => {
-      this.debouncer = null;
+    this.debounce = setTimeout(async () => {
+      this.debounce = null;
       await this.service.updateMemo(this.number, this.content, this.tags);
       this.isSaving = false;
       this.notify();
@@ -81,7 +81,6 @@ class MemoEditorService {
     });
     easyMDE.value(this.content);
     easyMDE.codemirror.on("change", () => this.updateContent(easyMDE.value()));
-    easyMDE.codemirror.on("blur", () => this.setViewMode("preview"));
     this.editor = easyMDE;
   }
 
@@ -116,7 +115,6 @@ class MemoEditorService {
   public setViewMode(mode: "preview" | "edit") {
     if (this.editor === null) return;
     this.viewMode = mode;
-    if (this.viewMode === "edit") this.editor.codemirror.focus();
     this.notify();
   }
 
@@ -149,11 +147,28 @@ export default function Memo({ service }: { service: MemoService }) {
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <h2>
+        <h2 className={styles.title}>
           # {number}
           {isSaving ? "*" : ""}
         </h2>
-        <Link to="/">Home</Link>
+        <span>
+          {
+            {
+              edit: (
+                <button onClick={() => editorService.setViewMode("preview")}>
+                  Preview
+                </button>
+              ),
+              preview: (
+                <button onClick={() => editorService.setViewMode("edit")}>
+                  Edit
+                </button>
+              ),
+            }[viewMode]
+          }
+          &nbsp;
+          <Link to="/">Home</Link>
+        </span>
       </header>
       {/* 
        Use style `height` to hide editor instead of `display` or `hidden` attribute,
@@ -167,14 +182,14 @@ export default function Memo({ service }: { service: MemoService }) {
       >
         <textarea ref={textAreaRef}></textarea>
       </div>
-      <div
-        hidden={viewMode !== "preview"}
-        style={{ minHeight: "100px" }}
-        onClick={() => editorService.setViewMode("edit")}
-        dangerouslySetInnerHTML={{
-          __html: marked(editorService.getContent()),
-        }}
-      ></div>
+      {viewMode === "preview" && (
+        <div
+          style={{ minHeight: "100px" }}
+          dangerouslySetInnerHTML={{
+            __html: marked(editorService.getContent()),
+          }}
+        />
+      )}
       <h3>Tags</h3>
       <Tags tags={tags} setTags={(v) => editorService.updateTags(v)} />
     </div>

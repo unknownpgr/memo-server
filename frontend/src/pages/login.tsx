@@ -1,6 +1,7 @@
 import { KeyboardEvent, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MemoService } from "../service";
+import style from "./login.module.css";
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -64,7 +65,8 @@ export default function Login({ service }: { service: MemoService }) {
   }
 
   return (
-    <div>
+    <div className={style.container}>
+      <h1>Memo</h1>
       <input
         type="text"
         placeholder="username"

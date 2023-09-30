@@ -61,6 +61,8 @@ export interface Repository {
   }): Promise<void>;
 
   getUser({ username }: { username: string }): Promise<User>;
+
+  clearUnusedTags({ userId }: { userId: number }): Promise<void>;
 }
 
 function getRandomHexString(length: number) {
@@ -120,7 +122,15 @@ export class MemoService {
     content: string;
     tags: string[];
   }): Promise<Memo> {
-    return await this.repository.updateMemo({ userId, number, content, tags });
+    const updatedMemo = await this.repository.updateMemo({
+      userId,
+      number,
+      content,
+      tags,
+    });
+    await this.repository.clearUnusedTags({ userId });
+
+    return updatedMemo;
   }
 
   public async deleteMemo({
@@ -130,7 +140,8 @@ export class MemoService {
     userId: number;
     number: number;
   }): Promise<void> {
-    return await this.repository.deleteMemo({ userId, number });
+    await this.repository.deleteMemo({ userId, number });
+    await this.repository.clearUnusedTags({ userId });
   }
 
   public async createUser({

@@ -18,15 +18,6 @@ function convertToMemo(
   };
 }
 
-export function clearUnrelatedTags({ userId }: { userId: number }) {
-  return prisma.tag.deleteMany({
-    where: {
-      userId,
-      memos: { none: { NOT: [{ id: -1 }] } },
-    },
-  });
-}
-
 export class PrismaRepository implements Repository {
   async findMemo({
     userId,
@@ -187,6 +178,15 @@ export class PrismaRepository implements Repository {
     number: number;
   }): Promise<void> {
     await prisma.memo.deleteMany({ where: { userId, number } });
+  }
+
+  async clearUnusedTags({ userId }: { userId: number }): Promise<void> {
+    await prisma.tag.deleteMany({
+      where: {
+        userId,
+        memos: { none: { NOT: [{ id: -1 }] } },
+      },
+    });
   }
 
   async addUser({

@@ -103,17 +103,13 @@ export class PrismaRepository implements Repository {
     content: string;
     tags: string[];
   }): Promise<Memo> {
-    const newNumber =
-      (
-        await prisma.memo.aggregate({
-          where: {
-            userId,
-          },
-          _max: {
-            number: true,
-          },
-        })
-      )._max.number || 0 + 1;
+    const {
+      _max: { number: maxNumber },
+    } = await prisma.memo.aggregate({
+      where: { userId },
+      _max: { number: true },
+    });
+    const newNumber = maxNumber ? maxNumber + 1 : 1;
 
     // Upsert tags
     const tagIds = await Promise.all(

@@ -1,6 +1,6 @@
 import { PrismaClient, Memo as MemoSchema, Tag } from "@prisma/client";
-import { Repository } from "./service";
-import { Memo, User } from "./entity";
+import { Repository } from "../core/memoService";
+import { Memo, User } from "../core/entity";
 
 const prisma = new PrismaClient();
 

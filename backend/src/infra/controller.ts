@@ -1,8 +1,8 @@
 import { Body, Delete, Get, Header, Path, Post, Put, Route } from "tsoa";
-import { MemoService } from "./service";
-import { Memo } from "./entity";
+import { MemoService } from "../core/memoService";
+import { Memo } from "../core/entity";
 import { PrismaRepository } from "./repository";
-import { AuthService } from "./authService";
+import { AuthService } from "../core/authService";
 
 // All dependencies are injected here.
 // For simplicity, dependency injection framework is not used.

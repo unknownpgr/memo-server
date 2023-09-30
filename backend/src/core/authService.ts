@@ -1,5 +1,5 @@
 import fs from "fs/promises";
-import { MemoService } from "./service";
+import { MemoService } from "./memoService";
 
 export class AuthService {
   private authStorage: Map<string, number> = new Map();

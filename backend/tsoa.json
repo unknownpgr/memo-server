@@ -1,5 +1,5 @@
 {
-  "entryFile": "main.ts",
+  "entryFile": "src/main.ts",
   "noImplicitAdditionalProperties": "throw-on-extras",
   "controllerPathGlobs": [
     "**/controller.ts"
@@ -12,7 +12,7 @@
   },
   "routes": {
     "basePath": "/api",
-    "routesDir": "router",
+    "routesDir": "src/router",
     "middleware": "koa"
   }
 }

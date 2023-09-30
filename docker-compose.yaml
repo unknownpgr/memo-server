@@ -7,4 +7,5 @@ services:
   memo-back:
     build: ./backend
     volumes:
-      - ./tmp:/tmp
+      - ./backend/prisma/dev.db:/db/sqlite
+      - /tmp/memo:/tmp

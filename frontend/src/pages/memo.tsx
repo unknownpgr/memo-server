@@ -148,7 +148,7 @@ export default function Memo({ service }: { service: MemoService }) {
 
   return (
     <div className={styles.container}>
-      <header>
+      <header className={styles.header}>
         <h2>
           # {number}
           {isSaving ? "*" : ""}
@@ -175,6 +175,7 @@ export default function Memo({ service }: { service: MemoService }) {
           __html: marked(editorService.getContent()),
         }}
       ></div>
+      <h3>Tags</h3>
       <Tags tags={tags} setTags={(v) => editorService.updateTags(v)} />
     </div>
   );

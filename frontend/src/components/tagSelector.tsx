@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./tagSelector.module.css";
 
 function parseTagString(tagString: string) {
@@ -17,7 +17,7 @@ export default function TagSelector({
   setTags,
 }: {
   tags: string[];
-  setTags: React.Dispatch<React.SetStateAction<string[]>>;
+  setTags: (tags: string[]) => void;
 }) {
   const [tagString, setTagString] = useState("");
 

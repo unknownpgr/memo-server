@@ -23,6 +23,7 @@ class MemoEditorService {
   private tags: string[] = [];
   private debouncer: number | null = null;
   private editor: EasyMDE | null = null;
+  private viewMode: "preview" | "edit" = "preview";
 
   constructor(private service: MemoService, private number: number) {
     if (number < 0) throw new Error("invalid number");
@@ -80,6 +81,7 @@ class MemoEditorService {
     });
     easyMDE.value(this.content);
     easyMDE.codemirror.on("change", () => this.updateContent(easyMDE.value()));
+    easyMDE.codemirror.on("blur", () => this.setViewMode("preview"));
     this.editor = easyMDE;
   }
 
@@ -111,9 +113,15 @@ class MemoEditorService {
     return this.tags;
   }
 
-  public focus() {
+  public setViewMode(mode: "preview" | "edit") {
     if (this.editor === null) return;
-    this.editor.codemirror.focus();
+    this.viewMode = mode;
+    if (this.viewMode === "edit") this.editor.codemirror.focus();
+    this.notify();
+  }
+
+  public getViewMode() {
+    return this.viewMode;
   }
 }
 
@@ -133,10 +141,10 @@ export default function Memo({ service }: { service: MemoService }) {
   const number = useMemoId();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const editorService = useMemoEditorService(service, number);
-  const [viewMode, setViewMode] = useState<"preview" | "edit">("preview");
   editorService.setEditorElement(textAreaRef.current);
   const isSaving = editorService.getIsSaving();
   const tags = editorService.getTags();
+  const viewMode = editorService.getViewMode();
 
   return (
     <div className={styles.container}>
@@ -147,15 +155,22 @@ export default function Memo({ service }: { service: MemoService }) {
         </h2>
         <Link to="/">Home</Link>
       </header>
-      <div hidden={viewMode !== "edit"} onBlur={() => setViewMode("preview")}>
+      {/* 
+       Use style `height` to hide editor instead of `display` or `hidden` attribute,
+       because it will not be rendered when it is hidden.
+       */}
+      <div
+        style={{
+          overflow: "hidden",
+          height: viewMode === "edit" ? "100%" : "0",
+        }}
+      >
         <textarea ref={textAreaRef}></textarea>
       </div>
       <div
         hidden={viewMode !== "preview"}
-        onClick={() => {
-          setViewMode("edit");
-          editorService.focus();
-        }}
+        style={{ minHeight: "100px" }}
+        onClick={() => editorService.setViewMode("edit")}
         dangerouslySetInnerHTML={{
           __html: marked(editorService.getContent()),
         }}

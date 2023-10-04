@@ -166,7 +166,7 @@ export default function Memo({ service }: { service: MemoService }) {
               ),
             }[viewMode]
           }
-          &nbsp;
+          &nbsp;/&nbsp;
           <Link to="/">Home</Link>
         </span>
       </header>
@@ -178,8 +178,7 @@ export default function Memo({ service }: { service: MemoService }) {
         style={{
           overflow: "hidden",
           height: viewMode === "edit" ? "100%" : "0",
-        }}
-      >
+        }}>
         <textarea ref={textAreaRef}></textarea>
       </div>
       {viewMode === "preview" && (

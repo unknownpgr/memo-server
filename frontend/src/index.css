@@ -31,8 +31,8 @@ h6 {
   font-family: "Noto Serif KR", serif;
 }
 
-input,
-textarea {
+textarea,
+input[type="text"] {
   border: none;
   padding: 0;
   outline: none;

@@ -166,7 +166,6 @@ function Path({ id }: { id: number }) {
 export default function MemoView() {
   const memoId = useMemoId();
   const editorService = useMemoEditorService(service, memoId);
-  const isSaving = editorService.getIsSaving();
   const viewMode = editorService.getViewMode();
   const [showSelector, setShowSelector] = useState(false);
   const navigate = useNavigate();
@@ -192,7 +191,6 @@ export default function MemoView() {
           value={editorService.getTitle()}
           onChange={(e) => editorService.setTitle(e.target.value)}
         />
-        {isSaving ? "*" : ""}
       </h2>
       <div>
         <button onClick={() => setShowSelector(true)}>
@@ -227,8 +225,7 @@ export default function MemoView() {
           className={styles.content}
           value={editorService.getContent()}
           placeholder="Content"
-          onChange={(e) => editorService.setContent(e.target.value)}
-        ></textarea>
+          onChange={(e) => editorService.setContent(e.target.value)}></textarea>
       )}
       {viewMode === "preview" && (
         <div

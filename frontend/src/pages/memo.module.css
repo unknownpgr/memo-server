@@ -12,6 +12,7 @@
 }
 
 .titleInput {
+  width: 100%;
   font-size: 2rem;
   border: none;
   font-weight: bold;

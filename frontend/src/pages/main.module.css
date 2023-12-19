@@ -5,6 +5,7 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 .newMemoButton {
@@ -19,6 +20,8 @@
 }
 
 .columns {
+  width: 100%;
+  max-width: 100rem;
   height: 100%;
   overflow: hidden;
   display: flex;
@@ -27,10 +30,49 @@
 }
 
 .columnList {
+  position: relative;
   width: 20rem;
   height: 100%;
-  overflow: scroll;
+  overflow-y: scroll;
+  overflow-x: hidden;
   padding: 2rem 0;
+  transition-duration: 0.5s;
+}
+
+.hideList {
+  width: 0;
+  padding: 0;
+}
+
+.toggleListButton {
+  font-size: 0.5rem;
+  background-color: #212529;
+  color: white;
+  padding: 0.25rem;
+  border: none;
+  outline: none;
+  height: 2rem;
+  position: absolute;
+  top: 50%;
+  left: 22rem;
+  transform: translateY(-50%);
+  transition-duration: 0.5s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 0 0.25rem 0.25rem 0;
+}
+
+@media (min-width: 1024px) {
+  .toggleListButton {
+    display: none;
+  }
+}
+
+.hideButton {
+  left: 0;
+  display: flex;
 }
 
 .columnView {

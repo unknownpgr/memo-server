@@ -127,7 +127,6 @@ function useMemoEditorService(service: MemoService, number: number) {
   if (ref.current === null)
     ref.current = new MemoEditorService(service, number);
   useEffect(() => {
-    if (ref.current!.getMemoId() === number) return;
     ref.current = new MemoEditorService(service, number);
     setCount((c) => c + 1);
     const listener = () => setCount((c) => c + 1);

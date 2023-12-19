@@ -45,4 +45,6 @@
   width: 100%;
   min-height: 80vh;
   resize: none;
+  border: none;
+  outline: none;
 }

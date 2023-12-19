@@ -30,6 +30,7 @@ export default function Home() {
   const [memos, setMemos] = useState<MemoSummary[]>([]);
   const navigate = useNavigate();
   const memoId = useMemoId();
+  const [showList, setShowList] = useState(true);
 
   const refresh = useCallback(async () => {
     if (!service.isLoggedIn()) {
@@ -65,7 +66,8 @@ export default function Home() {
     <div className={styles.container}>
       <Header service={service} />
       <div className={styles.columns}>
-        <div className={styles.columnList}>
+        <div
+          className={styles.columnList + " " + (!showList && styles.hideList)}>
           <button className={styles.newMemoButton} onClick={createMemo}>
             + New Memo
           </button>
@@ -82,6 +84,13 @@ export default function Home() {
             © 2023 Copyright : UnknownPgr
           </footer>
         </div>
+        <button
+          className={
+            styles.toggleListButton + " " + (!showList && styles.hideButton)
+          }
+          onClick={() => setShowList(!showList)}>
+          &lt;
+        </button>
       </div>
     </div>
   );

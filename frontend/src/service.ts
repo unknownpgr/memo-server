@@ -1,4 +1,4 @@
-import { DefaultService } from "./api";
+import { DefaultService, Memo } from "./api";
 
 export class MemoService {
   private api = DefaultService;
@@ -38,10 +38,10 @@ export class MemoService {
     return !!this.token;
   }
 
-  public async findMemo(number: number) {
+  public async findMemo(memoId: number) {
     this.authorized();
     return await this.api.findMemo({
-      number,
+      memoId,
       authorization: this.token,
     });
   }
@@ -53,27 +53,26 @@ export class MemoService {
     });
   }
 
-  public async createMemo(content: string, tags: string[]) {
+  public async createMemo() {
     this.authorized();
     return await this.api.createMemo({
       authorization: this.token,
-      requestBody: { content, tags },
     });
   }
 
-  public async updateMemo(number: number, content: string, tags: string[]) {
+  public async updateMemo(memo: Memo) {
     this.authorized();
     return await this.api.updateMemo({
-      number,
+      memoId: memo.id,
       authorization: this.token,
-      requestBody: { content, tags },
+      requestBody: { memo },
     });
   }
 
-  public async deleteMemo(number: number) {
+  public async deleteMemo(memoId: number) {
     this.authorized();
     return await this.api.deleteMemo({
-      number,
+      memoId,
       authorization: this.token,
     });
   }

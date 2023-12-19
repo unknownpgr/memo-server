@@ -1,11 +1,10 @@
-import EasyMDE from "easymde";
-import { useEffect, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import Tags from "../components/tagSelector";
-import { MemoService } from "../service";
-import styles from "./memo.module.css";
 import { marked } from "marked";
 import markedKatex from "marked-katex-extension";
+import { useEffect, useRef, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { Memo } from "../api";
+import { MemoService } from "../service";
+import styles from "./memo.module.css";
 
 marked.use(markedKatex({ throwOnError: false }));
 
@@ -16,13 +15,11 @@ function useMemoId() {
 }
 
 class MemoEditorService {
+  private memo: Memo | null = null;
   private isLoading = false;
   private isSaving = false;
   private listeners: (() => void)[] = [];
-  private content: string = "";
-  private tags: string[] = [];
   private debounce: number | null = null;
-  private editor: EasyMDE | null = null;
   private viewMode: "preview" | "edit" = "preview";
 
   constructor(private service: MemoService, private number: number) {
@@ -45,8 +42,7 @@ class MemoEditorService {
     if (this.isLoading) return;
     this.isLoading = true;
     const memo = await this.service.findMemo(this.number);
-    this.content = memo.content;
-    this.tags = memo.tags;
+    this.memo = memo;
     this.isLoading = false;
     this.notify();
   }
@@ -59,39 +55,15 @@ class MemoEditorService {
     }
     this.debounce = setTimeout(async () => {
       this.debounce = null;
-      await this.service.updateMemo(this.number, this.content, this.tags);
+      if (this.memo === null) return;
+      await this.service.updateMemo(this.memo);
       this.isSaving = false;
       this.notify();
     }, 1000);
   }
 
-  public setEditorElement(textArea: HTMLTextAreaElement | null) {
-    if (this.isLoading) return;
-    if (textArea === null) return;
-    if (this.editor !== null) return;
-    const easyMDE = new EasyMDE({
-      element: textArea,
-      autoDownloadFontAwesome: true,
-      spellChecker: false,
-      toolbar: false,
-      scrollbarStyle: "null",
-      renderingConfig: {
-        codeSyntaxHighlighting: true,
-      },
-    });
-    easyMDE.value(this.content);
-    easyMDE.codemirror.on("change", () => this.updateContent(easyMDE.value()));
-    this.editor = easyMDE;
-  }
-
   public async updateContent(content: string) {
-    this.content = content;
-    this.save();
-    this.notify();
-  }
-
-  public async updateTags(tags: string[]) {
-    this.tags = tags;
+    this.memo!.content = content;
     this.save();
     this.notify();
   }
@@ -105,15 +77,10 @@ class MemoEditorService {
   }
 
   public getContent() {
-    return this.content;
-  }
-
-  public getTags() {
-    return this.tags;
+    return this.memo?.content ?? "";
   }
 
   public setViewMode(mode: "preview" | "edit") {
-    if (this.editor === null) return;
     this.viewMode = mode;
     this.notify();
   }
@@ -135,13 +102,10 @@ function useMemoEditorService(service: MemoService, number: number) {
   return ref.current;
 }
 
-export default function Memo({ service }: { service: MemoService }) {
+export default function MemoView({ service }: { service: MemoService }) {
   const number = useMemoId();
-  const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const editorService = useMemoEditorService(service, number);
-  editorService.setEditorElement(textAreaRef.current);
   const isSaving = editorService.getIsSaving();
-  const tags = editorService.getTags();
   const viewMode = editorService.getViewMode();
 
   return (
@@ -170,16 +134,17 @@ export default function Memo({ service }: { service: MemoService }) {
           <Link to="/">Home</Link>
         </span>
       </header>
-      {/* 
-       Use style `height` to hide editor instead of `display` or `hidden` attribute,
-       because it will not be rendered when it is hidden.
-       */}
       <div
         style={{
           overflow: "hidden",
           height: viewMode === "edit" ? "100%" : "0",
-        }}>
-        <textarea ref={textAreaRef}></textarea>
+        }}
+      >
+        <textarea
+          style={{ minHeight: "100rem" }}
+          value={editorService.getContent()}
+          onChange={(e) => editorService.updateContent(e.target.value)}
+        ></textarea>
       </div>
       {viewMode === "preview" && (
         <div
@@ -189,8 +154,6 @@ export default function Memo({ service }: { service: MemoService }) {
           }}
         />
       )}
-      <h3>Tags</h3>
-      <Tags tags={tags} setTags={(v) => editorService.updateTags(v)} />
     </div>
   );
 }

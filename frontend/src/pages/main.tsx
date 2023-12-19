@@ -1,12 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Memo } from "../api";
+import { MemoSummary } from "../api";
 import { Header } from "../components/header";
-import MemoList from "../components/memolist";
-import Tag from "../components/tag";
-import TagSelector from "../components/tagSelector";
 import { MemoService } from "../service";
 import styles from "./main.module.css";
+import MemoList from "../components/memolist";
 
 function isHttpResponseError(
   error: unknown
@@ -20,9 +18,7 @@ function isHttpResponseError(
 }
 
 export default function Home({ service }: { service: MemoService }) {
-  const [memos, setMemos] = useState<Memo[]>([]);
-  const [tagList, setTagList] = useState<string[]>([]);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [memos, setMemos] = useState<MemoSummary[]>([]);
   const navigate = useNavigate();
 
   const refresh = useCallback(async () => {
@@ -33,9 +29,7 @@ export default function Home({ service }: { service: MemoService }) {
 
     try {
       const res = await service.listMemo();
-      const { memos, tags } = res;
-      setMemos(memos);
-      setTagList(tags);
+      setMemos(res);
     } catch (error: unknown) {
       if (isHttpResponseError(error) && error.response.status === 401) {
         navigate("/login");
@@ -47,8 +41,8 @@ export default function Home({ service }: { service: MemoService }) {
   }, [navigate, service]);
 
   const createMemo = useCallback(async () => {
-    const newMemo = await service.createMemo("This is a new memo", []);
-    navigate(`/memo/${newMemo.number}`);
+    const newMemo = await service.createMemo();
+    navigate(`/memo/${newMemo.id}`);
   }, [service, navigate]);
 
   const deleteMemo = useCallback(
@@ -60,24 +54,11 @@ export default function Home({ service }: { service: MemoService }) {
     [service, refresh]
   );
 
-  const onTagSelected = useCallback(
-    (tag: string) => {
-      if (selectedTags.includes(tag)) {
-        setSelectedTags((tags) => tags.filter((x) => x !== tag));
-      } else {
-        setSelectedTags((tags) => [...tags, tag]);
-      }
-    },
-    [selectedTags]
-  );
-
   useEffect(() => {
     refresh();
   }, [refresh]);
 
-  if (!memos || !tagList) return <h1>Loading</h1>;
-
-  const mergedTags = Array.from(new Set([...tagList, ...selectedTags]));
+  if (!memos) return <h1>Loading</h1>;
 
   return (
     <div className={styles.container}>
@@ -86,34 +67,7 @@ export default function Home({ service }: { service: MemoService }) {
         <button onClick={createMemo}>Create new memo</button>
       </div>
       <br />
-      <h2>Tags</h2>
-      <div>
-        {mergedTags.map((value, i) => (
-          <>
-            <Tag
-              key={i}
-              value={value}
-              onClick={() => onTagSelected(value)}
-              disabled={selectedTags.indexOf(value) >= 0}
-            ></Tag>
-            {i < mergedTags.length - 1 && ", "}
-          </>
-        ))}
-      </div>
-      <br />
-      <TagSelector tags={selectedTags} setTags={setSelectedTags}></TagSelector>
-
-      <br />
-      <br />
-      <MemoList
-        memos={memos.filter((memo) => {
-          if (selectedTags.length === 0) return true;
-          const memoTags = new Set(memo.tags);
-          for (const tag of selectedTags) if (!memoTags.has(tag)) return false;
-          return true;
-        })}
-        onDeleteMemo={deleteMemo}
-      />
+      <MemoList memos={memos} onDeleteMemo={deleteMemo} />
       <footer className={styles.footer}>© 2023 Copyright : UnknownPgr</footer>
     </div>
   );

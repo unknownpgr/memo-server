@@ -1,10 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { MemoSummary } from "../api";
 import { Header } from "../components/header";
 import MemoList from "../components/memolist";
 import { memoService } from "../service";
 import styles from "./main.module.css";
+import MemoView from "./memo";
+
+function useMemoId() {
+  const { id } = useParams();
+  if (!id) return -1;
+  return parseInt(id);
+}
 
 function isHttpResponseError(
   error: unknown
@@ -22,6 +29,7 @@ const service = memoService;
 export default function Home() {
   const [memos, setMemos] = useState<MemoSummary[]>([]);
   const navigate = useNavigate();
+  const memoId = useMemoId();
 
   const refresh = useCallback(async () => {
     if (!service.isLoggedIn()) {
@@ -40,12 +48,12 @@ export default function Home() {
         console.error(error);
       }
     }
-  }, [navigate, service]);
+  }, [navigate]);
 
   const createMemo = useCallback(async () => {
     const newMemo = await service.createMemo();
     navigate(`/memo/${newMemo.id}`);
-  }, [service, navigate]);
+  }, [navigate]);
 
   useEffect(() => {
     refresh();
@@ -56,12 +64,25 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <Header service={service} />
-      <div>
-        <button onClick={createMemo}>Create new memo</button>
+      <div className={styles.columns}>
+        <div className={styles.columnList}>
+          <button className={styles.newMemoButton} onClick={createMemo}>
+            + New Memo
+          </button>
+          <MemoList memos={memos} />
+        </div>
+        <div className={styles.divider} />
+        <div className={styles.columnView}>
+          {memoId === -1 ? (
+            <div>Select a memo</div>
+          ) : (
+            <MemoView memoId={memoId} />
+          )}
+          <footer className={styles.footer}>
+            © 2023 Copyright : UnknownPgr
+          </footer>
+        </div>
       </div>
-      <br />
-      <MemoList memos={memos} />
-      <footer className={styles.footer}>© 2023 Copyright : UnknownPgr</footer>
     </div>
   );
 }

@@ -21,7 +21,6 @@ export function Header({ service }: { service: MemoService }) {
           </button>
         )}
       </header>
-      <br />
     </>
   );
 }

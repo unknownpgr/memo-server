@@ -1,9 +1,14 @@
 .header {
+  background-color: #fff;
+  width: 100%;
+  padding: 0.5rem 2rem;
   display: flex;
   flex-direction: row;
+  border-bottom: 1px solid #e9ecef;
 }
 
 .title {
+  margin: 0;
   margin-right: auto;
 }
 

@@ -1,19 +1,13 @@
 import { marked } from "marked";
 import markedKatex from "marked-katex-extension";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Memo, MemoSummary } from "../api";
 import { MemoSelector } from "../components/memoselector";
 import { MemoService, memoService } from "../service";
 import styles from "./memo.module.css";
 
 marked.use(markedKatex({ throwOnError: false }));
-
-function useMemoId() {
-  const { id } = useParams();
-  if (!id) return -1;
-  return parseInt(id);
-}
 
 class MemoEditorService {
   private memo: Memo | null = null;
@@ -61,6 +55,10 @@ class MemoEditorService {
       this.isSaving = false;
       this.notify();
     }, 1000);
+  }
+
+  public getMemoId() {
+    return this.memoId;
   }
 
   public getIsLoading() {
@@ -129,9 +127,12 @@ function useMemoEditorService(service: MemoService, number: number) {
   if (ref.current === null)
     ref.current = new MemoEditorService(service, number);
   useEffect(() => {
+    if (ref.current!.getMemoId() === number) return;
+    ref.current = new MemoEditorService(service, number);
+    setCount((c) => c + 1);
     const listener = () => setCount((c) => c + 1);
     return ref.current!.addListener(listener);
-  }, []);
+  }, [service, number]);
   return ref.current;
 }
 
@@ -163,8 +164,7 @@ function Path({ id }: { id: number }) {
   return "Located at / " + path;
 }
 
-export default function MemoView() {
-  const memoId = useMemoId();
+export default function MemoView({ memoId }: { memoId: number }) {
   const editorService = useMemoEditorService(service, memoId);
   const viewMode = editorService.getViewMode();
   const [showSelector, setShowSelector] = useState(false);
@@ -183,15 +183,13 @@ export default function MemoView() {
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>
-        <input
-          type="text"
-          className={styles.titleInput}
-          placeholder="Title"
-          value={editorService.getTitle()}
-          onChange={(e) => editorService.setTitle(e.target.value)}
-        />
-      </h2>
+      <input
+        type="text"
+        className={styles.titleInput}
+        placeholder="Title"
+        value={editorService.getTitle()}
+        onChange={(e) => editorService.setTitle(e.target.value)}
+      />
       <div>
         <button onClick={() => setShowSelector(true)}>
           <Path id={editorService.getParentId()} />
@@ -214,8 +212,6 @@ export default function MemoView() {
               ),
             }[viewMode]
           }
-          &nbsp;/&nbsp;
-          <Link to="/">Home</Link>
           &nbsp;/&nbsp;
           <button onClick={deleteMemo}>Delete</button>
         </span>

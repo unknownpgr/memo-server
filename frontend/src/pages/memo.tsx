@@ -221,14 +221,14 @@ export default function MemoView({ memoId }: { memoId: number }) {
       </div>
       {viewMode === "edit" && (
         <textarea
-          className={styles.content}
+          className={styles.contentEditor}
           value={editorService.getContent()}
           placeholder="Content"
           onChange={(e) => editorService.setContent(e.target.value)}></textarea>
       )}
       {viewMode === "preview" && (
         <div
-          className={styles.content}
+          className={styles.contentPreview}
           style={{ minHeight: "100px" }}
           dangerouslySetInnerHTML={{
             __html: marked(editorService.getContent()),

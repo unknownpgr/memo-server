@@ -12,6 +12,7 @@
 .toolbarItem {
   font-size: 0.8rem;
   color: #868e96;
+  outline: none;
 }
 
 .header {
@@ -54,14 +55,16 @@
   overflow: scroll;
 }
 
-.content {
+.contentEditor {
   width: 100%;
   min-height: 80vh;
   resize: none;
   border: none;
   outline: none;
+  padding: 0;
+  font-size: 1rem;
 }
 
-.content li {
+.contentPreview li {
   margin-bottom: 0.5rem;
 }

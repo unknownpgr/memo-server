@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { MemoSummary } from "../api";
-import { Header } from "../components/header";
 import MemoList from "../components/memolist";
 import { memoService } from "../service";
 import styles from "./main.module.css";
@@ -60,15 +59,26 @@ export default function Home() {
     refresh();
   }, [refresh]);
 
+  async function signOut() {
+    await service.logout();
+    navigate("/login");
+  }
+
   if (!memos) return <h1>Loading</h1>;
 
   return (
     <div className={styles.container}>
-      <Header service={service} />
       <div className={styles.columns}>
         <div
           className={styles.columnList + " " + (!showList && styles.hideList)}>
-          <button className={styles.newMemoButton} onClick={createMemo}>
+          <button
+            className={styles.button + " " + styles.signOutButton}
+            onClick={signOut}>
+            Sign out
+          </button>
+          <button
+            className={styles.button + " " + styles.newMemoButton}
+            onClick={createMemo}>
             + New Memo
           </button>
           <MemoList memos={memos} />
@@ -80,9 +90,6 @@ export default function Home() {
           ) : (
             <MemoView memoId={memoId} />
           )}
-          <footer className={styles.footer}>
-            © 2023 Copyright : UnknownPgr
-          </footer>
         </div>
         <button
           className={

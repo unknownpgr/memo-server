@@ -1,5 +1,17 @@
 .container {
   width: 100%;
+  color: #37352f;
+}
+
+.toolbar {
+  margin-bottom: 1rem;
+  font-size: 0.8rem;
+  color: #868e96;
+}
+
+.toolbarItem {
+  font-size: 0.8rem;
+  color: #868e96;
 }
 
 .header {
@@ -15,6 +27,7 @@
   border: none;
   font-weight: bold;
   outline: none;
+  padding: 0;
 }
 
 .selector {
@@ -47,4 +60,8 @@
   resize: none;
   border: none;
   outline: none;
+}
+
+.content li {
+  margin-bottom: 0.5rem;
 }

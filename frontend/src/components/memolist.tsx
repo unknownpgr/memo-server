@@ -44,7 +44,7 @@ export default function MemoList({ memos }: { memos: MemoSummary[] }) {
   const memoTree = constructMemoTree(sortedMemoList);
 
   return (
-    <div>
+    <div className={styles.list}>
       {memoTree.children.map((c) => (
         <MemoItem key={c.id} {...c} />
       ))}

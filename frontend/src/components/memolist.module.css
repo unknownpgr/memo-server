@@ -1,7 +1,12 @@
 .item {
-  margin: 0.5rem 0;
-  font-size: 1.25rem;
-  font-weight: bold;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #212529;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
 .children {

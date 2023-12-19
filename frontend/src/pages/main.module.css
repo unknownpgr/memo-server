@@ -8,35 +8,48 @@
   align-items: center;
 }
 
-.newMemoButton {
+.button {
   width: 100%;
-  background-color: #212529;
-  color: white;
-  font-size: 1.5rem;
-  border: none;
+  font-size: 0.9rem;
+  font-weight: bold;
+  border: solid 1px #ced4da;
+  border-radius: 0.25rem;
   outline: none;
   padding: 0.25rem;
   cursor: pointer;
 }
 
+.newMemoButton {
+  margin-top: 0.5rem;
+}
+
+.signOutButton {
+}
+
 .columns {
   width: 100%;
-  max-width: 100rem;
   height: 100%;
   overflow: hidden;
   display: flex;
   flex-direction: row;
-  padding: 0 2rem;
 }
 
 .columnList {
   position: relative;
-  width: 20rem;
+  width: 100%;
   height: 100%;
   overflow-y: scroll;
   overflow-x: hidden;
-  padding: 2rem 0;
+  padding: 1.5rem 1.5rem;
   transition-duration: 0.5s;
+  /* background-color: #f8f9fa; */
+  /* border-right: 1px solid #e9ecef; */
+}
+
+@media (min-width: 1024px) {
+  .columnList {
+    width: 15rem;
+  }
 }
 
 .hideList {
@@ -54,14 +67,13 @@
   height: 2rem;
   position: absolute;
   top: 50%;
-  left: 22rem;
+  right: 0;
   transform: translateY(-50%);
   transition-duration: 0.5s;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  border-radius: 0 0.25rem 0.25rem 0;
 }
 
 @media (min-width: 1024px) {
@@ -71,21 +83,23 @@
 }
 
 .hideButton {
-  left: 0;
+  right: 100%;
+  transform: translateY(-50%) translateX(100%) rotate(180deg);
   display: flex;
 }
 
 .columnView {
   flex: 1;
+  width: 100%;
+  max-width: 50rem;
+  margin: auto;
   height: 100%;
   overflow: scroll;
-  padding: 2rem 0;
-  margin-left: 2rem;
+  padding: 0;
 }
 
-.footer {
-  display: flex;
-  height: 6rem;
-  align-items: center;
-  justify-content: center;
+@media (min-width: 1024px) {
+  .columnView {
+    padding: 6rem 6rem;
+  }
 }

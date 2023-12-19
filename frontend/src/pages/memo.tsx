@@ -157,10 +157,10 @@ function Path({ id }: { id: number }) {
       path.push(memo.title);
       current = memo.parentId;
     }
-    return path.reverse().join(" / ");
+    return path.reverse().join("/");
   }, [id, memoList]);
 
-  return "Located at / " + path;
+  return path;
 }
 
 export default function MemoView({ memoId }: { memoId: number }) {
@@ -189,32 +189,36 @@ export default function MemoView({ memoId }: { memoId: number }) {
         value={editorService.getTitle()}
         onChange={(e) => editorService.setTitle(e.target.value)}
       />
-      <div>
-        <button onClick={() => setShowSelector(true)}>
+      <div className={styles.toolbar}>
+        <button
+          className={styles.toolbarItem}
+          onClick={() => setShowSelector(true)}>
           <Path id={editorService.getParentId()} />
         </button>
-      </div>
-      <br />
-      <header className={styles.header}>
-        <span>
+        &nbsp;|&nbsp;
+        {
           {
-            {
-              edit: (
-                <button onClick={() => editorService.setViewMode("preview")}>
-                  Preview
-                </button>
-              ),
-              preview: (
-                <button onClick={() => editorService.setViewMode("edit")}>
-                  Edit
-                </button>
-              ),
-            }[viewMode]
-          }
-          &nbsp;/&nbsp;
-          <button onClick={deleteMemo}>Delete</button>
-        </span>
-      </header>
+            edit: (
+              <button
+                className={styles.toolbarItem}
+                onClick={() => editorService.setViewMode("preview")}>
+                Preview
+              </button>
+            ),
+            preview: (
+              <button
+                className={styles.toolbarItem}
+                onClick={() => editorService.setViewMode("edit")}>
+                Edit
+              </button>
+            ),
+          }[viewMode]
+        }
+        &nbsp;|&nbsp;
+        <button className={styles.toolbarItem} onClick={deleteMemo}>
+          Delete
+        </button>
+      </div>
       {viewMode === "edit" && (
         <textarea
           className={styles.content}
@@ -224,6 +228,7 @@ export default function MemoView({ memoId }: { memoId: number }) {
       )}
       {viewMode === "preview" && (
         <div
+          className={styles.content}
           style={{ minHeight: "100px" }}
           dangerouslySetInnerHTML={{
             __html: marked(editorService.getContent()),

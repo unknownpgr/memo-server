@@ -3,10 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type Memo = {
+export type MemoSummary = {
     updatedAt: string;
     createdAt: string;
-    content: string;
     title: string;
     userId: number;
     parentId: number;

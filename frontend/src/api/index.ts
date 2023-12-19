@@ -8,5 +8,6 @@ export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { Memo } from './models/Memo';
+export type { MemoSummary } from './models/MemoSummary';
 
 export { DefaultService } from './services/DefaultService';

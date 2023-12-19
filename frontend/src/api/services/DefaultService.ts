@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Memo } from '../models/Memo';
+import type { MemoSummary } from '../models/MemoSummary';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -73,17 +74,17 @@ export class DefaultService {
      * @throws ApiError
      */
     public static findMemo({
-        number,
+        memoId,
         authorization,
     }: {
-        number: number,
+        memoId: number,
         authorization: string,
     }): CancelablePromise<Memo> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/memo/{number}',
+            url: '/memo/{memoId}',
             path: {
-                'number': number,
+                'memoId': memoId,
             },
             headers: {
                 'authorization': authorization,
@@ -96,22 +97,21 @@ export class DefaultService {
      * @throws ApiError
      */
     public static updateMemo({
-        number,
+        memoId,
         authorization,
         requestBody,
     }: {
-        number: number,
+        memoId: number,
         authorization: string,
         requestBody: {
-            tags: Array<string>;
-            content: string;
+            memo: Memo;
         },
     }): CancelablePromise<Memo> {
         return __request(OpenAPI, {
             method: 'PUT',
-            url: '/memo/{number}',
+            url: '/memo/{memoId}',
             path: {
-                'number': number,
+                'memoId': memoId,
             },
             headers: {
                 'authorization': authorization,
@@ -126,17 +126,17 @@ export class DefaultService {
      * @throws ApiError
      */
     public static deleteMemo({
-        number,
+        memoId,
         authorization,
     }: {
-        number: number,
+        memoId: number,
         authorization: string,
     }): CancelablePromise<void> {
         return __request(OpenAPI, {
             method: 'DELETE',
-            url: '/memo/{number}',
+            url: '/memo/{memoId}',
             path: {
-                'number': number,
+                'memoId': memoId,
             },
             headers: {
                 'authorization': authorization,
@@ -145,17 +145,14 @@ export class DefaultService {
     }
 
     /**
-     * @returns any Ok
+     * @returns MemoSummary Ok
      * @throws ApiError
      */
     public static listMemo({
         authorization,
     }: {
         authorization: string,
-    }): CancelablePromise<{
-        memos: Array<Memo>;
-        tags: Array<string>;
-    }> {
+    }): CancelablePromise<Array<MemoSummary>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/memo',
@@ -171,13 +168,8 @@ export class DefaultService {
      */
     public static createMemo({
         authorization,
-        requestBody,
     }: {
         authorization: string,
-        requestBody: {
-            tags: Array<string>;
-            content: string;
-        },
     }): CancelablePromise<Memo> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -185,8 +177,6 @@ export class DefaultService {
             headers: {
                 'authorization': authorization,
             },
-            body: requestBody,
-            mediaType: 'application/json',
         });
     }
 

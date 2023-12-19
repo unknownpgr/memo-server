@@ -1,34 +1,9 @@
 .item {
-  margin-bottom: 3rem;
+  margin: 0.5rem 0;
+  font-size: 1.25rem;
+  font-weight: bold;
 }
 
-.header {
-  display: flex;
-  flex-direction: row;
-  margin-bottom: 0.5rem;
-}
-
-.title {
-  margin-top: 0;
-  margin-bottom: 0;
-  margin-right: 0.5rem;
-}
-
-.tag {
-  display: flex;
-  align-items: center;
-  margin-right: 0.25rem;
-}
-
-.delete {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-}
-
-.content {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  flex: 1;
+.children {
+  padding-left: 2rem;
 }

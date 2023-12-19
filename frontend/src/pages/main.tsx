@@ -2,9 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MemoSummary } from "../api";
 import { Header } from "../components/header";
-import { MemoService } from "../service";
-import styles from "./main.module.css";
 import MemoList from "../components/memolist";
+import { memoService } from "../service";
+import styles from "./main.module.css";
 
 function isHttpResponseError(
   error: unknown
@@ -17,7 +17,9 @@ function isHttpResponseError(
   return true;
 }
 
-export default function Home({ service }: { service: MemoService }) {
+const service = memoService;
+
+export default function Home() {
   const [memos, setMemos] = useState<MemoSummary[]>([]);
   const navigate = useNavigate();
 
@@ -67,7 +69,7 @@ export default function Home({ service }: { service: MemoService }) {
         <button onClick={createMemo}>Create new memo</button>
       </div>
       <br />
-      <MemoList memos={memos} onDeleteMemo={deleteMemo} />
+      <MemoList memos={memos} />
       <footer className={styles.footer}>© 2023 Copyright : UnknownPgr</footer>
     </div>
   );

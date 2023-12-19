@@ -1,11 +1,13 @@
 import { KeyboardEvent, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { MemoService } from "../service";
+import { memoService } from "../service";
 import style from "./login.module.css";
 
 const MIN_PASSWORD_LENGTH = 8;
 
-export default function Login({ service }: { service: MemoService }) {
+const service = memoService;
+
+export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");

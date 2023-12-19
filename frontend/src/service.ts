@@ -77,3 +77,5 @@ export class MemoService {
     });
   }
 }
+
+export const memoService = new MemoService();

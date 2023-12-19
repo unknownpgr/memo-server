@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400;500;600;700;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@200;300;400;500;600;700;900&display=swap");
 
 * {
   box-sizing: border-box;
@@ -8,14 +8,10 @@ html,
 body {
   padding: 0;
   margin: 0;
-  font-family: "Noto Serif KR", sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
 }
 
-body::-webkit-scrollbar {
-  display: none;
-}
-
-textarea::-webkit-scrollbar {
+*::-webkit-scrollbar {
   display: none;
 }
 
@@ -28,16 +24,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "Noto Serif KR", serif;
-}
-
-textarea,
-input[type="text"] {
-  border: none;
-  padding: 0;
-  outline: none;
-  width: 100%;
-  font-size: 1rem;
+  font-family: "Noto Sans KR", serif;
 }
 
 a {

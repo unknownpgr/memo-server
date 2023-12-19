@@ -34,13 +34,17 @@ export class PrismaRepository implements Repository {
         parentId: true,
         userId: true,
         title: true,
+        content: true, // Will be removed in the future
         createdAt: true,
         updatedAt: true,
       },
       orderBy: { updatedAt: "desc" },
     });
 
-    return results.map((memo) => memoSummarySchema.parse(memo));
+    return results.map((memo) => {
+      if (!memo.title) memo.title = memo.content?.slice(0, 20) || "No title";
+      return memoSummarySchema.parse(memo);
+    });
   }
 
   async createMemo({ userId }: { userId: number }): Promise<Memo> {

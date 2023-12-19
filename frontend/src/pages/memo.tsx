@@ -1,11 +1,11 @@
 import { marked } from "marked";
 import markedKatex from "marked-katex-extension";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Memo, MemoSummary } from "../api";
+import { MemoSelector } from "../components/memoselector";
 import { MemoService, memoService } from "../service";
 import styles from "./memo.module.css";
-import { MemoSelector } from "../components/memoselector";
 
 marked.use(markedKatex({ throwOnError: false }));
 
@@ -169,6 +169,18 @@ export default function MemoView() {
   const isSaving = editorService.getIsSaving();
   const viewMode = editorService.getViewMode();
   const [showSelector, setShowSelector] = useState(false);
+  const navigate = useNavigate();
+
+  const deleteMemo = useCallback(async () => {
+    if (
+      !confirm(
+        `Do you really want to delete memo [${editorService.getTitle()}]?`
+      )
+    )
+      return;
+    await service.deleteMemo(memoId);
+    navigate("/");
+  }, [memoId, editorService, navigate]);
 
   return (
     <div className={styles.container}>
@@ -206,6 +218,8 @@ export default function MemoView() {
           }
           &nbsp;/&nbsp;
           <Link to="/">Home</Link>
+          &nbsp;/&nbsp;
+          <button onClick={deleteMemo}>Delete</button>
         </span>
       </header>
       {viewMode === "edit" && (

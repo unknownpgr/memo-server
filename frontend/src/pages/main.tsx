@@ -47,15 +47,6 @@ export default function Home() {
     navigate(`/memo/${newMemo.id}`);
   }, [service, navigate]);
 
-  const deleteMemo = useCallback(
-    async (number: number) => {
-      if (!confirm(`Do you really want to delete memo ${number}?`)) return;
-      await service.deleteMemo(number);
-      refresh();
-    },
-    [service, refresh]
-  );
-
   useEffect(() => {
     refresh();
   }, [refresh]);

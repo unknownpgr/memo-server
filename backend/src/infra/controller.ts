@@ -32,13 +32,13 @@ export class MemoController {
     await memoService.createUser({ username, password });
   }
 
-  @Get("memo/{number}")
+  @Get("memo/{memoId}")
   public async findMemo(
-    @Path() number: number,
+    @Path() memoId: number,
     @Header("authorization") token: string
   ): Promise<Memo> {
     const userId = authService.authorize(token);
-    return memoService.findMemo({ userId, number });
+    return memoService.findMemo({ userId, memoId });
   }
 
   @Get("memo")
@@ -49,29 +49,28 @@ export class MemoController {
 
   @Post("memo")
   public async createMemo(
-    @Body() { content, tags }: { content: string; tags: string[] },
     @Header("authorization") token: string
   ): Promise<Memo> {
     const userId = authService.authorize(token);
-    return memoService.createMemo({ userId, content, tags });
+    return memoService.createMemo({ userId });
   }
 
-  @Put("memo/{number}")
+  @Put("memo/{memoId}")
   public async updateMemo(
-    @Path() number: number,
-    @Body() { content, tags }: { content: string; tags: string[] },
+    @Path() memoId: number,
+    @Body() { memo }: { memo: Memo },
     @Header("authorization") token: string
   ): Promise<Memo> {
     const userId = authService.authorize(token);
-    return memoService.updateMemo({ userId, number, content, tags });
+    return memoService.updateMemo({ userId, memo });
   }
 
-  @Delete("memo/{number}")
+  @Delete("memo/{memoId}")
   public async deleteMemo(
-    @Path() number: number,
+    @Path() memoId: number,
     @Header("authorization") token: string
   ): Promise<void> {
     const userId = authService.authorize(token);
-    return memoService.deleteMemo({ userId, number });
+    return memoService.deleteMemo({ userId, memoId });
   }
 }

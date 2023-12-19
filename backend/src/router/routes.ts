@@ -11,15 +11,13 @@ import type * as KoaRouter from '@koa/router';
 
 const models: TsoaRoute.Models = {
     "Memo": {
-        "dataType": "refObject",
-        "properties": {
-            "number": {"dataType":"double","required":true},
-            "content": {"dataType":"string","required":true},
-            "tags": {"dataType":"array","array":{"dataType":"string"},"required":true},
-            "createdAt": {"dataType":"string","required":true},
-            "updatedAt": {"dataType":"string","required":true},
-        },
-        "additionalProperties": false,
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"updatedAt":{"dataType":"datetime","required":true},"createdAt":{"dataType":"datetime","required":true},"content":{"dataType":"string","required":true},"title":{"dataType":"string","required":true},"userId":{"dataType":"double","required":true},"parentId":{"dataType":"double","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "MemoSummary": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"updatedAt":{"dataType":"datetime","required":true},"createdAt":{"dataType":"datetime","required":true},"title":{"dataType":"string","required":true},"userId":{"dataType":"double","required":true},"parentId":{"dataType":"double","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 };
@@ -104,13 +102,13 @@ export function RegisterRoutes(router: KoaRouter) {
             return promiseHandler(controller, promise, context, undefined, undefined);
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        router.get('/api/memo/:number',
+        router.get('/api/memo/:memoId',
             ...(fetchMiddlewares<Middleware>(MemoController)),
             ...(fetchMiddlewares<Middleware>(MemoController.prototype.findMemo)),
 
             async function MemoController_findMemo(context: any, next: any) {
             const args = {
-                    number: {"in":"path","name":"number","required":true,"dataType":"double"},
+                    memoId: {"in":"path","name":"memoId","required":true,"dataType":"double"},
                     token: {"in":"header","name":"authorization","required":true,"dataType":"string"},
             };
 
@@ -159,7 +157,6 @@ export function RegisterRoutes(router: KoaRouter) {
 
             async function MemoController_createMemo(context: any, next: any) {
             const args = {
-                    undefined: {"in":"body","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"tags":{"dataType":"array","array":{"dataType":"string"},"required":true},"content":{"dataType":"string","required":true}}},
                     token: {"in":"header","name":"authorization","required":true,"dataType":"string"},
             };
 
@@ -178,14 +175,14 @@ export function RegisterRoutes(router: KoaRouter) {
             return promiseHandler(controller, promise, context, undefined, undefined);
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        router.put('/api/memo/:number',
+        router.put('/api/memo/:memoId',
             ...(fetchMiddlewares<Middleware>(MemoController)),
             ...(fetchMiddlewares<Middleware>(MemoController.prototype.updateMemo)),
 
             async function MemoController_updateMemo(context: any, next: any) {
             const args = {
-                    number: {"in":"path","name":"number","required":true,"dataType":"double"},
-                    undefined: {"in":"body","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"tags":{"dataType":"array","array":{"dataType":"string"},"required":true},"content":{"dataType":"string","required":true}}},
+                    memoId: {"in":"path","name":"memoId","required":true,"dataType":"double"},
+                    undefined: {"in":"body","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"memo":{"ref":"Memo","required":true}}},
                     token: {"in":"header","name":"authorization","required":true,"dataType":"string"},
             };
 
@@ -204,13 +201,13 @@ export function RegisterRoutes(router: KoaRouter) {
             return promiseHandler(controller, promise, context, undefined, undefined);
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        router.delete('/api/memo/:number',
+        router.delete('/api/memo/:memoId',
             ...(fetchMiddlewares<Middleware>(MemoController)),
             ...(fetchMiddlewares<Middleware>(MemoController.prototype.deleteMemo)),
 
             async function MemoController_deleteMemo(context: any, next: any) {
             const args = {
-                    number: {"in":"path","name":"number","required":true,"dataType":"double"},
+                    memoId: {"in":"path","name":"memoId","required":true,"dataType":"double"},
                     token: {"in":"header","name":"authorization","required":true,"dataType":"string"},
             };
 

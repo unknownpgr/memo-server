@@ -8,35 +8,79 @@
 		"schemas": {
 			"Memo": {
 				"properties": {
-					"number": {
-						"type": "number",
-						"format": "double"
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
 					},
 					"content": {
 						"type": "string"
 					},
-					"tags": {
-						"items": {
-							"type": "string"
-						},
-						"type": "array"
-					},
-					"createdAt": {
+					"title": {
 						"type": "string"
 					},
-					"updatedAt": {
-						"type": "string"
+					"userId": {
+						"type": "number",
+						"format": "double"
+					},
+					"parentId": {
+						"type": "number",
+						"format": "double"
+					},
+					"id": {
+						"type": "number",
+						"format": "double"
 					}
 				},
 				"required": [
-					"number",
-					"content",
-					"tags",
+					"updatedAt",
 					"createdAt",
-					"updatedAt"
+					"content",
+					"title",
+					"userId",
+					"parentId",
+					"id"
 				],
-				"type": "object",
-				"additionalProperties": false
+				"type": "object"
+			},
+			"MemoSummary": {
+				"properties": {
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"title": {
+						"type": "string"
+					},
+					"userId": {
+						"type": "number",
+						"format": "double"
+					},
+					"parentId": {
+						"type": "number",
+						"format": "double"
+					},
+					"id": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"updatedAt",
+					"createdAt",
+					"title",
+					"userId",
+					"parentId",
+					"id"
+				],
+				"type": "object"
 			}
 		},
 		"securitySchemes": {}
@@ -147,7 +191,7 @@
 				}
 			}
 		},
-		"/memo/{number}": {
+		"/memo/{memoId}": {
 			"get": {
 				"operationId": "FindMemo",
 				"responses": {
@@ -166,7 +210,7 @@
 				"parameters": [
 					{
 						"in": "path",
-						"name": "number",
+						"name": "memoId",
 						"required": true,
 						"schema": {
 							"format": "double",
@@ -201,7 +245,7 @@
 				"parameters": [
 					{
 						"in": "path",
-						"name": "number",
+						"name": "memoId",
 						"required": true,
 						"schema": {
 							"format": "double",
@@ -223,19 +267,12 @@
 						"application/json": {
 							"schema": {
 								"properties": {
-									"tags": {
-										"items": {
-											"type": "string"
-										},
-										"type": "array"
-									},
-									"content": {
-										"type": "string"
+									"memo": {
+										"$ref": "#/components/schemas/Memo"
 									}
 								},
 								"required": [
-									"tags",
-									"content"
+									"memo"
 								],
 								"type": "object"
 							}
@@ -254,7 +291,7 @@
 				"parameters": [
 					{
 						"in": "path",
-						"name": "number",
+						"name": "memoId",
 						"required": true,
 						"schema": {
 							"format": "double",
@@ -281,25 +318,10 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"properties": {
-										"memos": {
-											"items": {
-												"$ref": "#/components/schemas/Memo"
-											},
-											"type": "array"
-										},
-										"tags": {
-											"items": {
-												"type": "string"
-											},
-											"type": "array"
-										}
+									"items": {
+										"$ref": "#/components/schemas/MemoSummary"
 									},
-									"required": [
-										"memos",
-										"tags"
-									],
-									"type": "object"
+									"type": "array"
 								}
 							}
 						}
@@ -341,32 +363,7 @@
 							"type": "string"
 						}
 					}
-				],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"properties": {
-									"tags": {
-										"items": {
-											"type": "string"
-										},
-										"type": "array"
-									},
-									"content": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"tags",
-									"content"
-								],
-								"type": "object"
-							}
-						}
-					}
-				}
+				]
 			}
 		}
 	},

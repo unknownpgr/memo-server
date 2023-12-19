@@ -1,53 +1,25 @@
-import { Memo, User } from "./entity";
+import { Memo, MemoSummary, User } from "./entity";
 import crypto from "crypto";
 
 export interface Repository {
   findMemo({
     userId,
-    number,
+    memoId,
   }: {
     userId: number;
-    number: number;
+    memoId: number;
   }): Promise<Memo>;
 
-  listMemo({
-    userId,
-    tags,
-  }: {
-    userId: number;
-    tags?: string[];
-  }): Promise<Memo[]>;
-
-  listTags({ userId }: { userId: number }): Promise<string[]>;
-
-  createMemo({
-    userId,
-    content,
-    tags,
-  }: {
-    userId: number;
-    content: string;
-    tags: string[];
-  }): Promise<Memo>;
-
-  updateMemo({
-    userId,
-    number,
-    content,
-    tags,
-  }: {
-    userId: number;
-    number: number;
-    content: string;
-    tags: string[];
-  }): Promise<Memo>;
+  listMemo({ userId }: { userId: number }): Promise<MemoSummary[]>;
+  createMemo({ userId }: { userId: number }): Promise<Memo>;
+  updateMemo({ userId, memo }: { userId: number; memo: Memo }): Promise<Memo>;
 
   deleteMemo({
     userId,
-    number,
+    memoId,
   }: {
     userId: number;
-    number: number;
+    memoId: number;
   }): Promise<void>;
 
   addUser({
@@ -61,8 +33,6 @@ export interface Repository {
   }): Promise<void>;
 
   getUser({ username }: { username: string }): Promise<User>;
-
-  clearUnusedTags({ userId }: { userId: number }): Promise<void>;
 }
 
 function getRandomHexString(length: number) {
@@ -82,66 +52,45 @@ export class MemoService {
   constructor(private readonly repository: Repository) {}
   public async findMemo({
     userId,
-    number,
+    memoId,
   }: {
     userId: number;
-    number: number;
+    memoId: number;
   }): Promise<Memo> {
-    return await this.repository.findMemo({ userId, number });
+    return await this.repository.findMemo({ userId, memoId });
   }
 
-  public async listMemo({ userId, tags }: { userId: number; tags?: string[] }) {
-    const tagList = await this.repository.listTags({ userId });
-    const memoList = await this.repository.listMemo({ userId, tags });
-    return {
-      tags: tagList,
-      memos: memoList,
-    };
+  public async listMemo({ userId }: { userId: number }) {
+    const memoList = await this.repository.listMemo({ userId });
+    return memoList;
   }
 
-  public async createMemo({
-    userId,
-    content,
-    tags,
-  }: {
-    userId: number;
-    content: string;
-    tags: string[];
-  }): Promise<Memo> {
-    return await this.repository.createMemo({ userId, content, tags });
+  public async createMemo({ userId }: { userId: number }): Promise<Memo> {
+    return await this.repository.createMemo({ userId });
   }
 
   public async updateMemo({
     userId,
-    number,
-    content,
-    tags,
+    memo,
   }: {
     userId: number;
-    number: number;
-    content: string;
-    tags: string[];
+    memo: Memo;
   }): Promise<Memo> {
     const updatedMemo = await this.repository.updateMemo({
       userId,
-      number,
-      content,
-      tags,
+      memo,
     });
-    await this.repository.clearUnusedTags({ userId });
-
     return updatedMemo;
   }
 
   public async deleteMemo({
     userId,
-    number,
+    memoId,
   }: {
     userId: number;
-    number: number;
+    memoId: number;
   }): Promise<void> {
-    await this.repository.deleteMemo({ userId, number });
-    await this.repository.clearUnusedTags({ userId });
+    await this.repository.deleteMemo({ userId, memoId });
   }
 
   public async createUser({

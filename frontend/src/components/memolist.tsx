@@ -1,23 +1,9 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { MemoSummary } from "../api";
+import { MemoNode, memoService } from "../service";
 import styles from "./memolist.module.css";
 
-interface MemoNode {
-  id: number;
-  title: string;
-  children: MemoNode[];
-}
-
-function constructMemoTree(memos: MemoSummary[], currentId = 0): MemoNode {
-  const current = memos.find((m) => m.id === currentId);
-  const children = memos.filter((m) => m.parentId === currentId);
-  const nodes = children.map((c) => constructMemoTree(memos, c.id));
-  return {
-    id: currentId,
-    title: current ? current.title : "",
-    children: nodes,
-  };
-}
+const service = memoService;
 
 function MemoItem({ id, title, children }: MemoNode) {
   return (
@@ -34,14 +20,20 @@ function MemoItem({ id, title, children }: MemoNode) {
   );
 }
 
-export default function MemoList({ memos }: { memos: MemoSummary[] }) {
-  const sortedMemoList = memos.sort((a, b) => {
-    if (a.title < b.title) return -1;
-    else if (a.title > b.title) return 1;
-    else return 0;
+export default function MemoList() {
+  const [memoTree, setMemoTree] = useState<MemoNode>({
+    id: 0,
+    title: "",
+    children: [],
   });
 
-  const memoTree = constructMemoTree(sortedMemoList);
+  useEffect(() => {
+    async function refresh() {
+      const memoTree = await service.getMemoTree();
+      setMemoTree(memoTree);
+    }
+    refresh();
+  }, []);
 
   return (
     <div className={styles.list}>

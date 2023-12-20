@@ -45,11 +45,9 @@
 
 .selectorContent {
   background-color: white;
-  padding: 2rem;
-  margin: 2rem;
-  border-radius: 0.5rem;
-  width: 30rem;
-  max-height: 80%;
+  padding: 4rem;
+  max-width: 30rem;
+  height: 100%;
   max-width: 50rem;
   flex-grow: 1;
   overflow: scroll;

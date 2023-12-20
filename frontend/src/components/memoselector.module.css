@@ -1,0 +1,14 @@
+.item {
+  margin-top: 0.5rem;
+}
+.title {
+  font-weight: 600;
+}
+
+.children {
+  margin-left: 2rem;
+}
+
+.root {
+  color: gray;
+}

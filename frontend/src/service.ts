@@ -1,4 +1,10 @@
-import { DefaultService, Memo } from "./api";
+import { DefaultService, Memo, MemoSummary } from "./api";
+
+export interface MemoNode {
+  id: number;
+  title: string;
+  children: MemoNode[];
+}
 
 export class MemoService {
   private api = DefaultService;
@@ -51,6 +57,36 @@ export class MemoService {
     return await this.api.listMemo({
       authorization: this.token,
     });
+  }
+
+  public async getMemoTree() {
+    function constructMemoTree(
+      memos: MemoSummary[],
+      currentId = 0,
+      parents = new Set<number>()
+    ): MemoNode {
+      if (parents.has(currentId))
+        throw new Error("Circular reference detected");
+      const current = memos.find((m) => m.id === currentId);
+      const children = memos.filter((m) => m.parentId === currentId);
+      const newParents = new Set([...parents, currentId]);
+      const nodes = children.map((c) =>
+        constructMemoTree(memos, c.id, newParents)
+      );
+      return {
+        id: currentId,
+        title: current ? current.title : "",
+        children: nodes,
+      };
+    }
+    let memoList = await this.listMemo();
+    memoList = memoList.sort((a, b) => {
+      if (a.title < b.title) return -1;
+      else if (a.title > b.title) return 1;
+      else return 0;
+    });
+    const memoTree = constructMemoTree(memoList);
+    return memoTree;
   }
 
   public async createMemo() {

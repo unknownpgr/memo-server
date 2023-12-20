@@ -1,38 +1,49 @@
 import { useEffect, useState } from "react";
-import { memoService } from "../service";
-import { MemoSummary } from "../api";
+import { MemoNode, memoService } from "../service";
+import { Link } from "react-router-dom";
+import styles from "./memoselector.module.css";
 
 const service = memoService;
 
+function Item({ memo }: { memo: MemoNode }) {
+  return (
+    <div className={styles.item}>
+      <Link className={styles.title} to={`/memo/${memo.id}`}>
+        {memo.title}
+      </Link>
+      <div className={styles.children}>
+        {memo.children.map((c) => (
+          <Item key={c.id} memo={c} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function MemoSelector({ onSelect }: { onSelect: (id: number) => void }) {
-  const [memoList, setMemoList] = useState<MemoSummary[]>([]);
+  const [memoTree, setMemoTree] = useState<MemoNode>({
+    id: 0,
+    title: "",
+    children: [],
+  });
 
   useEffect(() => {
-    async function refresh() {
-      let res = await service.listMemo();
-      res = res.sort((a, b) => {
-        if (a.title < b.title) return -1;
-        else if (a.title > b.title) return 1;
-        else return 0;
-      });
-      setMemoList(res);
-    }
-    refresh();
+    const load = async () => {
+      const memoTree = await service.getMemoTree();
+      setMemoTree(memoTree);
+    };
+    load();
   }, []);
 
   return (
     <div>
-      <h1>Search Memo</h1>
-      <ul>
-        <li>
-          <button onClick={() => onSelect(0)}>ROOT</button>
-        </li>
-        {memoList.map((memo) => (
-          <li key={memo.id}>
-            <button onClick={() => onSelect(memo.id)}>{memo.title}</button>
-          </li>
-        ))}
-      </ul>
+      <h1>Select</h1>
+      <button className={styles.root} onClick={() => onSelect(0)}>
+        Select root
+      </button>
+      {memoTree.children.map((c) => (
+        <Item key={c.id} memo={c} />
+      ))}
     </div>
   );
 }

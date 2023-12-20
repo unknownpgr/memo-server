@@ -157,6 +157,7 @@ function Path({ id }: { id: number }) {
       path.push(memo.title);
       current = memo.parentId;
     }
+    if (path.length === 0) return "Set path";
     return path.reverse().join("/");
   }, [id, memoList]);
 
@@ -192,7 +193,8 @@ export default function MemoView({ memoId }: { memoId: number }) {
       <div className={styles.toolbar}>
         <button
           className={styles.toolbarItem}
-          onClick={() => setShowSelector(true)}>
+          onClick={() => setShowSelector(true)}
+        >
           <Path id={editorService.getParentId()} />
         </button>
         &nbsp;|&nbsp;
@@ -201,14 +203,16 @@ export default function MemoView({ memoId }: { memoId: number }) {
             edit: (
               <button
                 className={styles.toolbarItem}
-                onClick={() => editorService.setViewMode("preview")}>
+                onClick={() => editorService.setViewMode("preview")}
+              >
                 Preview
               </button>
             ),
             preview: (
               <button
                 className={styles.toolbarItem}
-                onClick={() => editorService.setViewMode("edit")}>
+                onClick={() => editorService.setViewMode("edit")}
+              >
                 Edit
               </button>
             ),
@@ -224,7 +228,8 @@ export default function MemoView({ memoId }: { memoId: number }) {
           className={styles.contentEditor}
           value={editorService.getContent()}
           placeholder="Content"
-          onChange={(e) => editorService.setContent(e.target.value)}></textarea>
+          onChange={(e) => editorService.setContent(e.target.value)}
+        ></textarea>
       )}
       {viewMode === "preview" && (
         <div

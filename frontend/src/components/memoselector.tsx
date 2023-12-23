@@ -1,19 +1,22 @@
 import { useEffect, useState } from "react";
 import { MemoNode, memoService } from "../service";
-import { Link } from "react-router-dom";
 import styles from "./memoselector.module.css";
 
 const service = memoService;
 
-function Item({ memo }: { memo: MemoNode }) {
+function Item({
+  memo,
+  onSelect,
+}: {
+  memo: MemoNode;
+  onSelect: (id: number) => void;
+}) {
   return (
     <div className={styles.item}>
-      <Link className={styles.title} to={`/memo/${memo.id}`}>
-        {memo.title}
-      </Link>
+      <button onClick={() => onSelect(memo.id)}>{memo.title}</button>
       <div className={styles.children}>
         {memo.children.map((c) => (
-          <Item key={c.id} memo={c} />
+          <Item key={c.id} memo={c} onSelect={onSelect} />
         ))}
       </div>
     </div>
@@ -42,7 +45,7 @@ export function MemoSelector({ onSelect }: { onSelect: (id: number) => void }) {
         Select root
       </button>
       {memoTree.children.map((c) => (
-        <Item key={c.id} memo={c} />
+        <Item key={c.id} memo={c} onSelect={onSelect} />
       ))}
     </div>
   );

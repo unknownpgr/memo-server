@@ -39,18 +39,15 @@ export default function Home() {
     <div className={styles.container}>
       <div className={styles.columns}>
         <div
-          className={styles.columnList + " " + (!showList && styles.hideList)}
-        >
+          className={styles.columnList + " " + (!showList && styles.hideList)}>
           <button
             className={styles.button + " " + styles.signOutButton}
-            onClick={signOut}
-          >
+            onClick={signOut}>
             Sign out
           </button>
           <button
             className={styles.button + " " + styles.newMemoButton}
-            onClick={createMemo}
-          >
+            onClick={createMemo}>
             + New Memo
           </button>
           <MemoList />
@@ -67,8 +64,7 @@ export default function Home() {
           className={
             styles.toggleListButton + " " + (!showList && styles.hideButton)
           }
-          onClick={() => setShowList(!showList)}
-        >
+          onClick={() => setShowList(!showList)}>
           &lt;
         </button>
       </div>

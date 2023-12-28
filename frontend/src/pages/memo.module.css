@@ -66,3 +66,7 @@
 .contentPreview li {
   margin-bottom: 0.5rem;
 }
+
+.contentPreview a {
+  color: #007bff;
+}

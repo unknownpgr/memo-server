@@ -1,6 +1,13 @@
 import { marked } from "marked";
 import markedKatex from "marked-katex-extension";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  KeyboardEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { Memo, MemoSummary } from "../api";
 import { MemoSelector } from "../components/memoselector";
@@ -169,17 +176,47 @@ export default function MemoView({ memoId }: { memoId: number }) {
   const viewMode = editorService.getViewMode();
   const [showSelector, setShowSelector] = useState(false);
   const navigate = useNavigate();
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
-  const deleteMemo = useCallback(async () => {
-    if (
-      !confirm(
-        `Do you really want to delete memo [${editorService.getTitle()}]?`
-      )
-    )
-      return;
+  const handleResizeTextArea = useCallback(() => {
+    const textArea = textAreaRef.current;
+    if (textArea) {
+      const height = textArea.scrollHeight;
+      textArea.style.height = `${height}px`;
+    }
+  }, []);
+
+  const handleDeleteMemo = useCallback(async () => {
+    const message = `Do you really want to delete memo [${editorService.getTitle()}]?`;
+    if (!confirm(message)) return;
     await service.deleteMemo(memoId);
     navigate("/");
   }, [memoId, editorService, navigate]);
+
+  const handleMemoSave = useCallback(async () => {
+    editorService.setViewMode("preview");
+  }, [editorService]);
+
+  const handleOnKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLTextAreaElement>) => {
+      const shouldSave =
+        // Windows
+        (e.ctrlKey && e.key === "s") ||
+        // Mac
+        (e.metaKey && e.key === "s");
+
+      if (shouldSave) {
+        e.preventDefault();
+        handleMemoSave();
+      }
+    },
+    [handleMemoSave]
+  );
+
+  useEffect(() => {
+    handleResizeTextArea();
+  }, [handleResizeTextArea, viewMode]);
+  handleResizeTextArea();
 
   return (
     <div className={styles.container}>
@@ -193,8 +230,7 @@ export default function MemoView({ memoId }: { memoId: number }) {
       <div className={styles.toolbar}>
         <button
           className={styles.toolbarItem}
-          onClick={() => setShowSelector(true)}
-        >
+          onClick={() => setShowSelector(true)}>
           <Path id={editorService.getParentId()} />
         </button>
         &nbsp;|&nbsp;
@@ -203,33 +239,32 @@ export default function MemoView({ memoId }: { memoId: number }) {
             edit: (
               <button
                 className={styles.toolbarItem}
-                onClick={() => editorService.setViewMode("preview")}
-              >
+                onClick={() => editorService.setViewMode("preview")}>
                 Preview
               </button>
             ),
             preview: (
               <button
                 className={styles.toolbarItem}
-                onClick={() => editorService.setViewMode("edit")}
-              >
+                onClick={() => editorService.setViewMode("edit")}>
                 Edit
               </button>
             ),
           }[viewMode]
         }
         &nbsp;|&nbsp;
-        <button className={styles.toolbarItem} onClick={deleteMemo}>
+        <button className={styles.toolbarItem} onClick={handleDeleteMemo}>
           Delete
         </button>
       </div>
       {viewMode === "edit" && (
         <textarea
+          ref={textAreaRef}
           className={styles.contentEditor}
           value={editorService.getContent()}
           placeholder="Content"
           onChange={(e) => editorService.setContent(e.target.value)}
-        ></textarea>
+          onKeyDown={handleOnKeyDown}></textarea>
       )}
       {viewMode === "preview" && (
         <div
@@ -252,7 +287,7 @@ export default function MemoView({ memoId }: { memoId: number }) {
             />
           </div>
         </div>
-      )}{" "}
+      )}
     </div>
   );
 }

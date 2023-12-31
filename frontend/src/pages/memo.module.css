@@ -70,3 +70,10 @@
 .contentPreview a {
   color: #007bff;
 }
+
+.contentPreview pre {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 0.3rem;
+  overflow-x: scroll;
+}

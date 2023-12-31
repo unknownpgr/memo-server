@@ -25,6 +25,19 @@ export default function Home() {
     }
   }, [navigate]);
 
+  useEffect(() => {
+    if (memoId >= 0) return;
+    (async () => {
+      const tree = await service.getMemoTree();
+      if (tree.children.length > 0) {
+        navigate(`/memo/${tree.children[0].id}`);
+      } else {
+        const newMemo = await service.createMemo();
+        navigate(`/memo/${newMemo.id}`);
+      }
+    })();
+  }, [memoId, navigate]);
+
   const createMemo = useCallback(async () => {
     const newMemo = await service.createMemo();
     navigate(`/memo/${newMemo.id}`);

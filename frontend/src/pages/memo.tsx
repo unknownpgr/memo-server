@@ -177,7 +177,7 @@ const MilkdownEditor = ({ service }: { service: MemoEditorService }) => {
         .config(nord)
         .config((ctx) => {
           ctx.set(rootCtx, root);
-          ctx.set(defaultValueCtx, service.getContent());
+          ctx.set(defaultValueCtx, service.getContent() || "No content");
           ctx
             .get(listenerCtx)
             .markdownUpdated((_, markdown) => onUpdated(markdown));
@@ -231,6 +231,7 @@ export default function MemoView({ memoId }: { memoId: number }) {
         >
           <Path id={editorService.getParentId()} />
         </button>
+        &nbsp; | &nbsp;
         <button className={styles.toolbarItem} onClick={handleDeleteMemo}>
           Delete
         </button>

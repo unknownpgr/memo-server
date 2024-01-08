@@ -1,5 +1,3 @@
-import { marked } from "marked";
-import markedKatex from "marked-katex-extension";
 import {
   KeyboardEvent,
   useCallback,
@@ -12,9 +10,15 @@ import { useNavigate } from "react-router-dom";
 import { Memo, MemoSummary } from "../api";
 import { MemoSelector } from "../components/memoselector";
 import { MemoService, memoService } from "../service";
+import { Milkdown, MilkdownProvider, useEditor } from "@milkdown/react";
 import styles from "./memo.module.css";
-
-marked.use(markedKatex({ throwOnError: false }));
+import { Editor, defaultValueCtx, rootCtx } from "@milkdown/core";
+import { nord } from "@milkdown/theme-nord";
+import { commonmark } from "@milkdown/preset-commonmark";
+import { history } from "@milkdown/plugin-history";
+import { listener, listenerCtx } from "@milkdown/plugin-listener";
+import "@milkdown/theme-nord/style.css";
+import { math } from "@milkdown/plugin-math";
 
 class MemoEditorService {
   private memo: Memo | null = null;
@@ -22,7 +26,6 @@ class MemoEditorService {
   private isSaving = false;
   private listeners: (() => void)[] = [];
   private debounce: number | null = null;
-  private viewMode: "preview" | "edit" = "preview";
 
   constructor(private service: MemoService, private memoId: number) {
     if (memoId < 0) throw new Error("invalid number");
@@ -117,15 +120,6 @@ class MemoEditorService {
     this.save();
     this.notify();
   }
-
-  public setViewMode(mode: "preview" | "edit") {
-    this.viewMode = mode;
-    this.notify();
-  }
-
-  public getViewMode() {
-    return this.viewMode;
-  }
 }
 
 function useMemoEditorService(service: MemoService, number: number) {
@@ -171,20 +165,37 @@ function Path({ id }: { id: number }) {
   return path;
 }
 
+const MilkdownEditor = ({ service }: { service: MemoEditorService }) => {
+  const onUpdated = useCallback(
+    (markdown: string) => service.setContent(markdown),
+    [service]
+  );
+
+  useEditor(
+    (root) =>
+      Editor.make()
+        .config(nord)
+        .config((ctx) => {
+          ctx.set(rootCtx, root);
+          ctx.set(defaultValueCtx, service.getContent());
+          ctx
+            .get(listenerCtx)
+            .markdownUpdated((_, markdown) => onUpdated(markdown));
+        })
+        .use(math)
+        .use(listener)
+        .use(commonmark)
+        .use(history),
+    [onUpdated, service.getIsLoading()]
+  );
+
+  return <Milkdown />;
+};
+
 export default function MemoView({ memoId }: { memoId: number }) {
   const editorService = useMemoEditorService(service, memoId);
-  const viewMode = editorService.getViewMode();
   const [showSelector, setShowSelector] = useState(false);
   const navigate = useNavigate();
-  const textAreaRef = useRef<HTMLTextAreaElement>(null);
-
-  const handleResizeTextArea = useCallback(() => {
-    const textArea = textAreaRef.current;
-    if (textArea) {
-      const height = textArea.scrollHeight;
-      textArea.style.height = `${height}px`;
-    }
-  }, []);
 
   const handleDeleteMemo = useCallback(async () => {
     const message = `Do you really want to delete memo [${editorService.getTitle()}]?`;
@@ -193,33 +204,19 @@ export default function MemoView({ memoId }: { memoId: number }) {
     navigate("/");
   }, [memoId, editorService, navigate]);
 
-  const handleMemoSave = useCallback(async () => {
-    editorService.setViewMode("preview");
-  }, [editorService]);
-
-  const handleOnKeyDown = useCallback(
-    (e: KeyboardEvent<HTMLTextAreaElement>) => {
-      const shouldSave =
-        // Windows
-        (e.ctrlKey && e.key === "s") ||
-        // Mac
-        (e.metaKey && e.key === "s");
-
-      if (shouldSave) {
-        e.preventDefault();
-        handleMemoSave();
-      }
-    },
-    [handleMemoSave]
-  );
-
-  useEffect(() => {
-    handleResizeTextArea();
-  }, [handleResizeTextArea, viewMode]);
-  handleResizeTextArea();
+  const handleOnKeyDown = useCallback((e: KeyboardEvent<HTMLDivElement>) => {
+    const isSave =
+      // Windows
+      (e.ctrlKey && e.key === "s") ||
+      // Mac
+      (e.metaKey && e.key === "s");
+    if (isSave) {
+      e.preventDefault();
+    }
+  }, []);
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} onKeyDown={handleOnKeyDown}>
       <input
         type="text"
         className={styles.titleInput}
@@ -230,51 +227,19 @@ export default function MemoView({ memoId }: { memoId: number }) {
       <div className={styles.toolbar}>
         <button
           className={styles.toolbarItem}
-          onClick={() => setShowSelector(true)}>
+          onClick={() => setShowSelector(true)}
+        >
           <Path id={editorService.getParentId()} />
         </button>
-        &nbsp;|&nbsp;
-        {
-          {
-            edit: (
-              <button
-                className={styles.toolbarItem}
-                onClick={() => editorService.setViewMode("preview")}>
-                Preview
-              </button>
-            ),
-            preview: (
-              <button
-                className={styles.toolbarItem}
-                onClick={() => editorService.setViewMode("edit")}>
-                Edit
-              </button>
-            ),
-          }[viewMode]
-        }
-        &nbsp;|&nbsp;
         <button className={styles.toolbarItem} onClick={handleDeleteMemo}>
           Delete
         </button>
       </div>
-      {viewMode === "edit" && (
-        <textarea
-          ref={textAreaRef}
-          className={styles.contentEditor}
-          value={editorService.getContent()}
-          placeholder="Content"
-          onChange={(e) => editorService.setContent(e.target.value)}
-          onKeyDown={handleOnKeyDown}></textarea>
-      )}
-      {viewMode === "preview" && (
-        <div
-          className={styles.contentPreview}
-          style={{ minHeight: "100px" }}
-          dangerouslySetInnerHTML={{
-            __html: marked(editorService.getContent()),
-          }}
-        />
-      )}
+      <div className={styles.content}>
+        <MilkdownProvider>
+          <MilkdownEditor service={editorService} />
+        </MilkdownProvider>
+      </div>
       {showSelector && (
         <div className={styles.selector} onClick={() => setShowSelector(false)}>
           <div className={styles.selectorContent}>

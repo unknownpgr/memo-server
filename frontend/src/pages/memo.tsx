@@ -19,6 +19,8 @@ import { history } from "@milkdown/plugin-history";
 import { listener, listenerCtx } from "@milkdown/plugin-listener";
 import "@milkdown/theme-nord/style.css";
 import { math } from "@milkdown/plugin-math";
+import { indent } from "@milkdown/plugin-indent";
+import { trailing } from "@milkdown/plugin-trailing";
 
 class MemoEditorService {
   private memo: Memo | null = null;
@@ -182,10 +184,12 @@ const MilkdownEditor = ({ service }: { service: MemoEditorService }) => {
             .get(listenerCtx)
             .markdownUpdated((_, markdown) => onUpdated(markdown));
         })
-        .use(math)
-        .use(listener)
         .use(commonmark)
-        .use(history),
+        .use(history)
+        .use(math)
+        .use(indent)
+        .use(listener)
+        .use(trailing),
     [onUpdated, service.getIsLoading()]
   );
 

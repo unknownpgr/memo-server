@@ -479,6 +479,14 @@
     "@milkdown/utils" "7.3.3"
     tslib "^2.5.0"
 
+"@milkdown/plugin-indent@^7.3.3":
+  version "7.3.3"
+  resolved "https://registry.yarnpkg.com/@milkdown/plugin-indent/-/plugin-indent-7.3.3.tgz#34a4c12e988bf17ec37fe3025d4ee9d823eedb2d"
+  integrity sha512-mAzoTyfh8qucJ7Vtmxruiy+ZpFhddMLH6ZkYV6nKyboAsYW4VayKyeS1rYnDyC+xh/R3xCXdcs5x2v++8X9HTg==
+  dependencies:
+    "@milkdown/utils" "7.3.3"
+    tslib "^2.5.0"
+
 "@milkdown/plugin-listener@^7.3.3":
   version "7.3.3"
   resolved "https://registry.yarnpkg.com/@milkdown/plugin-listener/-/plugin-listener-7.3.3.tgz#8810409de40f06ffb7bc3ef02a0eac3d0f863d9f"
@@ -499,6 +507,14 @@
     "@types/katex" "^0.16.0"
     katex "^0.16.0"
     remark-math "^6.0.0"
+    tslib "^2.5.0"
+
+"@milkdown/plugin-trailing@^7.3.3":
+  version "7.3.3"
+  resolved "https://registry.yarnpkg.com/@milkdown/plugin-trailing/-/plugin-trailing-7.3.3.tgz#6c89e5520d04babc62b9b9192c3bff617e49f28c"
+  integrity sha512-7RUYa5QaMCOV+H10xpLsdz6eYiqAhga7F5eVBuL1uV+NoSDMaJVl5WYxf+XmCK8RjJc8/WfNTE8cvrdExDfrhA==
+  dependencies:
+    "@milkdown/utils" "7.3.3"
     tslib "^2.5.0"
 
 "@milkdown/preset-commonmark@^7.3.3":

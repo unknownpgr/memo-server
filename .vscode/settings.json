@@ -1,3 +1,10 @@
 {
-  "cSpell.words": ["codemirror", "commonmark", "Katex", "Milkdown", "nord"]
+  "cSpell.words": [
+    "codemirror",
+    "commonmark",
+    "Katex",
+    "Milkdown",
+    "nord"
+  ],
+  "editor.formatOnSave": true
 }

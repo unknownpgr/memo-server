@@ -54,11 +54,11 @@
   overflow: scroll;
 }
 
-.content .outline-none {
-  outline: none;
-}
-
-.content .milkdown {
+.content :global(.milkdown) {
   width: 100%;
   min-height: 80vh;
+}
+
+.content :global(.prose) {
+  max-width: none;
 }

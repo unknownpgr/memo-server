@@ -174,8 +174,8 @@ const MilkdownEditor = ({ service }: { service: MemoEditorService }) => {
   );
 
   useEditor(
-    (root) =>
-      Editor.make()
+    (root) => {
+      const editor = Editor.make()
         .config(nord)
         .config((ctx) => {
           ctx.set(rootCtx, root);
@@ -184,15 +184,16 @@ const MilkdownEditor = ({ service }: { service: MemoEditorService }) => {
             .get(listenerCtx)
             .markdownUpdated((_, markdown) => onUpdated(markdown));
         })
-        .use(commonmark)
+        .use(listener)
         .use(history)
+        .use(commonmark)
         .use(math)
         .use(indent)
-        .use(listener)
-        .use(trailing),
-    [onUpdated, service.getIsLoading()]
+        .use(trailing);
+      return editor;
+    },
+    [onUpdated]
   );
-
   return <Milkdown />;
 };
 
@@ -241,9 +242,13 @@ export default function MemoView({ memoId }: { memoId: number }) {
         </button>
       </div>
       <div className={styles.content}>
-        <MilkdownProvider>
-          <MilkdownEditor service={editorService} />
-        </MilkdownProvider>
+        {editorService.getIsLoading() ? (
+          <div>Loading...</div>
+        ) : (
+          <MilkdownProvider>
+            <MilkdownEditor service={editorService} />
+          </MilkdownProvider>
+        )}
       </div>
       {showSelector && (
         <div className={styles.selector} onClick={() => setShowSelector(false)}>

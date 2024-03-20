@@ -11,7 +11,6 @@ import { Memo, MemoSummary } from "../api";
 import { MemoSelector } from "../components/memoselector";
 import { MemoService, memoService } from "../service";
 import { Milkdown, MilkdownProvider, useEditor } from "@milkdown/react";
-import styles from "./memo.module.css";
 import { Editor, defaultValueCtx, rootCtx } from "@milkdown/core";
 import { nord } from "@milkdown/theme-nord";
 import { commonmark } from "@milkdown/preset-commonmark";
@@ -221,27 +220,22 @@ export default function MemoView({ memoId }: { memoId: number }) {
   }, []);
 
   return (
-    <div className={styles.container} onKeyDown={handleOnKeyDown}>
+    <div onKeyDown={handleOnKeyDown}>
       <input
+        className="text-4xl font-bold w-full mb-4"
         type="text"
-        className={styles.titleInput}
         placeholder="Title"
         value={editorService.getTitle()}
         onChange={(e) => editorService.setTitle(e.target.value)}
       />
-      <div className={styles.toolbar}>
-        <button
-          className={styles.toolbarItem}
-          onClick={() => setShowSelector(true)}
-        >
+      <div className="text-sm text-gray-500 mb-4">
+        <button onClick={() => setShowSelector(true)}>
           <Path id={editorService.getParentId()} />
         </button>
         &nbsp; | &nbsp;
-        <button className={styles.toolbarItem} onClick={handleDeleteMemo}>
-          Delete
-        </button>
+        <button onClick={handleDeleteMemo}>Delete</button>
       </div>
-      <div className={styles.content}>
+      <div>
         {editorService.getIsLoading() ? (
           <div>Loading...</div>
         ) : (
@@ -251,8 +245,11 @@ export default function MemoView({ memoId }: { memoId: number }) {
         )}
       </div>
       {showSelector && (
-        <div className={styles.selector} onClick={() => setShowSelector(false)}>
-          <div className={styles.selectorContent}>
+        <div
+          className="absolute w-full h-full p-8 left-0 top-0 z-20 backdrop-filter backdrop-blur-sm flex justify-center items-center bg-black bg-opacity-50"
+          onClick={() => setShowSelector(false)}
+        >
+          <div className="w-full max-w-4xl h-full max-h-full overflow-scroll p-16 bg-white border rounded-lg shadow-lg">
             <MemoSelector
               onSelect={(id) => {
                 editorService.setParentId(id);

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { MemoNode, memoService } from "../service";
-import styles from "./memoselector.module.css";
 
 const service = memoService;
 
@@ -12,9 +11,9 @@ function Item({
   onSelect: (id: number) => void;
 }) {
   return (
-    <div className={styles.item}>
+    <div className="text-lg">
       <button onClick={() => onSelect(memo.id)}>{memo.title}</button>
-      <div className={styles.children}>
+      <div className="ml-8 my-2 text-lg">
         {memo.children.map((c) => (
           <Item key={c.id} memo={c} onSelect={onSelect} />
         ))}
@@ -40,8 +39,8 @@ export function MemoSelector({ onSelect }: { onSelect: (id: number) => void }) {
 
   return (
     <div>
-      <h1>Select</h1>
-      <button className={styles.root} onClick={() => onSelect(0)}>
+      <h1 className="text-4xl font-bold mb-4">Select Parent</h1>
+      <button className="my-2 text-lg" onClick={() => onSelect(0)}>
         Select root
       </button>
       {memoTree.children.map((c) => (

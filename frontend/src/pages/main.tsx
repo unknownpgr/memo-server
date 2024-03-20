@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import MemoList from "../components/memolist";
 import { memoService } from "../service";
-import styles from "./main.module.css";
 import MemoView from "./memo";
 
 function useMemoId() {
@@ -49,40 +48,48 @@ export default function Home() {
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.columns}>
-        <div
-          className={styles.columnList + " " + (!showList && styles.hideList)}
-        >
+    <div className="h-dvh">
+      <div
+        className="w-full h-full p-8 border-r fixed bg-white z-10 lg:w-96 overflow-scroll"
+        hidden={!showList}
+      >
+        <div className="flex flex-row mb-8">
           <button
-            className={styles.button + " " + styles.signOutButton}
+            className="border border-gray-400 w-0 flex-1 p-2 rounded-md text-sm font-bold lg:hidden mr-2"
+            onClick={() => setShowList(!showList)}
+          >
+            Hide List
+          </button>
+          <button
+            className="border border-gray-400 w-0 flex-1 p-2 rounded-md text-sm font-bold mr-2"
             onClick={signOut}
           >
             Sign out
           </button>
           <button
-            className={styles.button + " " + styles.newMemoButton}
+            className="border border-gray-400 w-0 flex-1 p-2 rounded-md text-sm font-bold"
             onClick={createMemo}
           >
-            + New Memo
+            New Memo
           </button>
-          <MemoList />
         </div>
-        <div className={styles.columnView}>
+        <MemoList />
+      </div>
+      <div className="ml-0 h-full overflow-scroll flex flex-col items-center p-8 lg:ml-96">
+        <button
+          className="border border-gray-400 w-full p-2 rounded-md text-sm font-bold lg:hidden"
+          onClick={() => setShowList(!showList)}
+          hidden={showList}
+        >
+          Show List
+        </button>
+        <div className="max-w-4xl w-full">
           {memoId === -1 ? (
             <div>Select a memo</div>
           ) : (
             <MemoView memoId={memoId} />
           )}
         </div>
-        <button
-          className={
-            styles.toggleListButton + " " + (!showList && styles.hideButton)
-          }
-          onClick={() => setShowList(!showList)}
-        >
-          &lt;
-        </button>
       </div>
     </div>
   );

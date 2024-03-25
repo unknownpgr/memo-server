@@ -23,3 +23,8 @@
     font-size: 16px;
   }
 }
+
+/* Hard-coded size unlimit */
+.prose {
+  max-width: none;
+}

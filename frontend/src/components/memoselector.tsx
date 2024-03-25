@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { MemoNode, memoService } from "../service";
-
-const service = memoService;
+import { MemoNode } from "../core/service";
+import { di } from "../di";
 
 function Item({
   memo,
@@ -29,13 +28,15 @@ export function MemoSelector({ onSelect }: { onSelect: (id: number) => void }) {
     children: [],
   });
 
+  const service = di.service;
+
   useEffect(() => {
     const load = async () => {
       const memoTree = await service.getMemoTree();
       setMemoTree(memoTree);
     };
     load();
-  }, []);
+  }, [service]);
 
   return (
     <div>

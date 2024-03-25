@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { MemoNode, memoService } from "../service";
-
-const service = memoService;
+import { useObservable } from "../adapter/useObservable";
+import { MemoNode } from "../core/service";
+import { di } from "../di";
 
 function MemoItem({ id, title, children }: MemoNode) {
   const { id: currentMemo } = useParams();
@@ -23,20 +22,8 @@ function MemoItem({ id, title, children }: MemoNode) {
 }
 
 export default function MemoList() {
-  const [memoTree, setMemoTree] = useState<MemoNode>({
-    id: 0,
-    title: "",
-    children: [],
-  });
-
-  useEffect(() => {
-    async function refresh() {
-      const memoTree = await service.getMemoTree();
-      setMemoTree(memoTree);
-    }
-    refresh();
-  }, []);
-
+  const service = useObservable(di.service);
+  const memoTree = service.getMemoTree();
   return (
     <div className="mb-8">
       {memoTree.children.map((c) => (

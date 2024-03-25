@@ -86,7 +86,7 @@ export default function MemoView({ memoId }: { memoId: number }) {
   return (
     <div className="max-w-4xl mx-auto" onKeyDown={handleOnKeyDown}>
       <input
-        className="text-4xl font-bold mb-4"
+        className="w-full text-4xl font-bold mb-4"
         type="text"
         placeholder="Title"
         value={memo?.title || ""}

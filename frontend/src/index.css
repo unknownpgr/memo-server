@@ -28,3 +28,11 @@
 .prose {
   max-width: none;
 }
+
+.prose ul {
+  margin: 0;
+}
+
+.prose li > p {
+  margin: 0rem;
+}

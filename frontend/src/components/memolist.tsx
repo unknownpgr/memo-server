@@ -1,17 +1,18 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { MemoNode, memoService } from "../service";
-import styles from "./memolist.module.css";
-
-const service = memoService;
+import { Link, useParams } from "react-router-dom";
+import { useObservable } from "../adapter/useObservable";
+import { MemoNode } from "../core/service";
+import { di } from "../di";
 
 function MemoItem({ id, title, children }: MemoNode) {
+  const { id: currentMemo } = useParams();
+  const isSelected = `${id}` === currentMemo;
+
   return (
-    <div className={styles.item}>
-      <Link className={styles.title} to={`/memo/${id}`}>
-        {title}
+    <div className="">
+      <Link className="" to={`/memo/${id}`}>
+        {isSelected ? <strong>{title}</strong> : title}
       </Link>
-      <div className={styles.children}>
+      <div className="pl-8 my-4">
         {children.map((c) => (
           <MemoItem key={c.id} {...c} />
         ))}
@@ -21,22 +22,10 @@ function MemoItem({ id, title, children }: MemoNode) {
 }
 
 export default function MemoList() {
-  const [memoTree, setMemoTree] = useState<MemoNode>({
-    id: 0,
-    title: "",
-    children: [],
-  });
-
-  useEffect(() => {
-    async function refresh() {
-      const memoTree = await service.getMemoTree();
-      setMemoTree(memoTree);
-    }
-    refresh();
-  }, []);
-
+  const service = useObservable(di.service);
+  const memoTree = service.getMemoTree();
   return (
-    <div className={styles.list}>
+    <div className="mb-8">
       {memoTree.children.map((c) => (
         <MemoItem key={c.id} {...c} />
       ))}

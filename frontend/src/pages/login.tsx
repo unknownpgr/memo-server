@@ -1,19 +1,25 @@
-import { KeyboardEvent, useRef, useState } from "react";
+import { KeyboardEvent, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { memoService } from "../service";
-import style from "./login.module.css";
+import { useObservable } from "../adapter/useObservable";
+import { di } from "../di";
 
 const MIN_PASSWORD_LENGTH = 8;
 
-const service = memoService;
-
 export default function Login() {
-  const [isLoading, setIsLoading] = useState(false);
+  const service = useObservable(di.service);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [logs, setLogs] = useState<string[]>([]);
   const passwordRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const isLoggedIn = service.getAuthState() === "authorized";
+  const isLoading = service.getAuthState() === "verifying";
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/");
+    }
+  }, [isLoggedIn, navigate]);
 
   function log(message: string) {
     setLogs((logs) => [`#${logs.length + 1}. ${message}`, ...logs]);
@@ -33,7 +39,6 @@ export default function Login() {
       return;
     }
 
-    setIsLoading(true);
     try {
       await service.register(username, password);
       setUsername("");
@@ -42,18 +47,15 @@ export default function Login() {
     } catch {
       log(`Failed to sign up.`);
     }
-    setIsLoading(false);
   }
 
   async function signIn() {
-    setIsLoading(true);
     try {
       await service.login(username, password);
       navigate("/");
     } catch {
       log(`Username or password is invalid.`);
     }
-    setIsLoading(false);
   }
 
   const isUserValid = username.length > 0 && password.length > 0;
@@ -67,7 +69,7 @@ export default function Login() {
   }
 
   return (
-    <div className={style.container}>
+    <div>
       <h1>Memo</h1>
       <input
         type="text"

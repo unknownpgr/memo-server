@@ -1,13 +1,13 @@
 import { Body, Delete, Get, Header, Path, Post, Put, Route } from "tsoa";
 import { MemoService } from "../core/memoService";
 import { Memo } from "../core/entity";
-import { PrismaRepository } from "./repository";
 import { AuthService } from "../core/authService";
+import { JsonFileRepository } from "./repository";
 
 // All dependencies are injected here.
 // For simplicity, dependency injection framework is not used.
 
-const repository = new PrismaRepository();
+const repository = new JsonFileRepository();
 const memoService = new MemoService(repository);
 const authService = new AuthService(memoService);
 
@@ -15,21 +15,14 @@ const authService = new AuthService(memoService);
 export class MemoController {
   @Post("login")
   public async login(
-    @Body() { username, password }: { username: string; password: string }
+    @Body() { password }: { password: string }
   ): Promise<string> {
-    return authService.authenticate(username, password);
+    return authService.authenticate(password);
   }
 
   @Delete("logout")
   public async logout(@Header("authorization") token: string): Promise<void> {
     return authService.deauthenticate(token);
-  }
-
-  @Post("register")
-  public async register(
-    @Body() { username, password }: { username: string; password: string }
-  ): Promise<void> {
-    await memoService.createUser({ username, password });
   }
 
   @Get("memo/{memoId}")
@@ -38,13 +31,13 @@ export class MemoController {
     @Header("authorization") token: string
   ): Promise<Memo> {
     const userId = authService.authorize(token);
-    return memoService.findMemo({ userId, memoId });
+    return memoService.findMemo({ memoId });
   }
 
   @Get("memo")
   public async listMemo(@Header("authorization") token: string) {
     const userId = authService.authorize(token);
-    return memoService.listMemo({ userId });
+    return memoService.listMemo();
   }
 
   @Post("memo")
@@ -52,7 +45,7 @@ export class MemoController {
     @Header("authorization") token: string
   ): Promise<Memo> {
     const userId = authService.authorize(token);
-    return memoService.createMemo({ userId });
+    return memoService.createMemo();
   }
 
   @Put("memo/{memoId}")
@@ -62,7 +55,7 @@ export class MemoController {
     @Header("authorization") token: string
   ): Promise<Memo> {
     const userId = authService.authorize(token);
-    return memoService.updateMemo({ userId, memo });
+    return memoService.updateMemo({ memo });
   }
 
   @Delete("memo/{memoId}")
@@ -71,6 +64,6 @@ export class MemoController {
     @Header("authorization") token: string
   ): Promise<void> {
     const userId = authService.authorize(token);
-    return memoService.deleteMemo({ userId, memoId });
+    return memoService.deleteMemo({ memoId });
   }
 }

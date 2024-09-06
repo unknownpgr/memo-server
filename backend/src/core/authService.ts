@@ -1,8 +1,22 @@
 import fs from "fs/promises";
 import { MemoService } from "./memoService";
+import crypto from "crypto";
+
+const authorizedUsers = ["asdf"];
+const salt = "FM0Bvn9gy9eWNumyWkcYvh54h95xe9SHdZqKjilB7uTlj5XX6JtA";
+
+function hash(password: string, salt: string) {
+  return new Promise<string>((resolve, reject) => {
+    crypto.pbkdf2(password, salt, 10000, 256, "sha256", (err, key) => {
+      if (err) return reject(err);
+      resolve(key.toString("base64"));
+    });
+  });
+}
 
 export class AuthService {
-  private authStorage: Map<string, number> = new Map();
+  private authStorage: Set<string> = new Set();
+
   constructor(private service: MemoService) {
     this.load();
   }
@@ -10,7 +24,8 @@ export class AuthService {
   private async load() {
     try {
       const data = await fs.readFile("/tmp/auth.json", "utf-8");
-      this.authStorage = new Map([...JSON.parse(data), ...this.authStorage]);
+      const auth = JSON.parse(data);
+      this.authStorage = new Set(auth);
     } catch {
       // ignore
     }
@@ -20,10 +35,13 @@ export class AuthService {
     await fs.writeFile("/tmp/auth.json", JSON.stringify([...this.authStorage]));
   }
 
-  public async authenticate(username: string, password: string) {
-    const user = await this.service.verifyUser({ username, password });
+  public async authenticate(password: string) {
+    const hashed = await hash(password, salt);
+    if (!authorizedUsers.includes(hashed)) {
+      throw new Error("Unauthorized");
+    }
     const token = Math.random().toString(36).slice(2);
-    this.authStorage.set(token, user.id);
+    this.authStorage.add(token);
     this.save();
     return token;
   }
@@ -34,10 +52,8 @@ export class AuthService {
   }
 
   public authorize(token: string) {
-    const userId = this.authStorage.get(token);
-    if (userId === undefined) {
+    if (!this.authStorage.has(token)) {
       throw new Error("Unauthorized");
     }
-    return userId;
   }
 }

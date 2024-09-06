@@ -14,15 +14,15 @@ export class JsonFileRepository implements Repository {
       const data = await fs.readFile(`${this.databaseDir}/memo.json`, "utf-8");
       const memos = JSON.parse(data);
       this.memoStorage = memos.map((memo: any) => memoSchema.parse(memo));
-    } catch {
-      // ignore
+    } catch (e) {
+      console.log("No memo database found. Creating a new one.");
     }
   }
 
   private async save() {
     await fs.writeFile(
       `${this.databaseDir}/memo.json`,
-      JSON.stringify(this.memoStorage)
+      JSON.stringify(this.memoStorage, null, 2)
     );
   }
 
@@ -50,7 +50,7 @@ export class JsonFileRepository implements Repository {
         updatedAt: memo.updatedAt,
       };
     });
-    results.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+    results.sort((a, b) => (a.updatedAt > b.updatedAt ? -1 : 1));
     return results;
   }
 
@@ -60,8 +60,8 @@ export class JsonFileRepository implements Repository {
       parentId: 0,
       title: "New Memo",
       content: "New Memo",
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
     this.memoStorage.push(memo);
     await this.save();

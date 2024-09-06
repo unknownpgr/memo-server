@@ -1,7 +1,7 @@
 import { Body, Delete, Get, Header, Path, Post, Put, Route } from "tsoa";
-import { MemoService } from "../core/memoService";
-import { Memo } from "../core/entity";
 import { AuthService } from "../core/authService";
+import { Memo } from "../core/entity";
+import { MemoService } from "../core/memoService";
 import { JsonFileRepository } from "./repository";
 
 // All dependencies are injected here.
@@ -30,13 +30,13 @@ export class MemoController {
     @Path() memoId: number,
     @Header("authorization") token: string
   ): Promise<Memo> {
-    const userId = authService.authorize(token);
+    authService.authorize(token);
     return memoService.findMemo({ memoId });
   }
 
   @Get("memo")
   public async listMemo(@Header("authorization") token: string) {
-    const userId = authService.authorize(token);
+    authService.authorize(token);
     return memoService.listMemo();
   }
 
@@ -44,7 +44,7 @@ export class MemoController {
   public async createMemo(
     @Header("authorization") token: string
   ): Promise<Memo> {
-    const userId = authService.authorize(token);
+    authService.authorize(token);
     return memoService.createMemo();
   }
 
@@ -54,7 +54,7 @@ export class MemoController {
     @Body() { memo }: { memo: Memo },
     @Header("authorization") token: string
   ): Promise<Memo> {
-    const userId = authService.authorize(token);
+    authService.authorize(token);
     return memoService.updateMemo({ memo });
   }
 
@@ -63,7 +63,7 @@ export class MemoController {
     @Path() memoId: number,
     @Header("authorization") token: string
   ): Promise<void> {
-    const userId = authService.authorize(token);
+    authService.authorize(token);
     return memoService.deleteMemo({ memoId });
   }
 }

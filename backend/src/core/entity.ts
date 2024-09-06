@@ -5,16 +5,16 @@ export const memoSchema = z.object({
   parentId: z.number(),
   title: z.string(),
   content: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
 });
 
 export const memoSummarySchema = z.object({
   id: z.number(),
   parentId: z.number(),
   title: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
 });
 
 export type Memo = {
@@ -22,14 +22,14 @@ export type Memo = {
   parentId: number;
   title: string;
   content: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type MemoSummary = {
   id: number;
   parentId: number;
   title: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 };

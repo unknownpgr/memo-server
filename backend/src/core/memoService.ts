@@ -1,4 +1,5 @@
-import { Memo, MemoSummary } from "./entity";
+import { Memo, memoSchema } from "./entity";
+import { Repository } from "./repository";
 
 export class MemoService {
   constructor(private readonly repository: Repository) {}
@@ -15,8 +16,7 @@ export class MemoService {
   }
 
   public async updateMemo({ memo }: { memo: Memo }): Promise<Memo> {
-    const updatedMemo = await this.repository.updateMemo({ memo });
-    return updatedMemo;
+    return await this.repository.updateMemo({ memo: memoSchema.parse(memo) });
   }
 
   public async deleteMemo({ memoId }: { memoId: number }): Promise<void> {

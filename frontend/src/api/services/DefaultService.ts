@@ -20,7 +20,6 @@ export class DefaultService {
     }: {
         requestBody: {
             password: string;
-            username: string;
         },
     }): CancelablePromise<string> {
         return __request(OpenAPI, {
@@ -46,26 +45,6 @@ export class DefaultService {
             headers: {
                 'authorization': authorization,
             },
-        });
-    }
-
-    /**
-     * @returns void
-     * @throws ApiError
-     */
-    public static register({
-        requestBody,
-    }: {
-        requestBody: {
-            password: string;
-            username: string;
-        },
-    }): CancelablePromise<void> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/register',
-            body: requestBody,
-            mediaType: 'application/json',
         });
     }
 

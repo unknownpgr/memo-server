@@ -8,7 +8,6 @@ export type Memo = {
     createdAt: string;
     content: string;
     title: string;
-    userId: number;
     parentId: number;
     id: number;
 };

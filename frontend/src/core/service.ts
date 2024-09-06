@@ -60,7 +60,7 @@ export class MemoService extends Observable {
     }
   }
 
-  public async login(username: string, password: string): Promise<void> {
+  public async login(password: string): Promise<void> {
     if (this.authState === "authorized") return;
     if (this.authState === "verifying") return;
 
@@ -68,7 +68,7 @@ export class MemoService extends Observable {
     this.notify();
     try {
       const token = await this.api.login({
-        requestBody: { username, password },
+        requestBody: { password },
       });
       localStorage.setItem("token", token);
       this.token = token;
@@ -88,12 +88,6 @@ export class MemoService extends Observable {
     this.token = "";
     this.authState = "unauthorized";
     this.notify();
-  }
-
-  public async register(username: string, password: string): Promise<void> {
-    await this.api.register({
-      requestBody: { username, password },
-    });
   }
 
   public getAuthState() {

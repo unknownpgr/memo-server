@@ -2,12 +2,14 @@ import fs from "fs/promises";
 import { MemoService } from "./memoService";
 import crypto from "crypto";
 
-const authorizedUsers = ["asdf"];
+const authorizedUsers = [
+  "IbWFCwz0zMYAbNc1/uMWl5sClYiGfXOhE1cqqDjLR1Z2RE+QI/9lx0wc9fNvUKqrq1i3+pdRDEMAoMpFBuZY",
+];
 const salt = "FM0Bvn9gy9eWNumyWkcYvh54h95xe9SHdZqKjilB7uTlj5XX6JtA";
 
 function hash(password: string, salt: string) {
   return new Promise<string>((resolve, reject) => {
-    crypto.pbkdf2(password, salt, 10000, 256, "sha256", (err, key) => {
+    crypto.pbkdf2(password, salt, 10000, 63, "sha256", (err, key) => {
       if (err) return reject(err);
       resolve(key.toString("base64"));
     });

@@ -36,11 +36,11 @@ export default function Login() {
   }
 
   return (
-    <div>
-      <h1>Memo</h1>
-      <br />
+    <div className="container mx-auto h-dvh p-4 flex flex-col justify-center items-center">
+      <h1 className="text-2xl">Memo</h1>
       <input
         ref={passwordRef}
+        className="py-2 outline-none text-center"
         type="password"
         placeholder="password"
         value={password}
@@ -48,11 +48,9 @@ export default function Login() {
         onKeyDown={onPasswordKeyDown}
         disabled={isLoading}
       />
-      <br />
-      <br />
       <button onClick={signIn} disabled={isLoading}>
-        [ Sign In ]
-      </button>{" "}
+        Sign In
+      </button>
       <br />
       <br />
       <div>

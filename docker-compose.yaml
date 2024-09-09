@@ -7,7 +7,7 @@ services:
     working_dir: /app
     command: yarn dev
     ports:
-      - 3000:5173
+      - 5173:5173
 
   backend:
     image: node:18

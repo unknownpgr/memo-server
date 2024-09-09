@@ -4,6 +4,7 @@ import { useObservable } from "../adapter/useObservable";
 import MemoList from "../components/memolist";
 import { di } from "../di";
 import MemoView from "./memo";
+import { MdLogout } from "react-icons/md";
 
 function useMemoId() {
   const { id } = useParams();
@@ -59,25 +60,21 @@ export default function Home() {
     <div className="h-dvh">
       <div
         className="w-full h-full p-8 border-r fixed bg-white z-10 lg:w-96 overflow-scroll"
-        hidden={!showList}
-      >
+        hidden={!showList}>
         <div className="flex flex-row mb-8">
           <button
+            className="border border-gray-400 p-2 rounded-md text-sm font-bold mr-2"
+            onClick={signOut}>
+            <MdLogout />
+          </button>
+          <button
             className="border border-gray-400 w-0 flex-1 p-2 rounded-md text-sm font-bold lg:hidden mr-2"
-            onClick={() => setShowList(!showList)}
-          >
+            onClick={() => setShowList(!showList)}>
             Hide List
           </button>
           <button
-            className="border border-gray-400 w-0 flex-1 p-2 rounded-md text-sm font-bold mr-2"
-            onClick={signOut}
-          >
-            Sign out
-          </button>
-          <button
             className="border border-gray-400 w-0 flex-1 p-2 rounded-md text-sm font-bold"
-            onClick={createMemo}
-          >
+            onClick={createMemo}>
             New Memo
           </button>
         </div>
@@ -87,8 +84,7 @@ export default function Home() {
         <button
           className="border border-gray-400 w-full p-2 rounded-md text-sm font-bold mb-4 lg:hidden"
           onClick={() => setShowList(!showList)}
-          hidden={showList}
-        >
+          hidden={showList}>
           Show List
         </button>
         <div className="w-full flex-1">

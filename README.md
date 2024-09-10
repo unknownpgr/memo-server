@@ -1,12 +1,11 @@
 # Memo Server
 
-## Description
-
 - Simple memo server
-- Password based authentication supported.
-- Memo is stored in a sqlite database. (_Not encrypted_)
-- Tag based search supported.
+- Password based authentication is supported.
+- Memo is stored in a JSON file
 
 ## Usage
 
-- `docker-compose up --build`
+1. `docker-compose up`
+2. Access to `http://localhost:8080`
+3. When the service starts for the first time, a password input appears. Once a password is entered, it will be set, and you will be able to log in using the password.

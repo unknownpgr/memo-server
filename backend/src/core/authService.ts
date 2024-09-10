@@ -1,6 +1,5 @@
-import fs from "fs/promises";
-import { MemoService } from "./memoService";
 import crypto from "crypto";
+import fs from "fs/promises";
 import { z } from "zod";
 
 const authSchema = z.object({
@@ -46,6 +45,8 @@ export class AuthService {
   }
 
   private async load() {
+    await fs.mkdir("/db", { recursive: true });
+
     try {
       const data = await fs.readFile(this.authFilePath, "utf-8");
       const auth = JSON.parse(data);

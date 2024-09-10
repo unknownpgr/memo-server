@@ -97,7 +97,7 @@ export class JsonFileRepository implements Repository {
 
   async createBackup(): Promise<void> {
     const backupPath = `${this.databaseDir}/memo-${Date.now()}.json`;
-    await fs.writeFile(backupPath, JSON.stringify(this.memoStorage));
+    await fs.writeFile(backupPath, JSON.stringify(this.memoStorage, null, 2));
   }
 
   async listBackups(): Promise<string[]> {

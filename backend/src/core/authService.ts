@@ -1,61 +1,128 @@
 import fs from "fs/promises";
 import { MemoService } from "./memoService";
 import crypto from "crypto";
+import { z } from "zod";
 
-const authorizedUsers = [
-  "IbWFCwz0zMYAbNc1/uMWl5sClYiGfXOhE1cqqDjLR1Z2RE+QI/9lx0wc9fNvUKqrq1i3+pdRDEMAoMpFBuZY",
-];
-const salt = "FM0Bvn9gy9eWNumyWkcYvh54h95xe9SHdZqKjilB7uTlj5XX6JtA";
-
-function hash(password: string, salt: string) {
-  return new Promise<string>((resolve, reject) => {
-    crypto.pbkdf2(password, salt, 10000, 63, "sha256", (err, key) => {
-      if (err) return reject(err);
-      resolve(key.toString("base64"));
-    });
-  });
-}
+const authSchema = z.object({
+  passwordHash: z.string(),
+  salt: z.string(),
+  sessions: z.array(
+    z.object({
+      token: z.string(),
+      expiresAt: z.number(),
+    })
+  ),
+});
+type Auth = z.infer<typeof authSchema>;
 
 export class AuthService {
-  private authStorage: Set<string> = new Set();
+  private auth: Auth;
 
-  constructor(private service: MemoService) {
+  private static hash(password: string, salt: string) {
+    return new Promise<string>((resolve, reject) => {
+      crypto.pbkdf2(password, salt, 10000, 63, "sha256", (err, key) => {
+        if (err) return reject(err);
+        resolve(key.toString("base64"));
+      });
+    });
+  }
+
+  private static randomString(n: number) {
+    return crypto.randomBytes(n).toString("base64");
+  }
+
+  constructor(
+    private readonly service: MemoService,
+    private readonly authFilePath = "/db/auth.json"
+  ) {
+    this.auth = {
+      passwordHash: "",
+      salt: AuthService.randomString(32),
+      sessions: [],
+    };
     this.load();
+    setInterval(() => this.cronJob(), 60_000).unref();
+  }
+
+  private async cronJob() {
+    // Remove expired sessions
+    const now = Date.now();
+    this.auth.sessions = this.auth.sessions.filter((s) => s.expiresAt > now);
+    await this.save();
   }
 
   private async load() {
     try {
-      const data = await fs.readFile("/tmp/auth.json", "utf-8");
+      const data = await fs.readFile(this.authFilePath, "utf-8");
       const auth = JSON.parse(data);
-      this.authStorage = new Set(auth);
+      this.auth = authSchema.parse(auth);
     } catch {
       // ignore
     }
   }
 
   private async save() {
-    await fs.writeFile("/tmp/auth.json", JSON.stringify([...this.authStorage]));
+    await fs.writeFile(
+      this.authFilePath,
+      JSON.stringify(this.auth, null, 2),
+      "utf-8"
+    );
   }
 
-  public async authenticate(password: string) {
-    const hashed = await hash(password, salt);
-    if (!authorizedUsers.includes(hashed)) {
-      throw new Error("Unauthorized");
-    }
-    const token = Math.random().toString(36).slice(2);
-    this.authStorage.add(token);
-    this.save();
+  /**
+   * Issue a token that expires in the given duration
+   * @param duration Duration in milliseconds
+   * @returns
+   */
+  private issueToken(duration: number = 24 * 60 * 60 * 1000) {
+    const token = AuthService.randomString(32);
+    const expiresAt = Date.now() + duration;
+    this.auth.sessions.push({ token, expiresAt });
+    this.save(); // Note that it is not awaited, because it is not critical
     return token;
   }
 
-  public async deauthenticate(token: string) {
-    this.authStorage.delete(token);
-    this.save();
+  private validateToken(token: string) {
+    const session = this.auth.sessions.find((s) => s.token === token);
+    if (!session || session.expiresAt < Date.now()) {
+      throw new Error("Unauthorized");
+    }
+  }
+
+  private extendToken(token: string, duration: number = 24 * 60 * 60 * 1000) {
+    const session = this.auth.sessions.find((s) => s.token === token);
+    if (session) {
+      session.expiresAt = Date.now() + duration;
+      this.save();
+    }
+  }
+
+  public async login(password: string): Promise<string> {
+    const hashed = await AuthService.hash(password, this.auth.salt);
+
+    // In case of initial setup, register the password
+    if (!this.auth.passwordHash) {
+      this.auth.passwordHash = hashed;
+      await this.save();
+      return this.issueToken(); // 24 hours
+    }
+
+    // Else, validate the password
+    if (hashed !== this.auth.passwordHash) {
+      throw new Error("Unauthorized");
+    }
+
+    return this.issueToken();
+  }
+
+  public async logout(token: string) {
+    this.validateToken(token);
+    this.auth.sessions = this.auth.sessions.filter((s) => s.token !== token);
+    await this.save();
   }
 
   public authorize(token: string) {
-    if (!this.authStorage.has(token)) {
-      throw new Error("Unauthorized");
-    }
+    this.validateToken(token);
+    this.extendToken(token);
   }
 }

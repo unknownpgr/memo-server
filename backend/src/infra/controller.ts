@@ -17,12 +17,12 @@ export class MemoController {
   public async login(
     @Body() { password }: { password: string }
   ): Promise<string> {
-    return authService.authenticate(password);
+    return authService.login(password);
   }
 
   @Delete("logout")
   public async logout(@Header("authorization") token: string): Promise<void> {
-    return authService.deauthenticate(token);
+    return authService.logout(token);
   }
 
   @Get("memo/{memoId}")

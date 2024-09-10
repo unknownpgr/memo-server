@@ -3,7 +3,7 @@ import { useObservable } from "../adapter/useObservable";
 import { di } from "../di";
 
 function isPasswordValid(password: string) {
-  return password.length > 8;
+  return password.length >= 8;
 }
 
 export function Login() {

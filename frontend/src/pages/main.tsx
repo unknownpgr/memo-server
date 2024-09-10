@@ -27,15 +27,9 @@ export function Home() {
   // If memoId is not provided, go to the first memo or create a new memo if there is no memo
   useEffect(() => {
     if (memoId >= 0) return;
-    (async () => {
-      const tree = memo.getMemoTree();
-      if (tree.children.length > 0) {
-        navigate(`/memo/${tree.children[0].id}`);
-      } else {
-        const newMemo = await memo.createMemo();
-        navigate(`/memo/${newMemo.id}`);
-      }
-    })();
+    const tree = memo.getMemoTree();
+    if (tree.children.length === 0) return;
+    navigate(`/memo/${tree.children[0].id}`);
   }, [memo, memoId, navigate]);
 
   // If memo is changed, hide the list

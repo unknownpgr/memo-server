@@ -2,7 +2,16 @@ import { Memo, memoSchema } from "./entity";
 import { Repository } from "./repository";
 
 export class MemoService {
-  constructor(private readonly repository: Repository) {}
+  constructor(private readonly repository: Repository) {
+    this.initialize();
+  }
+
+  private async initialize() {
+    const memos = await this.repository.listMemo();
+    if (memos.length > 0) return;
+    await this.repository.createMemo();
+  }
+
   public async findMemo({ memoId }: { memoId: number }): Promise<Memo> {
     return await this.repository.findMemo({ memoId });
   }

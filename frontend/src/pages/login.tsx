@@ -1,13 +1,15 @@
-import { KeyboardEvent, useEffect, useRef, useState } from "react";
+import { KeyboardEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useObservable } from "../adapter/useObservable";
 import { di } from "../di";
 
+function isPasswordValid(password: string) {
+  return password.length > 8;
+}
+
 export function Login() {
   const service = useObservable(di.authService);
   const [password, setPassword] = useState("");
-  const [logs, setLogs] = useState<string[]>([]);
-  const passwordRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const isLoggedIn = service.getAuthState() === "authorized";
   const isLoading = service.getAuthState() === "verifying";
@@ -18,16 +20,12 @@ export function Login() {
     }
   }, [isLoggedIn, navigate]);
 
-  function log(message: string) {
-    setLogs((logs) => [`#${logs.length + 1}. ${message}`, ...logs]);
-  }
-
   async function signIn() {
     try {
       await service.login(password);
       navigate("/");
     } catch {
-      log(`Username or password is invalid.`);
+      setPassword("");
     }
   }
 
@@ -36,10 +34,8 @@ export function Login() {
   }
 
   return (
-    <div className="container mx-auto h-dvh p-4 flex flex-col justify-center items-center">
-      <h1 className="text-2xl">Memo</h1>
+    <div className="container mx-auto h-dvh p-2 flex flex-col justify-center items-center">
       <input
-        ref={passwordRef}
         className="py-2 outline-none text-center"
         type="password"
         placeholder="password"
@@ -48,16 +44,12 @@ export function Login() {
         onKeyDown={onPasswordKeyDown}
         disabled={isLoading}
       />
-      <button onClick={signIn} disabled={isLoading}>
+      <button
+        className="mt-4 disabled:opacity-50"
+        onClick={signIn}
+        disabled={isLoading || !isPasswordValid(password)}>
         Sign In
       </button>
-      <br />
-      <br />
-      <div>
-        {logs.map((log, i) => (
-          <div key={i}>{log}</div>
-        ))}
-      </div>
     </div>
   );
 }

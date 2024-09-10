@@ -3,11 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useObservable } from "../adapter/useObservable";
 import { di } from "../di";
 
-const MIN_PASSWORD_LENGTH = 8;
-
 export default function Login() {
   const service = useObservable(di.service);
-  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [logs, setLogs] = useState<string[]>([]);
   const passwordRef = useRef<HTMLInputElement>(null);
@@ -25,65 +22,25 @@ export default function Login() {
     setLogs((logs) => [`#${logs.length + 1}. ${message}`, ...logs]);
   }
 
-  async function signUp() {
-    if (username.length === 0 || password.length === 0) {
-      log(
-        `To sign up, please enter both username and password, and click sign up button.`
-      );
-      return;
-    }
-    if (password.length < MIN_PASSWORD_LENGTH) {
-      log(
-        `Password is too short. It must be at least ${MIN_PASSWORD_LENGTH} characters long`
-      );
-      return;
-    }
-
-    try {
-      await service.register(username, password);
-      setUsername("");
-      setPassword("");
-      log(`Successfully signed up. Login with your username and password.`);
-    } catch {
-      log(`Failed to sign up.`);
-    }
-  }
-
   async function signIn() {
     try {
-      await service.login(username, password);
+      await service.login(password);
       navigate("/");
     } catch {
       log(`Username or password is invalid.`);
     }
   }
 
-  const isUserValid = username.length > 0 && password.length > 0;
-
-  function onUsernameKeyDown(e: KeyboardEvent) {
-    if (e.key === "Enter" && passwordRef.current) passwordRef.current.focus();
-  }
-
   function onPasswordKeyDown(e: KeyboardEvent) {
-    if (e.key === "Enter" && isUserValid) signIn();
+    if (e.key === "Enter") signIn();
   }
 
   return (
-    <div>
-      <h1>Memo</h1>
-      <input
-        type="text"
-        placeholder="username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        onKeyDown={onUsernameKeyDown}
-        disabled={isLoading}
-        autoFocus
-      />
-      <br />
-      <br />
+    <div className="container mx-auto h-dvh p-4 flex flex-col justify-center items-center">
+      <h1 className="text-2xl">Memo</h1>
       <input
         ref={passwordRef}
+        className="py-2 outline-none text-center"
         type="password"
         placeholder="password"
         value={password}
@@ -91,13 +48,8 @@ export default function Login() {
         onKeyDown={onPasswordKeyDown}
         disabled={isLoading}
       />
-      <br />
-      <br />
-      <button onClick={signIn} disabled={isLoading || !isUserValid}>
-        [ Sign In ]
-      </button>{" "}
-      <button onClick={signUp} disabled={isLoading}>
-        [ Sign Up ]
+      <button onClick={signIn} disabled={isLoading}>
+        Sign In
       </button>
       <br />
       <br />

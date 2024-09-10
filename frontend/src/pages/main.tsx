@@ -4,6 +4,7 @@ import { useObservable } from "../adapter/useObservable";
 import MemoList from "../components/memolist";
 import { di } from "../di";
 import MemoView from "./memo";
+import { MdClose, MdCreate, MdList, MdLogout } from "react-icons/md";
 
 function useMemoId() {
   const { id } = useParams();
@@ -56,47 +57,38 @@ export default function Home() {
   }
 
   return (
-    <div className="h-dvh">
+    <div className="h-dvh flex">
       <div
-        className="w-full h-full p-8 border-r fixed bg-white z-10 lg:w-96 overflow-scroll"
-        hidden={!showList}
-      >
-        <div className="flex flex-row mb-8">
+        className="w-full h-full p-8 border-r fixed bg-white z-10 overflow-scroll lg:w-96 lg:static"
+        hidden={!showList}>
+        <div className="flex flex-row mb-4">
           <button
-            className="border border-gray-400 w-0 flex-1 p-2 rounded-md text-sm font-bold lg:hidden mr-2"
-            onClick={() => setShowList(!showList)}
-          >
-            Hide List
+            className="py-2 rounded-md font-bold lg mr-2"
+            onClick={() => setShowList(!showList)}>
+            <MdClose />
           </button>
-          <button
-            className="border border-gray-400 w-0 flex-1 p-2 rounded-md text-sm font-bold mr-2"
-            onClick={signOut}
-          >
-            Sign out
-          </button>
-          <button
-            className="border border-gray-400 w-0 flex-1 p-2 rounded-md text-sm font-bold"
-            onClick={createMemo}
-          >
-            New Memo
-          </button>
+          <div className="flex-1"></div>
         </div>
         <MemoList />
-      </div>
-      <div className="ml-0 h-full overflow-scroll flex flex-col items-center p-8 lg:ml-96">
-        <button
-          className="border border-gray-400 w-full p-2 rounded-md text-sm font-bold mb-4 lg:hidden"
-          onClick={() => setShowList(!showList)}
-          hidden={showList}
-        >
-          Show List
+        <button className="font-bold" onClick={createMemo}>
+          <MdCreate />
         </button>
+      </div>
+      <div className="ml-0 w-0 h-full overflow-scroll flex flex-col flex-1 p-8">
+        <div className="flex">
+          <button
+            className="py-2 rounded-md font-bold"
+            onClick={() => setShowList(!showList)}
+            hidden={showList}>
+            <MdList />
+          </button>
+          <div className="flex-1"></div>
+          <button className="py-2 rounded-md font-bold" onClick={signOut}>
+            <MdLogout />
+          </button>
+        </div>
         <div className="w-full flex-1">
-          {memoId === -1 ? (
-            <div>Select a memo</div>
-          ) : (
-            <MemoView memoId={memoId} />
-          )}
+          {memoId >= 0 && <MemoView memoId={memoId} />}
         </div>
       </div>
     </div>

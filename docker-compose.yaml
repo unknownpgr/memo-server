@@ -7,9 +7,12 @@ services:
     working_dir: /app
     command: yarn dev
     ports:
-      - 3000:5173
-  memo-back:
-    build: ./backend
+      - 5173:5173
+
+  backend:
+    image: node:18
     volumes:
-      - ./backend/prisma/dev.db:/db/sqlite
-      - /tmp/memo:/tmp
+      - ./backend:/app
+      - ./db:/db
+    working_dir: /app
+    command: yarn dev

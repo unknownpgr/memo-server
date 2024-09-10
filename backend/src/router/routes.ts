@@ -12,12 +12,12 @@ import type * as KoaRouter from '@koa/router';
 const models: TsoaRoute.Models = {
     "Memo": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"updatedAt":{"dataType":"datetime","required":true},"createdAt":{"dataType":"datetime","required":true},"content":{"dataType":"string","required":true},"title":{"dataType":"string","required":true},"userId":{"dataType":"double","required":true},"parentId":{"dataType":"double","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"updatedAt":{"dataType":"string","required":true},"createdAt":{"dataType":"string","required":true},"content":{"dataType":"string","required":true},"title":{"dataType":"string","required":true},"parentId":{"dataType":"double","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "MemoSummary": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"updatedAt":{"dataType":"datetime","required":true},"createdAt":{"dataType":"datetime","required":true},"title":{"dataType":"string","required":true},"userId":{"dataType":"double","required":true},"parentId":{"dataType":"double","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"updatedAt":{"dataType":"string","required":true},"createdAt":{"dataType":"string","required":true},"title":{"dataType":"string","required":true},"parentId":{"dataType":"double","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 };
@@ -36,7 +36,7 @@ export function RegisterRoutes(router: KoaRouter) {
 
             async function MemoController_login(context: any, next: any) {
             const args = {
-                    undefined: {"in":"body","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"password":{"dataType":"string","required":true},"username":{"dataType":"string","required":true}}},
+                    undefined: {"in":"body","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"password":{"dataType":"string","required":true}}},
             };
 
             let validatedArgs: any[] = [];
@@ -75,30 +75,6 @@ export function RegisterRoutes(router: KoaRouter) {
             const controller = new MemoController();
 
             const promise = controller.logout.apply(controller, validatedArgs as any);
-            return promiseHandler(controller, promise, context, undefined, undefined);
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        router.post('/api/register',
-            ...(fetchMiddlewares<Middleware>(MemoController)),
-            ...(fetchMiddlewares<Middleware>(MemoController.prototype.register)),
-
-            async function MemoController_register(context: any, next: any) {
-            const args = {
-                    undefined: {"in":"body","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"password":{"dataType":"string","required":true},"username":{"dataType":"string","required":true}}},
-            };
-
-            let validatedArgs: any[] = [];
-            try {
-              validatedArgs = getValidatedArgs(args, context, next);
-            } catch (err) {
-              const error = err as any;
-              context.status = error.status;
-              context.throw(error.status, JSON.stringify({ fields: error.fields }));
-            }
-
-            const controller = new MemoController();
-
-            const promise = controller.register.apply(controller, validatedArgs as any);
             return promiseHandler(controller, promise, context, undefined, undefined);
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa

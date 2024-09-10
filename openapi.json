@@ -9,22 +9,16 @@
 			"Memo": {
 				"properties": {
 					"updatedAt": {
-						"type": "string",
-						"format": "date-time"
+						"type": "string"
 					},
 					"createdAt": {
-						"type": "string",
-						"format": "date-time"
+						"type": "string"
 					},
 					"content": {
 						"type": "string"
 					},
 					"title": {
 						"type": "string"
-					},
-					"userId": {
-						"type": "number",
-						"format": "double"
 					},
 					"parentId": {
 						"type": "number",
@@ -40,7 +34,6 @@
 					"createdAt",
 					"content",
 					"title",
-					"userId",
 					"parentId",
 					"id"
 				],
@@ -49,19 +42,13 @@
 			"MemoSummary": {
 				"properties": {
 					"updatedAt": {
-						"type": "string",
-						"format": "date-time"
+						"type": "string"
 					},
 					"createdAt": {
-						"type": "string",
-						"format": "date-time"
+						"type": "string"
 					},
 					"title": {
 						"type": "string"
-					},
-					"userId": {
-						"type": "number",
-						"format": "double"
 					},
 					"parentId": {
 						"type": "number",
@@ -76,7 +63,6 @@
 					"updatedAt",
 					"createdAt",
 					"title",
-					"userId",
 					"parentId",
 					"id"
 				],
@@ -120,14 +106,10 @@
 								"properties": {
 									"password": {
 										"type": "string"
-									},
-									"username": {
-										"type": "string"
 									}
 								},
 								"required": [
-									"password",
-									"username"
+									"password"
 								],
 								"type": "object"
 							}
@@ -155,40 +137,6 @@
 						}
 					}
 				]
-			}
-		},
-		"/register": {
-			"post": {
-				"operationId": "Register",
-				"responses": {
-					"204": {
-						"description": "No content"
-					}
-				},
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"properties": {
-									"password": {
-										"type": "string"
-									},
-									"username": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"password",
-									"username"
-								],
-								"type": "object"
-							}
-						}
-					}
-				}
 			}
 		},
 		"/memo/{memoId}": {

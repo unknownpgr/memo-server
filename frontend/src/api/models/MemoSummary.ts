@@ -7,7 +7,6 @@ export type MemoSummary = {
     updatedAt: string;
     createdAt: string;
     title: string;
-    userId: number;
     parentId: number;
     id: number;
 };

@@ -60,7 +60,7 @@ export class MemoService extends Observable {
     }
   }
 
-  public async login(username: string, password: string): Promise<void> {
+  public async login(password: string): Promise<void> {
     if (this.authState === "authorized") return;
     if (this.authState === "verifying") return;
 
@@ -68,7 +68,7 @@ export class MemoService extends Observable {
     this.notify();
     try {
       const token = await this.api.login({
-        requestBody: { username, password },
+        requestBody: { password },
       });
       localStorage.setItem("token", token);
       this.token = token;
@@ -88,12 +88,6 @@ export class MemoService extends Observable {
     this.token = "";
     this.authState = "unauthorized";
     this.notify();
-  }
-
-  public async register(username: string, password: string): Promise<void> {
-    await this.api.register({
-      requestBody: { username, password },
-    });
   }
 
   public getAuthState() {
@@ -152,7 +146,7 @@ export class MemoService extends Observable {
     if (this.updateDebounce) clearTimeout(this.updateDebounce);
     const id = setTimeout(async () => {
       if (this.updateDebounce !== id) {
-        console.log("THIS SHOULD NOT HAPPEN");
+        alert("THIS SHOULD NOT HAPPEN");
         return;
       }
       await this.updateMemoSync();
@@ -173,11 +167,16 @@ export class MemoService extends Observable {
 
   public async setTitle(title: string) {
     if (this.memoState === "loading") return;
-    if (!this.currentMemo) throw new Error("No memo loaded");
-    this.currentMemo.title = title;
+    const currentMemo = this.currentMemo;
+    if (!currentMemo) throw new Error("No memo loaded");
+    currentMemo.title = title;
+
+    // Update memo title in the memo list
+    const memo = this.memoList.find((memo) => memo.id === currentMemo.id);
+    if (memo) memo.title = title;
+
+    this.updateMemoDebounce();
     this.notify();
-    await this.updateMemoDebounce();
-    this.loadMemoList();
   }
 
   public async setContent(content: string) {
@@ -190,12 +189,13 @@ export class MemoService extends Observable {
 
   public async setParentId(parentId: number) {
     if (this.memoState === "loading") return;
-    if (!this.currentMemo) throw new Error("No memo loaded");
+    const currentMemo = this.currentMemo;
+    if (!currentMemo) throw new Error("No memo loaded");
 
     // Check for circular reference
     let current = parentId;
     while (current !== 0) {
-      if (current === this.currentMemo.id) {
+      if (current === currentMemo.id) {
         throw new Error("Circular reference detected");
       }
       const memo = this.memoList.find((memo) => memo.id === current);
@@ -203,8 +203,12 @@ export class MemoService extends Observable {
       current = memo.parentId;
     }
 
+    // Update parent ID in the memo list
+    const memo = this.memoList.find((memo) => memo.id === currentMemo.id);
+    if (memo) memo.parentId = parentId;
+
     // Set parent ID
-    this.currentMemo.parentId = parentId;
+    currentMemo.parentId = parentId;
     this.notify();
     await this.updateMemoSync();
     this.loadMemoList();
@@ -225,7 +229,7 @@ export class MemoService extends Observable {
       current = memo.parentId;
     }
     if (path.length === 0) return "Set path";
-    return path.reverse().join("/");
+    return "/" + path.reverse().join("/");
   }
 
   public getMemoTree() {

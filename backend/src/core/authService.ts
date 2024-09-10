@@ -18,7 +18,7 @@ type Auth = z.infer<typeof authSchema>;
 export class AuthService {
   private auth: Auth;
 
-  private static hash(password: string, salt: string) {
+  private static async hash(password: string, salt: string): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       crypto.pbkdf2(password, salt, 10000, 63, "sha256", (err, key) => {
         if (err) return reject(err);

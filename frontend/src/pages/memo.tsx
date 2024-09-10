@@ -27,7 +27,7 @@ const MilkdownEditor = () => {
         .config(nord)
         .config((ctx) => {
           ctx.set(rootCtx, root);
-          ctx.set(defaultValueCtx, service.getCurrentMemo()?.content || "");
+          ctx.set(defaultValueCtx, service.getContent());
           ctx
             .get(listenerCtx)
             .markdownUpdated((_, markdown) => onUpdated(markdown));
@@ -49,17 +49,16 @@ export function MemoView({ memoId }: { memoId: number }) {
   const [showSelector, setShowSelector] = useState(false);
   const navigate = useNavigate();
   const service = di.memoService;
-  const memo = service.getCurrentMemo();
   const memoState = service.getMemoState();
   const isEditable = memoState === "idle" || memoState === "updating";
   const isUpdating = memoState === "updating";
 
   const handleDeleteMemo = useCallback(async () => {
-    const message = `Do you really want to delete memo [${memo?.title}]?`;
+    const message = `Do you really want to delete memo [${service.getTitle()}]?`;
     if (!confirm(message)) return;
     await service.deleteMemo(memoId);
     navigate("/");
-  }, [service, memo, memoId, navigate]);
+  }, [service, memoId, navigate]);
 
   const handleOnKeyDown = useCallback((e: KeyboardEvent<HTMLDivElement>) => {
     const isSave =
@@ -86,7 +85,7 @@ export function MemoView({ memoId }: { memoId: number }) {
         className="w-full text-4xl font-bold mb-4 outline-none"
         type="text"
         placeholder="Title"
-        value={memo?.title || ""}
+        value={service.getTitle()}
         onChange={(e) => service.setTitle(e.target.value)}
       />
       <div className="flex text-sm text-gray-500 mb-4">

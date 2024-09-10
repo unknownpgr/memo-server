@@ -8,14 +8,15 @@ export interface MemoNode {
   children: MemoNode[];
 }
 
-/*
-- memo:
-  - "idle"
-  - "loading"
-  - "updating"
- */
+export type MemoEvent =
+  | "StateChange"
+  | "MemoLoaded"
+  | "MemoUpdated"
+  | "ListUpdate";
 
-export class MemoService extends Observable {
+export type MemoState = "idle" | "loading" | "updating";
+
+export class MemoService extends Observable<MemoEvent> {
   constructor(
     private readonly api: MemoRepository,
     private readonly authService: AuthService
@@ -37,7 +38,7 @@ export class MemoService extends Observable {
 
   private memoList: MemoSummary[] = [];
   private currentMemo: Memo | null = null;
-  private memoState: "idle" | "loading" | "updating" = "idle";
+  private memoState: MemoState = "idle";
   private updateDebounce: number | null = null;
 
   private async loadMemoList() {
@@ -45,20 +46,23 @@ export class MemoService extends Observable {
       authorization: this.authService.getToken(),
     });
     this.memoList = memoList;
-    this.notify();
+    this.notify("ListUpdate");
   }
 
   public async loadMemo(memoId: number) {
+    if (this.memoState !== "idle") return;
+    if (this.currentMemo && this.currentMemo.id === memoId) return;
     this.currentMemo = null;
     this.memoState = "loading";
-    this.notify();
+    this.notify("StateChange");
     const memo = await this.api.findMemo({
       memoId,
       authorization: this.authService.getToken(),
     });
     this.currentMemo = memo;
+    this.notify("MemoLoaded");
     this.memoState = "idle";
-    this.notify();
+    this.notify("StateChange");
   }
 
   public async createMemo() {
@@ -80,7 +84,7 @@ export class MemoService extends Observable {
   private async updateMemoDebounce() {
     if (!this.currentMemo) throw new Error("No memo loaded");
     this.memoState = "updating";
-    this.notify();
+    this.notify("StateChange");
     if (this.updateDebounce) clearTimeout(this.updateDebounce);
     const id = setTimeout(async () => {
       if (this.updateDebounce !== id) {
@@ -90,7 +94,7 @@ export class MemoService extends Observable {
       await this.updateMemoSync();
       if (this.updateDebounce !== id) return;
       this.memoState = "idle";
-      this.notify();
+      this.notify("StateChange");
     }, 1000);
     this.updateDebounce = id;
   }
@@ -101,6 +105,17 @@ export class MemoService extends Observable {
       authorization: this.authService.getToken(),
     });
     await this.loadMemoList();
+  }
+
+  public getMemoState() {
+    return this.memoState;
+  }
+
+  // getters and setters
+
+  public getTitle() {
+    if (this.memoState === "loading") return "";
+    return this.currentMemo?.title || "";
   }
 
   public async setTitle(title: string) {
@@ -114,7 +129,12 @@ export class MemoService extends Observable {
     if (memo) memo.title = title;
 
     this.updateMemoDebounce();
-    this.notify();
+    this.notify("MemoUpdated");
+  }
+
+  public getContent() {
+    if (this.memoState === "loading") return "";
+    return this.currentMemo?.content || "";
   }
 
   public async setContent(content: string) {
@@ -122,8 +142,13 @@ export class MemoService extends Observable {
     if (!this.currentMemo) throw new Error("No memo loaded");
     if (this.currentMemo.content === content) return;
     this.currentMemo.content = content;
-    this.notify();
+    this.notify("MemoUpdated");
     await this.updateMemoDebounce();
+  }
+
+  public getParentId() {
+    if (this.memoState === "loading") return -1;
+    return this.currentMemo?.parentId || -1;
   }
 
   public async setParentId(parentId: number) {
@@ -148,13 +173,9 @@ export class MemoService extends Observable {
 
     // Set parent ID
     currentMemo.parentId = parentId;
-    this.notify();
+    this.notify("MemoUpdated");
     await this.updateMemoSync();
     this.loadMemoList();
-  }
-
-  public getCurrentMemo() {
-    return this.currentMemo;
   }
 
   public getPath() {
@@ -200,10 +221,6 @@ export class MemoService extends Observable {
     return memoTree;
   }
 
-  public getMemoState() {
-    return this.memoState;
-  }
-
   // Backup-related
 
   private backupList: string[] | null = null;
@@ -212,7 +229,7 @@ export class MemoService extends Observable {
     this.backupList = await this.api.listBackups({
       authorization: this.authService.getToken(),
     });
-    this.notify();
+    this.notify("ListUpdate");
   }
 
   public getBackupList(): string[] {

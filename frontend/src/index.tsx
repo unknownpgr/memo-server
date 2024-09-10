@@ -1,8 +1,9 @@
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
-import Login from "./pages/login";
-import Home from "./pages/main";
+import { Login } from "./pages/login";
+import { Home } from "./pages/main";
+import { Settings } from "./pages/settings";
 
 const router = createBrowserRouter([
   {
@@ -16,6 +17,10 @@ const router = createBrowserRouter([
   {
     path: "/memo/:id",
     element: <Home />,
+  },
+  {
+    path: "/settings",
+    element: <Settings />,
   },
 ]);
 

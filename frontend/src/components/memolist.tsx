@@ -23,7 +23,7 @@ function MemoItem(node: MemoNode) {
   );
 }
 
-export default function MemoList() {
+export function MemoList() {
   const service = useObservable(di.service);
   const memoTree = service.getMemoTree();
   return (

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { MdCreate, MdList, MdLogout } from "react-icons/md";
-import { useNavigate, useParams } from "react-router-dom";
+import { MdCreate, MdList, MdSettings } from "react-icons/md";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useObservable } from "../adapter/useObservable";
-import MemoList from "../components/memolist";
+import { MemoList } from "../components/memolist";
 import { di } from "../di";
-import MemoView from "./memo";
+import { MemoView } from "./memo";
 
 function useMemoId() {
   const { id } = useParams();
@@ -12,7 +12,7 @@ function useMemoId() {
   return parseInt(id);
 }
 
-export default function Home() {
+export function Home() {
   const navigate = useNavigate();
   const memoId = useMemoId();
   const [showList, setShowList] = useState(true);
@@ -51,29 +51,25 @@ export default function Home() {
     navigate(`/memo/${newMemo.id}`);
   };
 
-  async function signOut() {
-    await service.logout();
-    navigate("/login");
-  }
-
   return (
     <div className="h-dvh flex flex-col">
-      <div className="py-2 px-4 border-b flex justify-between">
-        <button className="py-2 px-4" onClick={() => setShowList(!showList)}>
+      <div className="py-2 px-6 border-b flex">
+        <button className="p-2" onClick={() => setShowList(!showList)}>
           <MdList />
         </button>
-        <button className="py-2 px-4" onClick={signOut}>
-          <MdLogout />
+        <button className="p-2" onClick={createMemo}>
+          <MdCreate />
         </button>
+        <div className="flex-1" />
+        <Link className="p-2" to="/settings">
+          <MdSettings />
+        </Link>
       </div>
       <div className="flex h-0 flex-1">
         <div
           className="w-full h-full p-8 fixed bg-white z-10 overflow-scroll lg:w-96 lg:static"
           hidden={!showList}>
           <MemoList />
-          <button className="font-bold" onClick={createMemo}>
-            <MdCreate />
-          </button>
         </div>
         <div className="ml-0 w-0 h-full overflow-scroll flex flex-col flex-1 p-8">
           <div className="w-full flex-1">

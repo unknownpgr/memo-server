@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useObservable } from "../adapter/useObservable";
 import { di } from "../di";
 
-export default function Login() {
+export function Login() {
   const service = useObservable(di.service);
   const [password, setPassword] = useState("");
   const [logs, setLogs] = useState<string[]>([]);

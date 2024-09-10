@@ -45,7 +45,7 @@ const MilkdownEditor = () => {
   return <Milkdown />;
 };
 
-export default function MemoView({ memoId }: { memoId: number }) {
+export function MemoView({ memoId }: { memoId: number }) {
   const [showSelector, setShowSelector] = useState(false);
   const navigate = useNavigate();
   const service = di.service;

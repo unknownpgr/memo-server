@@ -27,10 +27,7 @@ const MilkdownEditor = () => {
         .config(nord)
         .config((ctx) => {
           ctx.set(rootCtx, root);
-          ctx.set(
-            defaultValueCtx,
-            service.getCurrentMemo()?.content || "No content"
-          );
+          ctx.set(defaultValueCtx, service.getCurrentMemo()?.content || "");
           ctx
             .get(listenerCtx)
             .markdownUpdated((_, markdown) => onUpdated(markdown));
@@ -111,8 +108,7 @@ export default function MemoView({ memoId }: { memoId: number }) {
       {showSelector && (
         <div
           className="absolute w-full h-full p-8 left-0 top-0 z-20 backdrop-filter backdrop-blur-sm flex justify-center items-center bg-black bg-opacity-50"
-          onClick={() => setShowSelector(false)}
-        >
+          onClick={() => setShowSelector(false)}>
           <div className="w-full max-w-4xl h-full max-h-full overflow-scroll p-16 bg-white border rounded-lg shadow-lg">
             <MemoSelector
               onSelect={(id) => {

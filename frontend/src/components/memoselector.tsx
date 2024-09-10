@@ -11,7 +11,9 @@ function Item({
 }) {
   return (
     <div className="text-lg">
-      <button onClick={() => onSelect(memo.id)}>{memo.title}</button>
+      <button onClick={() => onSelect(memo.id)}>
+        {memo.title || "Untitled"}
+      </button>
       <div className="ml-8 my-2 text-lg">
         {memo.children.map((c) => (
           <Item key={c.id} memo={c} onSelect={onSelect} />

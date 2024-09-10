@@ -3,8 +3,10 @@ import { useObservable } from "../adapter/useObservable";
 import { MemoNode } from "../core/service";
 import { di } from "../di";
 
-function MemoItem({ id, title, children }: MemoNode) {
+function MemoItem(node: MemoNode) {
   const { id: currentMemo } = useParams();
+  const { id, children } = node;
+  const title = node.title || "Untitled";
   const isSelected = `${id}` === currentMemo;
 
   return (
@@ -25,7 +27,7 @@ export default function MemoList() {
   const service = useObservable(di.service);
   const memoTree = service.getMemoTree();
   return (
-    <div className="mb-8">
+    <div>
       {memoTree.children.map((c) => (
         <MemoItem key={c.id} {...c} />
       ))}

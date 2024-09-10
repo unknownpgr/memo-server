@@ -229,7 +229,7 @@ export class MemoService extends Observable {
       current = memo.parentId;
     }
     if (path.length === 0) return "Set path";
-    return path.reverse().join("/");
+    return "/" + path.reverse().join("/");
   }
 
   public getMemoTree() {

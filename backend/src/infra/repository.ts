@@ -58,8 +58,8 @@ export class JsonFileRepository implements Repository {
     const memo: Memo = {
       id: this.createMemoId(),
       parentId: 0,
-      title: "New Memo",
-      content: "New Memo",
+      title: "",
+      content: "",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };

@@ -99,4 +99,11 @@ export class JsonFileRepository implements Repository {
     const backupPath = `${this.databaseDir}/memo-${Date.now()}.json`;
     await fs.writeFile(backupPath, JSON.stringify(this.memoStorage));
   }
+
+  async listBackups(): Promise<string[]> {
+    const files = await fs.readdir(this.databaseDir);
+    return files
+      .filter((file) => file.startsWith("memo-"))
+      .map((file) => file.replace("memo-", "").replace(".json", ""));
+  }
 }

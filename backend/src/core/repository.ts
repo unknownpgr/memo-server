@@ -7,4 +7,5 @@ export interface Repository {
   updateMemo({ memo }: { memo: Memo }): Promise<Memo>;
   deleteMemo({ memoId }: { memoId: number }): Promise<void>;
   createBackup(): Promise<void>;
+  listBackups(): Promise<string[]>;
 }

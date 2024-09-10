@@ -6,6 +6,7 @@ import { di } from "../di";
 export function Settings() {
   const service = useObservable(di.service);
   const navigate = useNavigate();
+  const backups = service.getBackupList();
 
   async function signOut() {
     await service.logout();
@@ -27,10 +28,26 @@ export function Settings() {
             Sign out
           </button>
           <h2 className="text-xl font-semibold mt-6 mb-2">Backups</h2>
-          <button className="flex items-center gap-1">
+          <button
+            className="flex items-center gap-1"
+            onClick={() => service.createBackup()}>
             <MdBackup />
             Create Backup
           </button>
+          <ul className="mt-4">
+            {backups.map((backupName) => {
+              let dateString = backupName;
+              const date = new Date(+backupName);
+              if (!isNaN(date.getTime())) {
+                dateString = date.toLocaleString();
+              }
+              return (
+                <li key={backupName} className="flex items-center gap-2">
+                  <span>- {dateString}</span>
+                </li>
+              );
+            })}
+          </ul>
         </div>
       </div>
     </div>

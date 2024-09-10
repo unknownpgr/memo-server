@@ -264,4 +264,27 @@ export class MemoService extends Observable {
   public getMemoState() {
     return this.memoState;
   }
+
+  // Backup-related
+
+  private backupList: string[] | null = null;
+
+  private async loadBackupList() {
+    this.backupList = await this.api.listBackups({ authorization: this.token });
+    this.notify();
+  }
+
+  public getBackupList(): string[] {
+    if (this.backupList === null) {
+      this.loadBackupList();
+      this.backupList = []; // To prevent multiple API calls
+      return [];
+    }
+    return this.backupList;
+  }
+
+  public async createBackup() {
+    await this.api.backupMemo({ authorization: this.token });
+    await this.loadBackupList();
+  }
 }

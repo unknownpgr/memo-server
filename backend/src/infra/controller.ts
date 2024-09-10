@@ -70,6 +70,14 @@ export class MemoController {
     return MemoController.memoService.deleteMemo({ memoId });
   }
 
+  @Get("backup")
+  public async listBackups(
+    @Header("authorization") token: string
+  ): Promise<string[]> {
+    MemoController.authService.authorize(token);
+    return MemoController.memoService.listBackups();
+  }
+
   @Post("backup")
   public async backupMemo(
     @Header("authorization") token: string

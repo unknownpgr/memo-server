@@ -26,4 +26,8 @@ export class MemoService {
   public async backupMemo(): Promise<void> {
     await this.repository.createBackup();
   }
+
+  public async listBackups(): Promise<string[]> {
+    return await this.repository.listBackups();
+  }
 }

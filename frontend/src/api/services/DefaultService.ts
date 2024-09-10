@@ -159,4 +159,40 @@ export class DefaultService {
         });
     }
 
+    /**
+     * @returns string Ok
+     * @throws ApiError
+     */
+    public static listBackups({
+        authorization,
+    }: {
+        authorization: string,
+    }): CancelablePromise<Array<string>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/backup',
+            headers: {
+                'authorization': authorization,
+            },
+        });
+    }
+
+    /**
+     * @returns void
+     * @throws ApiError
+     */
+    public static backupMemo({
+        authorization,
+    }: {
+        authorization: string,
+    }): CancelablePromise<void> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/backup',
+            headers: {
+                'authorization': authorization,
+            },
+        });
+    }
+
 }

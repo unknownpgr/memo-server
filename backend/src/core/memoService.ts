@@ -22,4 +22,8 @@ export class MemoService {
   public async deleteMemo({ memoId }: { memoId: number }): Promise<void> {
     await this.repository.deleteMemo({ memoId });
   }
+
+  public async backupMemo(): Promise<void> {
+    await this.repository.createBackup();
+  }
 }

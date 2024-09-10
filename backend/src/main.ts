@@ -6,8 +6,17 @@ import bodyParser from "koa-bodyparser";
 import dotenv from "dotenv";
 import serve from "koa-static";
 import fs from "fs";
+import { JsonFileRepository } from "./infra/repository";
+import { MemoService } from "./core/memoService";
+import { AuthService } from "./core/authService";
+import { MemoController } from "./infra/controller";
 
 dotenv.config();
+
+const repository = new JsonFileRepository();
+const memoService = new MemoService(repository);
+const authService = new AuthService();
+MemoController.injectDependencies(memoService, authService); // Dependency injection with constructor is not supported
 
 const app = new koa();
 

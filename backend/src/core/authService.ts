@@ -31,10 +31,7 @@ export class AuthService {
     return crypto.randomBytes(n).toString("base64");
   }
 
-  constructor(
-    private readonly service: MemoService,
-    private readonly authFilePath = "/db/auth.json"
-  ) {
+  constructor(private readonly authFilePath = "/db/auth.json") {
     this.auth = {
       passwordHash: "",
       salt: AuthService.randomString(32),

@@ -13,6 +13,5 @@ services:
     image: node:18
     volumes:
       - ./backend:/app
-      - ./db:/db
     working_dir: /app
     command: yarn dev

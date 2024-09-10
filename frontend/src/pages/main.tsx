@@ -15,11 +15,12 @@ function useMemoId() {
 export function Home() {
   const navigate = useNavigate();
   const memoId = useMemoId();
-  const [showList, setShowList] = useState(true);
+  const [showList, setShowList] = useState(false);
   const memo = useObservable(di.memoService);
   const auth = useObservable(di.authService);
   const authState = auth.getAuthState();
 
+  // Redirect to login page if not authorized
   useEffect(() => {
     if (authState === "unauthorized") {
       navigate("/login");
@@ -27,15 +28,15 @@ export function Home() {
     }
   }, [authState, navigate]);
 
+  // Load memo if memoId is provided or changed
   useEffect(() => {
     if (memoId < 0) return;
-    if (authState !== "authorized") return;
     memo.loadMemo(memoId);
-  }, [memo, authState, memoId, navigate]);
+  }, [memo, memoId]);
 
+  // If memoId is not provided, go to the first memo or create a new memo if there is no memo
   useEffect(() => {
     if (memoId >= 0) return;
-    if (authState !== "authorized") return;
     (async () => {
       const tree = memo.getMemoTree();
       if (tree.children.length > 0) {
@@ -45,7 +46,14 @@ export function Home() {
         navigate(`/memo/${newMemo.id}`);
       }
     })();
-  }, [memo, authState, memoId, navigate]);
+  }, [memo, memoId, navigate]);
+
+  // If memo is changed, hide the list
+  useEffect(() => {
+    if (memoId >= 0) {
+      setShowList(false);
+    }
+  }, [memoId]);
 
   const createMemo = async () => {
     const newMemo = await memo.createMemo();

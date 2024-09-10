@@ -58,7 +58,11 @@ export class AuthServiceImpl
 
   public async logout(): Promise<void> {
     localStorage.removeItem("token");
-    await this.repo.logout({ authorization: this.token });
+    try {
+      await this.repo.logout({ authorization: this.token });
+    } catch {
+      // ignore
+    }
     this.token = "";
     this.authState = "unauthorized";
     this.notify("StateChange");

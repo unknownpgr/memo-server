@@ -30,7 +30,7 @@ export function MemoSelector({ onSelect }: { onSelect: (id: number) => void }) {
     children: [],
   });
 
-  const service = di.service;
+  const service = di.memoService;
 
   useEffect(() => {
     const load = async () => {

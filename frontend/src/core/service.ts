@@ -1,5 +1,6 @@
-import { DefaultService, Memo, MemoSummary } from "../api";
-import { Observable } from "./observable";
+import { AuthService } from "./model/auth";
+import { Memo, MemoRepository, MemoSummary } from "./model/memo";
+import { Observable } from "./model/observable";
 
 export interface MemoNode {
   id: number;
@@ -8,12 +9,6 @@ export interface MemoNode {
 }
 
 /*
-Memo service state machine:
-- auth:
-  - "unauthorized"
-  - "verifying"
-  - "authorized"
-
 - memo:
   - "idle"
   - "loading"
@@ -21,79 +16,23 @@ Memo service state machine:
  */
 
 export class MemoService extends Observable {
-  // Global
-  private api = DefaultService;
-
-  constructor() {
+  constructor(
+    private readonly api: MemoRepository,
+    private readonly authService: AuthService
+  ) {
     super();
-    this.init();
-  }
 
-  private async init() {
-    await this.verifyToken();
-    if (this.authState === "authorized") {
-      await this.loadMemoList();
+    if (authService.getAuthState() === "authorized") {
+      this.loadMemoList();
+      this.loadBackupList();
     }
+    authService.addListener(() => {
+      if (authService.getAuthState() === "authorized") {
+        this.loadMemoList();
+        this.loadBackupList();
+      }
+    });
   }
-
-  // Auth-related
-
-  private token: string = "";
-  private authState: "authorized" | "verifying" | "unauthorized" = "verifying";
-
-  private async verifyToken(): Promise<void> {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      this.authState = "unauthorized";
-      this.notify();
-      return;
-    }
-
-    try {
-      await this.api.listMemo({ authorization: token });
-      this.token = token;
-      this.authState = "authorized";
-      await this.loadMemoList();
-    } catch (e) {
-      this.authState = "unauthorized";
-      this.notify();
-    }
-  }
-
-  public async login(password: string): Promise<void> {
-    if (this.authState === "authorized") return;
-    if (this.authState === "verifying") return;
-
-    this.authState = "verifying";
-    this.notify();
-    try {
-      const token = await this.api.login({
-        requestBody: { password },
-      });
-      localStorage.setItem("token", token);
-      this.token = token;
-      this.authState = "authorized";
-      await this.loadMemoList();
-    } catch {
-      this.authState = "unauthorized";
-      this.notify();
-    }
-  }
-
-  public async logout(): Promise<void> {
-    if (this.authState === "unauthorized") return;
-    if (!this.token) return;
-    await this.api.logout({ authorization: this.token });
-    localStorage.removeItem("token");
-    this.token = "";
-    this.authState = "unauthorized";
-    this.notify();
-  }
-
-  public getAuthState() {
-    return this.authState;
-  }
-
   // Memo-related
 
   private memoList: MemoSummary[] = [];
@@ -102,8 +41,8 @@ export class MemoService extends Observable {
   private updateDebounce: number | null = null;
 
   private async loadMemoList() {
-    const memoList = await this.api.listMemo({
-      authorization: this.token,
+    const memoList = await this.api.listMemos({
+      authorization: this.authService.getToken(),
     });
     this.memoList = memoList;
     this.notify();
@@ -115,7 +54,7 @@ export class MemoService extends Observable {
     this.notify();
     const memo = await this.api.findMemo({
       memoId,
-      authorization: this.token,
+      authorization: this.authService.getToken(),
     });
     this.currentMemo = memo;
     this.memoState = "idle";
@@ -124,7 +63,7 @@ export class MemoService extends Observable {
 
   public async createMemo() {
     const newMemo = await this.api.createMemo({
-      authorization: this.token,
+      authorization: this.authService.getToken(),
     });
     await this.loadMemoList();
     return newMemo;
@@ -133,9 +72,8 @@ export class MemoService extends Observable {
   private async updateMemoSync(): Promise<void> {
     if (!this.currentMemo) return;
     await this.api.updateMemo({
-      memoId: this.currentMemo.id,
-      authorization: this.token,
-      requestBody: { memo: this.currentMemo },
+      authorization: this.authService.getToken(),
+      memo: this.currentMemo,
     });
   }
 
@@ -160,7 +98,7 @@ export class MemoService extends Observable {
   public async deleteMemo(memoId: number) {
     await this.api.deleteMemo({
       memoId,
-      authorization: this.token,
+      authorization: this.authService.getToken(),
     });
     await this.loadMemoList();
   }
@@ -182,6 +120,7 @@ export class MemoService extends Observable {
   public async setContent(content: string) {
     if (this.memoState === "loading") return;
     if (!this.currentMemo) throw new Error("No memo loaded");
+    if (this.currentMemo.content === content) return;
     this.currentMemo.content = content;
     this.notify();
     await this.updateMemoDebounce();
@@ -270,7 +209,9 @@ export class MemoService extends Observable {
   private backupList: string[] | null = null;
 
   private async loadBackupList() {
-    this.backupList = await this.api.listBackups({ authorization: this.token });
+    this.backupList = await this.api.listBackups({
+      authorization: this.authService.getToken(),
+    });
     this.notify();
   }
 
@@ -284,7 +225,7 @@ export class MemoService extends Observable {
   }
 
   public async createBackup() {
-    await this.api.backupMemo({ authorization: this.token });
+    await this.api.createBackup({ authorization: this.authService.getToken() });
     await this.loadBackupList();
   }
 }

@@ -16,8 +16,9 @@ export function Home() {
   const navigate = useNavigate();
   const memoId = useMemoId();
   const [showList, setShowList] = useState(true);
-  const service = useObservable(di.service);
-  const authState = service.getAuthState();
+  const memo = useObservable(di.memoService);
+  const auth = useObservable(di.authService);
+  const authState = auth.getAuthState();
 
   useEffect(() => {
     if (authState === "unauthorized") {
@@ -29,25 +30,25 @@ export function Home() {
   useEffect(() => {
     if (memoId < 0) return;
     if (authState !== "authorized") return;
-    service.loadMemo(memoId);
-  }, [service, authState, memoId, navigate]);
+    memo.loadMemo(memoId);
+  }, [memo, authState, memoId, navigate]);
 
   useEffect(() => {
     if (memoId >= 0) return;
     if (authState !== "authorized") return;
     (async () => {
-      const tree = service.getMemoTree();
+      const tree = memo.getMemoTree();
       if (tree.children.length > 0) {
         navigate(`/memo/${tree.children[0].id}`);
       } else {
-        const newMemo = await service.createMemo();
+        const newMemo = await memo.createMemo();
         navigate(`/memo/${newMemo.id}`);
       }
     })();
-  }, [service, authState, memoId, navigate]);
+  }, [memo, authState, memoId, navigate]);
 
   const createMemo = async () => {
-    const newMemo = await service.createMemo();
+    const newMemo = await memo.createMemo();
     navigate(`/memo/${newMemo.id}`);
   };
 

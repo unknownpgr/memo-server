@@ -24,7 +24,7 @@ function MemoItem(node: MemoNode) {
 }
 
 export function MemoList() {
-  const service = useObservable(di.service);
+  const service = useObservable(di.memoService);
   const memoTree = service.getMemoTree();
   return (
     <div>

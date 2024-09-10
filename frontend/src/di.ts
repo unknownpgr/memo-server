@@ -1,7 +1,20 @@
+import { AuthServiceImpl } from "./core/authService";
+import { AuthService } from "./core/model/auth";
+
 import { MemoService } from "./core/service";
+import { AuthRepositoryImpl } from "./infra/authRepository";
+import { MemoRepositoryImpl } from "./infra/memoRepository";
 
-const service = new MemoService();
+const authRepository = new AuthRepositoryImpl();
+const memoRepository = new MemoRepositoryImpl();
 
-export const di = {
-  service,
+const authService = new AuthServiceImpl(authRepository);
+const memoService = new MemoService(memoRepository, authService);
+
+export const di: {
+  authService: AuthService;
+  memoService: MemoService;
+} = {
+  authService,
+  memoService,
 };

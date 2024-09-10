@@ -14,7 +14,7 @@ import { MemoSelector } from "../components/memoselector";
 import { di } from "../di";
 
 const MilkdownEditor = () => {
-  const service = di.service;
+  const service = di.memoService;
 
   const onUpdated = useCallback(
     (markdown: string) => service.setContent(markdown),
@@ -48,7 +48,7 @@ const MilkdownEditor = () => {
 export function MemoView({ memoId }: { memoId: number }) {
   const [showSelector, setShowSelector] = useState(false);
   const navigate = useNavigate();
-  const service = di.service;
+  const service = di.memoService;
   const memo = service.getCurrentMemo();
   const memoState = service.getMemoState();
   const isEditable = memoState === "idle" || memoState === "updating";

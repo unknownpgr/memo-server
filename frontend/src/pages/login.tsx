@@ -4,7 +4,7 @@ import { useObservable } from "../adapter/useObservable";
 import { di } from "../di";
 
 export function Login() {
-  const service = useObservable(di.service);
+  const service = useObservable(di.authService);
   const [password, setPassword] = useState("");
   const [logs, setLogs] = useState<string[]>([]);
   const passwordRef = useRef<HTMLInputElement>(null);

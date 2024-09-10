@@ -16,7 +16,7 @@ const authSchema = z.object({
 type Auth = z.infer<typeof authSchema>;
 
 export class AuthService {
-  private auth: Auth;
+  private auth: Auth | null = null;
 
   private static async hash(password: string, salt: string): Promise<string> {
     return new Promise<string>((resolve, reject) => {
@@ -32,16 +32,13 @@ export class AuthService {
   }
 
   constructor(private readonly authFilePath = "/db/auth.json") {
-    this.auth = {
-      passwordHash: "",
-      salt: AuthService.randomString(32),
-      sessions: [],
-    };
     this.load();
     setInterval(() => this.cronJob(), 60_000).unref();
   }
 
   private async cronJob() {
+    if (!this.auth) return;
+
     // Remove expired sessions
     const now = Date.now();
     this.auth.sessions = this.auth.sessions.filter((s) => s.expiresAt > now);
@@ -54,7 +51,11 @@ export class AuthService {
       const auth = JSON.parse(data);
       this.auth = authSchema.parse(auth);
     } catch {
-      // ignore
+      this.auth = {
+        passwordHash: "",
+        salt: AuthService.randomString(32),
+        sessions: [],
+      };
     }
   }
 
@@ -72,6 +73,10 @@ export class AuthService {
    * @returns
    */
   private issueToken(duration: number = 24 * 60 * 60 * 1000) {
+    if (!this.auth) {
+      throw new Error("Service is not initialized");
+    }
+
     const token = AuthService.randomString(32);
     const expiresAt = Date.now() + duration;
     this.auth.sessions.push({ token, expiresAt });
@@ -80,6 +85,10 @@ export class AuthService {
   }
 
   private validateToken(token: string) {
+    if (!this.auth) {
+      throw new Error("Service is not initialized");
+    }
+
     const session = this.auth.sessions.find((s) => s.token === token);
     if (!session || session.expiresAt < Date.now()) {
       throw new Error("Unauthorized");
@@ -87,6 +96,10 @@ export class AuthService {
   }
 
   private extendToken(token: string, duration: number = 24 * 60 * 60 * 1000) {
+    if (!this.auth) {
+      throw new Error("Service is not initialized");
+    }
+
     const session = this.auth.sessions.find((s) => s.token === token);
     if (session) {
       session.expiresAt = Date.now() + duration;
@@ -95,6 +108,10 @@ export class AuthService {
   }
 
   public async login(password: string): Promise<string> {
+    if (!this.auth) {
+      throw new Error("Service is not initialized");
+    }
+
     const hashed = await AuthService.hash(password, this.auth.salt);
 
     // In case of initial setup, register the password
@@ -113,6 +130,10 @@ export class AuthService {
   }
 
   public async logout(token: string) {
+    if (!this.auth) {
+      throw new Error("Service is not initialized");
+    }
+
     this.validateToken(token);
     this.auth.sessions = this.auth.sessions.filter((s) => s.token !== token);
     await this.save();

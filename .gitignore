@@ -4,3 +4,4 @@ db
 *.log
 tmp
 dist
+docker-compose.prod.yaml

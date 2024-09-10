@@ -1,0 +1,18 @@
+version: "3"
+services:
+  frontend:
+    image: node:18
+    volumes:
+      - ./frontend:/app
+    working_dir: /app
+    command: yarn dev
+    ports:
+      - 5173:5173
+
+  backend:
+    image: node:18
+    volumes:
+      - ./backend:/app
+      - ./db:/db
+    working_dir: /app
+    command: yarn dev

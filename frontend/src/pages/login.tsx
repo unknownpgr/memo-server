@@ -1,5 +1,4 @@
-import { KeyboardEvent, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { KeyboardEvent, useState } from "react";
 import { useObservable } from "../adapter/useObservable";
 import { di } from "../di";
 
@@ -8,25 +7,13 @@ function isPasswordValid(password: string) {
 }
 
 export function Login() {
-  const service = useObservable(di.authService);
+  const auth = useObservable(di.authService);
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
-  const isLoggedIn = service.getAuthState() === "authorized";
-  const isLoading = service.getAuthState() === "verifying";
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      navigate("/");
-    }
-  }, [isLoggedIn, navigate]);
+  const isLoading = auth.getAuthState() === "verifying";
 
   async function signIn() {
-    try {
-      await service.login(password);
-      navigate("/");
-    } catch {
-      setPassword("");
-    }
+    await auth.login(password);
+    if (auth.getAuthState() === "unauthorized") setPassword("");
   }
 
   function onPasswordKeyDown(e: KeyboardEvent) {
@@ -36,7 +23,7 @@ export function Login() {
   return (
     <div className="container mx-auto h-dvh p-2 flex flex-col justify-center items-center">
       <input
-        className="py-2 outline-none text-center"
+        className="py-2 outline-none text-center bg-white"
         type="password"
         placeholder="password"
         value={password}

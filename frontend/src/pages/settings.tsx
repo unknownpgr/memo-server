@@ -1,17 +1,15 @@
 import { MdArrowBack, MdBackup, MdLogout } from "react-icons/md";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useObservable } from "../adapter/useObservable";
 import { di } from "../di";
 
 export function Settings() {
   const auth = useObservable(di.authService);
   const memo = useObservable(di.memoService);
-  const navigate = useNavigate();
   const backups = memo.getBackupList();
 
   async function signOut() {
     await auth.logout();
-    navigate("/login");
   }
 
   return (

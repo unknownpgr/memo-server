@@ -17,16 +17,6 @@ export function Home() {
   const memoId = useMemoId();
   const [showList, setShowList] = useState(false);
   const memo = useObservable(di.memoService);
-  const auth = useObservable(di.authService);
-  const authState = auth.getAuthState();
-
-  // Redirect to login page if not authorized
-  useEffect(() => {
-    if (authState === "unauthorized") {
-      navigate("/login");
-      return;
-    }
-  }, [authState, navigate]);
 
   // Load memo if memoId is provided or changed
   useEffect(() => {

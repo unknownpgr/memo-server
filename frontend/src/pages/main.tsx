@@ -17,6 +17,7 @@ export function Home() {
   const memoId = useMemoId();
   const [showList, setShowList] = useState(false);
   const memo = useObservable(di.memoService);
+  const state = memo.getMemoState();
 
   // Load memo if memoId is provided or changed
   useEffect(() => {
@@ -27,10 +28,11 @@ export function Home() {
   // If memoId is not provided, go to the first memo or create a new memo if there is no memo
   useEffect(() => {
     if (memoId >= 0) return;
+    if (state !== "idle") return;
     const tree = memo.getMemoTree();
     if (tree.children.length === 0) return;
     navigate(`/memo/${tree.children[0].id}`);
-  }, [memo, memoId, navigate]);
+  }, [memo, state, memoId, navigate]);
 
   // If memo is changed, hide the list
   useEffect(() => {

@@ -13,35 +13,41 @@ import { MemoController } from "./infra/controller";
 
 dotenv.config();
 
-const repository = new JsonFileRepository();
-const memoService = new MemoService(repository);
-const authService = new AuthService();
-MemoController.injectDependencies(memoService, authService); // Dependency injection with constructor is not supported
+async function main() {
+  const repository = new JsonFileRepository();
+  await repository.init();
 
-const app = new koa();
+  const memoService = new MemoService(repository);
+  const authService = new AuthService();
+  MemoController.injectDependencies(memoService, authService); // Dependency injection with constructor is not supported
 
-// Global middlewares
-app.use(bodyParser());
-app.use(morgan("dev"));
+  const app = new koa();
 
-// Application routes
-const router = new KoaRouter();
-RegisterRoutes(router);
-app.use(router.routes());
+  // Global middlewares
+  app.use(bodyParser());
+  app.use(morgan("dev"));
 
-// Static files
-app.use(serve("public"));
+  // Application routes
+  const router = new KoaRouter();
+  RegisterRoutes(router);
+  app.use(router.routes());
 
-// SPA support
-const indexHtml = fs.readFileSync("public/index.html");
-app.use(async (ctx, next) => {
-  await next();
-  if (ctx.status === 404) {
-    ctx.type = "html";
-    ctx.body = indexHtml;
-  }
-});
+  // Static files
+  app.use(serve("public"));
 
-app.listen(80, () => {
-  console.log("server started");
-});
+  // SPA support
+  const indexHtml = fs.readFileSync("public/index.html");
+  app.use(async (ctx, next) => {
+    await next();
+    if (ctx.status === 404) {
+      ctx.type = "html";
+      ctx.body = indexHtml;
+    }
+  });
+
+  app.listen(80, () => {
+    console.log("server started");
+  });
+}
+
+main();

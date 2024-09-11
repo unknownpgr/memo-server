@@ -3,19 +3,19 @@ import { Memo, MemoSummary, memoSchema } from "../core/entity";
 import { Repository } from "../core/repository";
 
 export class JsonFileRepository implements Repository {
-  private memoStorage: Memo[] = [];
+  private memoStorage: Memo[] | null = null;
 
-  constructor(private databaseDir: string = "/db") {
-    this.load();
-  }
+  constructor(private databaseDir: string = "/db") {}
 
-  private async load() {
+  public async init() {
     try {
       const data = await fs.readFile(`${this.databaseDir}/memo.json`, "utf-8");
       const memos = JSON.parse(data);
       this.memoStorage = memos.map((memo: any) => memoSchema.parse(memo));
     } catch (e) {
       console.log("No memo database found. Creating a new one.");
+      this.memoStorage = [];
+      await this.save();
     }
   }
 
@@ -27,6 +27,7 @@ export class JsonFileRepository implements Repository {
   }
 
   private createMemoId() {
+    if (!this.memoStorage) throw new Error("DB not loaded");
     let maxId = 0;
     for (const memo of this.memoStorage) {
       maxId = Math.max(maxId, memo.id);
@@ -35,12 +36,14 @@ export class JsonFileRepository implements Repository {
   }
 
   async findMemo({ memoId }: { memoId: number }): Promise<Memo> {
+    if (!this.memoStorage) throw new Error("DB not loaded");
     const memo = this.memoStorage.find((memo) => memo.id === memoId);
     if (!memo) throw new Error("Not found");
     return memo;
   }
 
   async listMemo(): Promise<MemoSummary[]> {
+    if (!this.memoStorage) throw new Error("DB not loaded");
     const results = this.memoStorage.map((memo) => {
       return {
         id: memo.id,
@@ -55,6 +58,7 @@ export class JsonFileRepository implements Repository {
   }
 
   async createMemo(): Promise<Memo> {
+    if (!this.memoStorage) throw new Error("DB not loaded");
     const memo: Memo = {
       id: this.createMemoId(),
       parentId: 0,
@@ -68,27 +72,23 @@ export class JsonFileRepository implements Repository {
     return memo;
   }
 
-  async updateMemo({
-    userId,
-    memo,
-  }: {
-    userId: number;
-    memo: Memo;
-  }): Promise<Memo> {
+  async updateMemo({ memo }: { userId: number; memo: Memo }): Promise<Memo> {
+    if (!this.memoStorage) throw new Error("DB not loaded");
     const index = this.memoStorage.findIndex((m) => m.id === memo.id);
     if (index === -1) throw new Error("Not found");
+    memo.updatedAt = new Date().toISOString();
     this.memoStorage[index] = memo;
     await this.save();
     return memo;
   }
 
   async deleteMemo({
-    userId,
     memoId,
   }: {
     userId: number;
     memoId: number;
   }): Promise<void> {
+    if (!this.memoStorage) throw new Error("DB not loaded");
     const index = this.memoStorage.findIndex((m) => m.id === memoId);
     if (index === -1) throw new Error("Not found");
     this.memoStorage.splice(index, 1);

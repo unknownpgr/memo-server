@@ -20,15 +20,17 @@ export function Settings() {
         </Link>
       </div>
       <div>
-        <div className="max-w-4xl mx-auto p-4">
+        <div className="max-w-4xl mx-auto px-4">
           <h1 className="mt-8 text-4xl font-bold mb-4">Settings</h1>
-          <button className="flex items-center gap-1" onClick={signOut}>
+          <button
+            className="flex items-center gap-1 text-gray-700"
+            onClick={signOut}>
             <MdLogout />
             Sign out
           </button>
           <h2 className="mt-8 text-2xl font-semibold mb-4">Backups</h2>
           <button
-            className="flex items-center gap-1"
+            className="flex items-center gap-1 text-gray-700"
             onClick={() => memo.createBackup()}>
             <MdBackup />
             Create Backup

@@ -3,10 +3,10 @@ import { Repository } from "./repository";
 
 export class MemoService {
   constructor(private readonly repository: Repository) {
-    this.initialize();
+    this.init();
   }
 
-  private async initialize() {
+  private async init() {
     const memos = await this.repository.listMemo();
     if (memos.length > 0) return;
     await this.repository.createMemo();

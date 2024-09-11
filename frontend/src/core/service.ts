@@ -14,42 +14,45 @@ export type MemoEvent =
   | "MemoUpdated"
   | "ListUpdate";
 
-export type MemoState = "idle" | "loading" | "updating";
+export type MemoState = "uninitialized" | "idle" | "loading" | "updating";
 
 export class MemoService extends Observable<MemoEvent> {
+  private memoList: MemoSummary[] = [];
+  private currentMemo: Memo | null = null;
+  private memoState: MemoState = "uninitialized";
+  private updateDebounce: number | null = null;
+  private memoTreeCache: MemoNode | null = null;
+
   constructor(
     private readonly api: MemoRepository,
     private readonly authService: AuthService
   ) {
     super();
 
-    if (authService.getAuthState() === "authorized") {
-      this.loadMemoList();
-      this.loadBackupList();
-    }
+    if (authService.getAuthState() === "authorized") this.init();
     authService.addListener(() => {
-      if (authService.getAuthState() === "authorized") {
-        this.loadMemoList();
-        this.loadBackupList();
-      }
+      if (authService.getAuthState() === "authorized") this.init();
     });
   }
-  // Memo-related
 
-  private memoList: MemoSummary[] = [];
-  private currentMemo: Memo | null = null;
-  private memoState: MemoState = "idle";
-  private updateDebounce: number | null = null;
+  private async init() {
+    await this.loadMemoList();
+    this.loadBackupList();
+    this.memoState = "idle";
+    this.notify("StateChange");
+  }
 
   private async loadMemoList() {
     const memoList = await this.api.listMemos({
       authorization: this.authService.getToken(),
     });
     this.memoList = memoList;
+    this.memoTreeCache = null;
     this.notify("ListUpdate");
   }
 
   public async loadMemo(memoId: number) {
+    console.log("loadMemo", memoId, this.memoState, this.currentMemo);
     if (this.memoState !== "idle") return;
     if (this.currentMemo && this.currentMemo.id === memoId) return;
     this.currentMemo = null;
@@ -128,6 +131,9 @@ export class MemoService extends Observable<MemoEvent> {
     const memo = this.memoList.find((memo) => memo.id === currentMemo.id);
     if (memo) memo.title = title;
 
+    // Invalidate memo tree cache
+    this.memoTreeCache = null;
+
     this.updateMemoDebounce();
     this.notify("MemoUpdated");
   }
@@ -173,6 +179,10 @@ export class MemoService extends Observable<MemoEvent> {
 
     // Set parent ID
     currentMemo.parentId = parentId;
+
+    // Invalidate memo tree cache
+    this.memoTreeCache = null;
+
     this.notify("MemoUpdated");
     await this.updateMemoSync();
     this.loadMemoList();
@@ -193,6 +203,8 @@ export class MemoService extends Observable<MemoEvent> {
   }
 
   public getMemoTree() {
+    if (this.memoTreeCache) return this.memoTreeCache;
+
     function constructMemoTree(
       memos: MemoSummary[],
       currentId = 0,
@@ -218,6 +230,7 @@ export class MemoService extends Observable<MemoEvent> {
       else return 0;
     });
     const memoTree = constructMemoTree(this.memoList);
+    this.memoTreeCache = memoTree;
     return memoTree;
   }
 

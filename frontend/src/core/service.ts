@@ -52,7 +52,6 @@ export class MemoService extends Observable<MemoEvent> {
   }
 
   public async loadMemo(memoId: number) {
-    console.log("loadMemo", memoId, this.memoState, this.currentMemo);
     if (this.memoState !== "idle") return;
     if (this.currentMemo && this.currentMemo.id === memoId) return;
     this.currentMemo = null;

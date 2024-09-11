@@ -19,26 +19,25 @@ export function Home() {
   const memo = useObservable(di.memoService);
   const state = memo.getMemoState();
 
-  // Load memo if memoId is provided or changed
   useEffect(() => {
-    if (memoId < 0) return;
-    memo.loadMemo(memoId);
-  }, [memo, memoId]);
-
-  // If memoId is not provided, go to the first memo or create a new memo if there is no memo
-  useEffect(() => {
-    if (memoId >= 0) return;
+    // If something is loading, or not initialized, do nothing
     if (state !== "idle") return;
+
+    // If memoId is specified, load the memo
+    if (memoId >= 0) {
+      memo.loadMemo(memoId);
+      return;
+    }
+
+    // If memoId is not specified, load the first memo
     const tree = memo.getMemoTree();
     if (tree.children.length === 0) return;
     navigate(`/memo/${tree.children[0].id}`);
-  }, [memo, state, memoId, navigate]);
+  }, [memo, memoId, state, navigate]);
 
-  // If memo is changed, hide the list
   useEffect(() => {
-    if (memoId >= 0) {
-      setShowList(false);
-    }
+    if (memoId >= 0) setShowList(false);
+    else setShowList(true);
   }, [memoId]);
 
   const createMemo = async () => {

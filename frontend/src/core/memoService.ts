@@ -113,6 +113,12 @@ export class MemoService extends Observable<MemoEvent> {
     return this.memoState;
   }
 
+  public getFirstMemoId(): number {
+    const tree = this.getMemoTree();
+    if (tree.children.length === 0) return -1;
+    return tree.children[0].id;
+  }
+
   // getters and setters
 
   public getTitle() {

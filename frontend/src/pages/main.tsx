@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MdCreate, MdList, MdSettings } from "react-icons/md";
+import { MdCreate, MdHome, MdList, MdSettings } from "react-icons/md";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useObservable } from "../adapter/useObservable";
 import { MemoList } from "../components/memolist";
@@ -18,6 +18,7 @@ export function Home() {
   const [showList, setShowList] = useState(false);
   const memo = useObservable(di.memoService);
   const state = memo.getMemoState();
+  const firstMemoId = memo.getFirstMemoId();
 
   useEffect(() => {
     // If something is loading, or not initialized, do nothing
@@ -30,10 +31,9 @@ export function Home() {
     }
 
     // If memoId is not specified, load the first memo
-    const tree = memo.getMemoTree();
-    if (tree.children.length === 0) return;
-    navigate(`/memo/${tree.children[0].id}`);
-  }, [memo, memoId, state, navigate]);
+    if (firstMemoId < 0) return;
+    navigate(`/memo/${firstMemoId}`);
+  }, [memo, memoId, state, firstMemoId, navigate]);
 
   useEffect(() => {
     if (memoId >= 0) setShowList(false);
@@ -54,6 +54,11 @@ export function Home() {
         <button className="p-2" onClick={createMemo}>
           <MdCreate />
         </button>
+        {firstMemoId >= 0 && (
+          <Link className="p-2" to={`/memo/${firstMemoId}`}>
+            <MdHome />
+          </Link>
+        )}
         <div className="flex-1" />
         <Link className="p-2" to="/settings">
           <MdSettings />

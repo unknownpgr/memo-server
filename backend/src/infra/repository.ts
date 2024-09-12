@@ -15,6 +15,7 @@ export class JsonFileRepository implements Repository {
     } catch (e) {
       console.log("No memo database found. Creating a new one.");
       this.memoStorage = [];
+      await fs.mkdir(this.databaseDir, { recursive: true });
       await this.save();
     }
   }

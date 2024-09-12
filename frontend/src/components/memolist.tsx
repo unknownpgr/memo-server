@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { useObservable } from "../adapter/useObservable";
-import { MemoNode } from "../core/service";
+import { MemoNode } from "../core/memoService";
 import { di } from "../di";
 
 function MemoItem(node: MemoNode) {

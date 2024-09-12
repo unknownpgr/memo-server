@@ -1,7 +1,7 @@
 import { AuthServiceImpl } from "./core/authService";
 import { AuthService } from "./core/model/auth";
 
-import { MemoService } from "./core/service";
+import { MemoService } from "./core/memoService";
 import { AuthRepositoryImpl } from "./infra/authRepository";
 import { MemoRepositoryImpl } from "./infra/memoRepository";
 

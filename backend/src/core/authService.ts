@@ -73,7 +73,7 @@ export class AuthService {
    * @param duration Duration in milliseconds
    * @returns
    */
-  private issueToken(duration: number = 24 * 60 * 60 * 1000) {
+  private issueToken(duration: number = 7 * 24 * 60 * 60 * 1000) {
     if (!this.auth) {
       throw new Error("Service is not initialized");
     }
@@ -119,7 +119,7 @@ export class AuthService {
     if (!this.auth.passwordHash) {
       this.auth.passwordHash = hashed;
       await this.save();
-      return this.issueToken(); // 24 hours
+      return this.issueToken();
     }
 
     // Else, validate the password

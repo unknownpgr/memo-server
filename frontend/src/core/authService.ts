@@ -26,14 +26,15 @@ export class AuthServiceImpl
       return;
     }
 
-    try {
-      this.token = token;
-      this.authState = "authorized";
-      this.notify("StateChange");
-    } catch (e) {
+    if (!(await this.repo.verifyToken({ authorization: token }))) {
       this.authState = "unauthorized";
       this.notify("StateChange");
+      return;
     }
+
+    this.token = token;
+    this.authState = "authorized";
+    this.notify("StateChange");
   }
 
   public async login(password: string): Promise<void> {

@@ -6,6 +6,7 @@ export type AuthEvent = "StateChange";
 export interface AuthRepository {
   login(request: { requestBody: { password: string } }): Promise<string>;
   logout(request: { authorization: string }): Promise<void>;
+  verifyToken(request: { authorization: string }): Promise<boolean>;
 }
 
 export interface AuthService extends Observable<AuthEvent> {

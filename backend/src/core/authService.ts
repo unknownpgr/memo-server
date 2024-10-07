@@ -142,6 +142,6 @@ export class AuthService {
 
   public authorize(token: string) {
     this.validateToken(token);
-    this.extendToken(token);
+    this.extendToken(token, 7 * 24 * 60 * 60 * 1000);
   }
 }

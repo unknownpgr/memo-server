@@ -1,5 +1,6 @@
+import { MemoInstanceService, MemoState } from "./memoInstanceService";
 import { AuthService } from "./model/auth";
-import { Memo, MemoRepository, MemoSummary } from "./model/memo";
+import { MemoRepository, MemoSummary } from "./model/memo";
 import { Observable } from "./model/observable";
 
 export interface MemoNode {
@@ -8,19 +9,11 @@ export interface MemoNode {
   children: MemoNode[];
 }
 
-export type MemoEvent =
-  | "StateChange"
-  | "MemoLoaded"
-  | "MemoUpdated"
-  | "ListUpdate";
+export type MemoServiceState = "uninitialized" | MemoState;
 
-export type MemoState = "uninitialized" | "idle" | "loading" | "updating";
-
-export class MemoService extends Observable<MemoEvent> {
+export class MemoService extends Observable {
+  private currentMemo: MemoInstanceService | null = null;
   private memoList: MemoSummary[] = [];
-  private currentMemo: Memo | null = null;
-  private memoState: MemoState = "uninitialized";
-  private updateDebounce: number | null = null;
   private memoTreeCache: MemoNode | null = null;
 
   constructor(
@@ -29,17 +22,20 @@ export class MemoService extends Observable<MemoEvent> {
   ) {
     super();
 
-    if (authService.getAuthState() === "authorized") this.init();
-    authService.addListener(() => {
-      if (authService.getAuthState() === "authorized") this.init();
-    });
-  }
+    const init = async () => {
+      await this.loadMemoList();
+      this.loadBackupList();
+      const firstMemoId = this.getFirstMemoId();
+      if (firstMemoId !== -1) {
+        await this.loadMemo(firstMemoId);
+      }
+      this.notify();
+    };
 
-  private async init() {
-    await this.loadMemoList();
-    this.loadBackupList();
-    this.memoState = "idle";
-    this.notify("StateChange");
+    if (authService.getAuthState() === "authorized") init();
+    authService.addListener(() => {
+      if (authService.getAuthState() === "authorized") init();
+    });
   }
 
   private async loadMemoList() {
@@ -48,23 +44,25 @@ export class MemoService extends Observable<MemoEvent> {
     });
     this.memoList = memoList;
     this.memoTreeCache = null;
-    this.notify("ListUpdate");
+    this.notify();
   }
 
   public async loadMemo(memoId: number) {
-    if (this.memoState !== "idle") return;
-    if (this.currentMemo && this.currentMemo.id === memoId) return;
-    this.currentMemo = null;
-    this.memoState = "loading";
-    this.notify("StateChange");
-    const memo = await this.api.findMemo({
-      memoId,
-      authorization: this.authService.getToken(),
-    });
-    this.currentMemo = memo;
-    this.notify("MemoLoaded");
-    this.memoState = "idle";
-    this.notify("StateChange");
+    if (this.currentMemo) {
+      // If the memo is already loaded, do nothing
+      if (this.currentMemo.getId() === memoId) return;
+
+      this.currentMemo.removeAllListeners();
+    }
+
+    this.currentMemo = new MemoInstanceService(
+      this.authService,
+      this.api,
+      memoId
+    );
+    this.currentMemo.addListener(() => this.notify());
+
+    this.notify();
   }
 
   public async createMemo() {
@@ -75,32 +73,6 @@ export class MemoService extends Observable<MemoEvent> {
     return newMemo;
   }
 
-  private async updateMemoSync(): Promise<void> {
-    if (!this.currentMemo) return;
-    await this.api.updateMemo({
-      authorization: this.authService.getToken(),
-      memo: this.currentMemo,
-    });
-  }
-
-  private async updateMemoDebounce() {
-    if (!this.currentMemo) throw new Error("No memo loaded");
-    this.memoState = "updating";
-    this.notify("StateChange");
-    if (this.updateDebounce) clearTimeout(this.updateDebounce);
-    const id = setTimeout(async () => {
-      if (this.updateDebounce !== id) {
-        alert("THIS SHOULD NOT HAPPEN");
-        return;
-      }
-      await this.updateMemoSync();
-      if (this.updateDebounce !== id) return;
-      this.memoState = "idle";
-      this.notify("StateChange");
-    }, 1000);
-    this.updateDebounce = id;
-  }
-
   public async deleteMemo(memoId: number) {
     await this.api.deleteMemo({
       memoId,
@@ -109,8 +81,9 @@ export class MemoService extends Observable<MemoEvent> {
     await this.loadMemoList();
   }
 
-  public getMemoState() {
-    return this.memoState;
+  public getServiceState(): MemoServiceState {
+    if (!this.currentMemo) return "uninitialized";
+    return this.currentMemo.getMemoState();
   }
 
   public getFirstMemoId(): number {
@@ -122,55 +95,53 @@ export class MemoService extends Observable<MemoEvent> {
   // getters and setters
 
   public getTitle() {
-    if (this.memoState === "loading") return "";
-    return this.currentMemo?.title || "";
+    if (!this.currentMemo) return "Loading...";
+    return this.currentMemo.getTitle();
   }
 
   public async setTitle(title: string) {
-    if (this.memoState === "loading") return;
     const currentMemo = this.currentMemo;
-    if (!currentMemo) throw new Error("No memo loaded");
-    currentMemo.title = title;
+
+    if (!currentMemo) return;
+    currentMemo.setTitle(title);
 
     // Update memo title in the memo list
-    const memo = this.memoList.find((memo) => memo.id === currentMemo.id);
+    const memo = this.memoList.find((memo) => memo.id === currentMemo.getId());
     if (memo) memo.title = title;
 
     // Invalidate memo tree cache
     this.memoTreeCache = null;
 
-    this.updateMemoDebounce();
-    this.notify("MemoUpdated");
+    this.notify();
   }
 
   public getContent() {
-    if (this.memoState === "loading") return "";
-    return this.currentMemo?.content || "";
+    if (!this.currentMemo) return "";
+    return this.currentMemo.getContent();
   }
 
   public async setContent(content: string) {
-    if (this.memoState === "loading") return;
-    if (!this.currentMemo) throw new Error("No memo loaded");
-    if (this.currentMemo.content === content) return;
-    this.currentMemo.content = content;
-    this.notify("MemoUpdated");
-    await this.updateMemoDebounce();
+    const currentMemo = this.currentMemo;
+
+    if (!currentMemo) return;
+    currentMemo.setContent(content);
+
+    this.notify();
   }
 
   public getParentId() {
-    if (this.memoState === "loading") return -1;
-    return this.currentMemo?.parentId || -1;
+    if (!this.currentMemo) return -1;
+    return this.currentMemo.getParentId();
   }
 
   public async setParentId(parentId: number) {
-    if (this.memoState === "loading") return;
     const currentMemo = this.currentMemo;
     if (!currentMemo) throw new Error("No memo loaded");
 
     // Check for circular reference
     let current = parentId;
     while (current !== 0) {
-      if (current === currentMemo.id) {
+      if (current === currentMemo.getId()) {
         throw new Error("Circular reference detected");
       }
       const memo = this.memoList.find((memo) => memo.id === current);
@@ -179,24 +150,23 @@ export class MemoService extends Observable<MemoEvent> {
     }
 
     // Update parent ID in the memo list
-    const memo = this.memoList.find((memo) => memo.id === currentMemo.id);
+    const memo = this.memoList.find((memo) => memo.id === currentMemo.getId());
     if (memo) memo.parentId = parentId;
 
     // Set parent ID
-    currentMemo.parentId = parentId;
+    currentMemo.setParentId(parentId);
 
     // Invalidate memo tree cache
     this.memoTreeCache = null;
 
-    this.notify("MemoUpdated");
-    await this.updateMemoSync();
+    this.notify();
     this.loadMemoList();
   }
 
   public getPath() {
     if (!this.currentMemo) return "X";
     const path = [];
-    let current = this.currentMemo.id;
+    let current = this.currentMemo.getId();
     for (;;) {
       const memo = this.memoList.find((memo) => memo.id === current);
       if (!memo) break;
@@ -239,6 +209,11 @@ export class MemoService extends Observable<MemoEvent> {
     return memoTree;
   }
 
+  public getError() {
+    if (!this.currentMemo) return "";
+    return this.currentMemo.getError();
+  }
+
   // Backup-related
 
   private backupList: string[] | null = null;
@@ -247,7 +222,7 @@ export class MemoService extends Observable<MemoEvent> {
     this.backupList = await this.api.listBackups({
       authorization: this.authService.getToken(),
     });
-    this.notify("ListUpdate");
+    this.notify();
   }
 
   public getBackupList(): string[] {

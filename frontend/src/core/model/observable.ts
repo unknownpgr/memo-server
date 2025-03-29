@@ -9,6 +9,10 @@ export class Observable<Event = void> {
     this.listeners = this.listeners.filter((l) => l !== listener);
   }
 
+  public removeAllListeners() {
+    this.listeners = [];
+  }
+
   protected notify(event: Event) {
     this.listeners.forEach((l) => l(event));
   }

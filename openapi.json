@@ -14,6 +14,9 @@
 					"createdAt": {
 						"type": "string"
 					},
+					"hash": {
+						"type": "string"
+					},
 					"content": {
 						"type": "string"
 					},
@@ -32,6 +35,7 @@
 				"required": [
 					"updatedAt",
 					"createdAt",
+					"hash",
 					"content",
 					"title",
 					"parentId",
@@ -215,11 +219,15 @@
 						"application/json": {
 							"schema": {
 								"properties": {
+									"previousHash": {
+										"type": "string"
+									},
 									"memo": {
 										"$ref": "#/components/schemas/Memo"
 									}
 								},
 								"required": [
+									"previousHash",
 									"memo"
 								],
 								"type": "object"

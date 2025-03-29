@@ -3,6 +3,7 @@ export interface Memo {
   title: string;
   parentId: number;
   content: string;
+  hash: string;
 }
 
 export interface MemoSummary {
@@ -15,7 +16,11 @@ export interface MemoRepository {
   listMemos(request: { authorization: string }): Promise<MemoSummary[]>;
   createMemo(request: { authorization: string }): Promise<Memo>;
   findMemo(request: { authorization: string; memoId: number }): Promise<Memo>;
-  updateMemo(request: { authorization: string; memo: Memo }): Promise<void>;
+  updateMemo(request: {
+    authorization: string;
+    memo: Memo;
+    previousHash: string;
+  }): Promise<Memo>;
   deleteMemo(request: { authorization: string; memoId: number }): Promise<void>;
   listBackups(request: { authorization: string }): Promise<string[]>;
   createBackup(request: { authorization: string }): Promise<void>;

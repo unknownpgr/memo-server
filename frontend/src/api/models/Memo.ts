@@ -6,6 +6,7 @@
 export type Memo = {
     updatedAt: string;
     createdAt: string;
+    hash: string;
     content: string;
     title: string;
     parentId: number;

@@ -8,15 +8,32 @@ export class JsonFileRepository implements Repository {
   constructor(private databaseDir: string = "/db") {}
 
   public async init() {
+    let data;
     try {
-      const data = await fs.readFile(`${this.databaseDir}/memo.json`, "utf-8");
-      const memos = JSON.parse(data);
-      this.memoStorage = memos.map((memo: any) => memoSchema.parse(memo));
+      data = await fs.readFile(`${this.databaseDir}/memo.json`, "utf-8");
     } catch (e) {
       console.log("No memo database found. Creating a new one.");
       this.memoStorage = [];
       await fs.mkdir(this.databaseDir, { recursive: true });
       await this.save();
+      return;
+    }
+
+    let rawMemos;
+    try {
+      rawMemos = JSON.parse(data);
+    } catch (e) {
+      console.error(e);
+      console.error(data);
+      throw new Error("Memo database is not a valid JSON file.");
+    }
+
+    try {
+      this.memoStorage = rawMemos.map((memo: any) => memoSchema.parse(memo));
+    } catch (e) {
+      console.error(e);
+      console.error(rawMemos);
+      throw new Error("Memo database is corrupted.");
     }
   }
 
@@ -65,8 +82,9 @@ export class JsonFileRepository implements Repository {
       parentId: 0,
       title: "",
       content: "",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      hash: "",
+      createdAt: "",
+      updatedAt: "",
     };
     this.memoStorage.push(memo);
     await this.save();
@@ -77,7 +95,6 @@ export class JsonFileRepository implements Repository {
     if (!this.memoStorage) throw new Error("DB not loaded");
     const index = this.memoStorage.findIndex((m) => m.id === memo.id);
     if (index === -1) throw new Error("Not found");
-    memo.updatedAt = new Date().toISOString();
     this.memoStorage[index] = memo;
     await this.save();
     return memo;

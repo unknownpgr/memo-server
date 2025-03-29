@@ -83,6 +83,7 @@ export class DefaultService {
         memoId: number,
         authorization: string,
         requestBody: {
+            previousHash: string;
             memo: Memo;
         },
     }): CancelablePromise<Memo> {

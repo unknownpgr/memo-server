@@ -22,11 +22,12 @@ export class MemoRepositoryImpl implements MemoRepository {
   async updateMemo(request: {
     authorization: string;
     memo: Memo;
-  }): Promise<void> {
-    await this.api.updateMemo({
+    previousHash: string;
+  }): Promise<Memo> {
+    return await this.api.updateMemo({
       memoId: request.memo.id,
       authorization: request.authorization,
-      requestBody: { memo: request.memo },
+      requestBody: { memo: request.memo, previousHash: request.previousHash },
     });
   }
 

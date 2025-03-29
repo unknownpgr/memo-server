@@ -5,6 +5,7 @@ export const memoSchema = z.object({
   parentId: z.number(),
   title: z.string(),
   content: z.string(),
+  hash: z.string(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });
@@ -22,6 +23,7 @@ export type Memo = {
   parentId: number;
   title: string;
   content: string;
+  hash: string;
   createdAt: string;
   updatedAt: string;
 };

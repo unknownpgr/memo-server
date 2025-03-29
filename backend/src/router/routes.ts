@@ -12,7 +12,7 @@ import type * as KoaRouter from '@koa/router';
 const models: TsoaRoute.Models = {
     "Memo": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"updatedAt":{"dataType":"string","required":true},"createdAt":{"dataType":"string","required":true},"content":{"dataType":"string","required":true},"title":{"dataType":"string","required":true},"parentId":{"dataType":"double","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"updatedAt":{"dataType":"string","required":true},"createdAt":{"dataType":"string","required":true},"hash":{"dataType":"string","required":true},"content":{"dataType":"string","required":true},"title":{"dataType":"string","required":true},"parentId":{"dataType":"double","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "MemoSummary": {
@@ -158,7 +158,7 @@ export function RegisterRoutes(router: KoaRouter) {
             async function MemoController_updateMemo(context: any, next: any) {
             const args = {
                     memoId: {"in":"path","name":"memoId","required":true,"dataType":"double"},
-                    undefined: {"in":"body","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"memo":{"ref":"Memo","required":true}}},
+                    undefined: {"in":"body","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"previousHash":{"dataType":"string","required":true},"memo":{"ref":"Memo","required":true}}},
                     token: {"in":"header","name":"authorization","required":true,"dataType":"string"},
             };
 

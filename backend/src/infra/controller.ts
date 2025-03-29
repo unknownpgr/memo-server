@@ -54,11 +54,11 @@ export class MemoController {
   @Put("memo/{memoId}")
   public async updateMemo(
     @Path() memoId: number,
-    @Body() { memo }: { memo: Memo },
+    @Body() { memo, previousHash }: { memo: Memo; previousHash: string },
     @Header("authorization") token: string
   ): Promise<Memo> {
     MemoController.authService.authorize(token);
-    return MemoController.memoService.updateMemo({ memo });
+    return MemoController.memoService.updateMemo({ memo, previousHash });
   }
 
   @Delete("memo/{memoId}")

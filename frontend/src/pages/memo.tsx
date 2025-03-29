@@ -49,9 +49,13 @@ export function MemoView({ memoId }: { memoId: number }) {
   const [showSelector, setShowSelector] = useState(false);
   const navigate = useNavigate();
   const service = di.memoService;
-  const memoState = service.getMemoState();
-  const isEditable = memoState === "idle" || memoState === "updating";
-  const isUpdating = memoState === "updating";
+  const memoState = service.getServiceState();
+
+  const isError = memoState === "error";
+  const isUpdating =
+    memoState === "debouncing" ||
+    memoState === "saving" ||
+    memoState === "saving-modified";
 
   const handleDeleteMemo = useCallback(async () => {
     const message = `Do you really want to delete memo [${service.getTitle()}]?`;
@@ -71,10 +75,10 @@ export function MemoView({ memoId }: { memoId: number }) {
     }
   }, []);
 
-  if (!isEditable) {
+  if (isError) {
     return (
       <div className="w-full h-full flex justify-center items-center text-4xl font-bold">
-        Loading...
+        Error: {service.getError()}
       </div>
     );
   }

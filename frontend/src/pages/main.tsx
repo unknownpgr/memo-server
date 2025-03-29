@@ -17,7 +17,7 @@ export function Home() {
   const memoId = useMemoId();
   const [showList, setShowList] = useState(false);
   const memo = useObservable(di.memoService);
-  const state = memo.getMemoState();
+  const state = memo.getServiceState();
   const firstMemoId = memo.getFirstMemoId();
 
   useEffect(() => {

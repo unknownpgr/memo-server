@@ -51,6 +51,11 @@ export function MemoView({ memoId }: { memoId: number }) {
   const service = di.memoService;
   const memoState = service.getServiceState();
 
+  const isEditable =
+    memoState === "debouncing" ||
+    memoState === "idle" ||
+    memoState === "saving" ||
+    memoState === "saving-modified";
   const isError = memoState === "error";
   const isUpdating =
     memoState === "debouncing" ||
@@ -105,9 +110,13 @@ export function MemoView({ memoId }: { memoId: number }) {
           </>
         )}
       </div>
-      <MilkdownProvider>
-        <MilkdownEditor />
-      </MilkdownProvider>
+      {isEditable ? (
+        <>
+          <MilkdownProvider>
+            <MilkdownEditor />
+          </MilkdownProvider>
+        </>
+      ) : null}
       {showSelector && (
         <div
           className="absolute w-full h-full p-8 left-0 top-0 z-20 backdrop-filter backdrop-blur-sm flex justify-center items-center bg-black bg-opacity-50"

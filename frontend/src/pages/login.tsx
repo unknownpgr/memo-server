@@ -9,9 +9,9 @@ function isPasswordValid(password: string) {
 export function Login() {
   const auth = useObservable(di.authService);
   const [password, setPassword] = useState("");
-  const isLoading = auth.getAuthState() === "verifying";
 
   async function signIn() {
+    if (!isPasswordValid(password)) return;
     await auth.login(password);
     if (auth.getAuthState() === "unauthorized") setPassword("");
   }
@@ -21,22 +21,24 @@ export function Login() {
   }
 
   return (
-    <div className="container mx-auto h-dvh p-2 flex flex-col justify-center items-center">
+    <div className="container mx-auto max-w-64 h-dvh p-2 flex flex-col justify-center">
       <input
-        className="py-2 outline-none text-center bg-white"
+        className="py-1 mb-4 outline-none text-center font-bold bg-white border border-gray-300 rounded-md"
         type="password"
         placeholder="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         onKeyDown={onPasswordKeyDown}
-        disabled={isLoading}
       />
-      <button
-        className="mt-4 disabled:opacity-50"
-        onClick={signIn}
-        disabled={isLoading || !isPasswordValid(password)}>
-        Sign In
-      </button>
+      {isPasswordValid(password) ? (
+        <button
+          className="py-1 outline-none text-center bg-black text-white font-bold rounded-md"
+          onClick={signIn}>
+          Sign In
+        </button>
+      ) : (
+        <span className="py-1">&nbsp;</span>
+      )}
     </div>
   );
 }

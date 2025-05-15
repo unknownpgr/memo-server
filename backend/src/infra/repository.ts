@@ -32,7 +32,6 @@ export class JsonFileRepository implements Repository {
       this.memoStorage = rawMemos.map((memo: any) => memoSchema.parse(memo));
     } catch (e) {
       console.error(e);
-      console.error(rawMemos);
       throw new Error("Memo database is corrupted.");
     }
   }

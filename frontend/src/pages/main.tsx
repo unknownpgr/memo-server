@@ -35,11 +35,6 @@ export function Home() {
     navigate(`/memo/${firstMemoId}`);
   }, [memo, memoId, state, firstMemoId, navigate]);
 
-  useEffect(() => {
-    if (memoId >= 0) setShowList(false);
-    else setShowList(true);
-  }, [memoId]);
-
   const createMemo = async () => {
     const newMemo = await memo.createMemo();
     navigate(`/memo/${newMemo.id}`);
@@ -66,7 +61,7 @@ export function Home() {
       </div>
       <div className="flex h-0 flex-1">
         <div
-          className="w-full h-full p-8 fixed bg-white z-10 overflow-scroll lg:w-96 lg:static"
+          className="w-full h-full p-8 fixed bg-white z-10 overflow-scroll lg:w-64 lg:static"
           hidden={!showList}>
           <MemoList />
         </div>

@@ -87,6 +87,8 @@ export function MemoView({ memoId }: { memoId: number }) {
     );
   }
 
+  if (memoState === "loading") return null;
+
   return (
     <div className="max-w-4xl mx-auto" onKeyDown={handleOnKeyDown}>
       <input

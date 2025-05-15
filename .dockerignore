@@ -3,3 +3,5 @@ dist
 *.env
 *.db
 *.log
+db-dev
+db

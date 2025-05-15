@@ -24,15 +24,62 @@
   }
 }
 
-/* Hard-coded size unlimit */
-.prose {
-  max-width: none;
+.milkdown {
+  line-height: 2;
 }
 
-.prose ul {
-  margin: 0;
+.milkdown * {
+  outline: none;
 }
 
-.prose li > p {
-  margin: 0rem;
+.milkdown h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+.milkdown h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+.milkdown h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+.milkdown h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+.milkdown ul {
+  list-style-type: disc;
+  padding-left: 0.5rem;
+}
+
+.milkdown ol {
+  list-style-type: decimal;
+  padding-left: 0.5rem;
+}
+
+.milkdown li {
+  margin-left: 1rem;
+}
+
+.milkdown code {
+  background-color: #f0f0f0;
+}
+
+.milkdown pre {
+  background-color: #f0f0f0;
+  padding: 0.5rem;
+}
+
+.milkdown blockquote {
+  border: solid 1px #000;
+  padding: 0.5rem;
 }

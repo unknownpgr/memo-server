@@ -1,3 +1,6 @@
+import { KeyboardEvent, useCallback, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import { Editor, defaultValueCtx, rootCtx } from "@milkdown/core";
 import { history } from "@milkdown/plugin-history";
 import { indent } from "@milkdown/plugin-indent";
@@ -6,10 +9,7 @@ import { math } from "@milkdown/plugin-math";
 import { trailing } from "@milkdown/plugin-trailing";
 import { commonmark } from "@milkdown/preset-commonmark";
 import { Milkdown, MilkdownProvider, useEditor } from "@milkdown/react";
-import { nord } from "@milkdown/theme-nord";
-import "@milkdown/theme-nord/style.css";
-import { KeyboardEvent, useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
+
 import { MemoSelector } from "../components/memoselector";
 import { di } from "../di";
 
@@ -24,7 +24,6 @@ const MilkdownEditor = () => {
   useEditor(
     (root) => {
       const editor = Editor.make()
-        .config(nord)
         .config((ctx) => {
           ctx.set(rootCtx, root);
           ctx.set(defaultValueCtx, service.getContent());

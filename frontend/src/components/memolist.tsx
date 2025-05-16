@@ -40,7 +40,7 @@ function MemoItem(node: MemoNode) {
             memoListOpenConfig[id] = !isOpen;
             saveConfig();
           }}>
-          <code>{isOpen ? "▼" : "▶"}</code>
+          <code>{isOpen ? "-" : "+"}</code>
         </button>
       )}
       <Link className="" to={`/memo/${id}`}>

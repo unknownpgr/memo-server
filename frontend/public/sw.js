@@ -1,14 +1,9 @@
 // Service worker
-const CACHE_NAME = "memo-app-v1";
-const urlsToCache = [];
+const CACHE_NAME = "memo-app-cache-v4";
 
-// Install event - cache assets
+// Install event - do not wait for clients restart
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(urlsToCache);
-    })
-  );
+  event.skipWaiting();
 });
 
 // Activate event - clean up old caches
@@ -37,7 +32,6 @@ self.addEventListener("fetch", (event) => {
 
       // Clone the request
       const fetchRequest = event.request.clone();
-      console.log(fetchRequest);
 
       return fetch(fetchRequest).then((response) => {
         // Check if we received a valid response
@@ -49,6 +43,30 @@ self.addEventListener("fetch", (event) => {
         const responseToCache = response.clone();
 
         caches.open(CACHE_NAME).then((cache) => {
+          // If the scheme is not http or https, don't cache
+          if (
+            !event.request.url.startsWith("http") &&
+            !event.request.url.startsWith("https")
+          ) {
+            return;
+          }
+
+          // API requests should not be cached
+          if (event.request.url.includes("/api/")) {
+            return;
+          }
+
+          // Root path should not be cached
+          if (new URL(event.request.url).pathname === "/") {
+            return;
+          }
+
+          // If the request is not a GET request, don't cache
+          if (event.request.method !== "GET") {
+            return;
+          }
+
+          // Cache the response
           cache.put(event.request, responseToCache);
         });
 

@@ -42,7 +42,7 @@ export function Home() {
 
   return (
     <div className="h-dvh flex flex-col">
-      <div className="py-2 px-6 border-b flex">
+      <div className="py-2 px-8 border-b flex">
         <button className="p-2" onClick={() => setShowList(!showList)}>
           <MdList />
         </button>
@@ -61,7 +61,7 @@ export function Home() {
       </div>
       <div className="flex h-0 flex-1">
         <div
-          className="w-full h-full p-8 fixed bg-white z-10 overflow-scroll lg:w-64 lg:static"
+          className="w-full h-full py-8 pl-8 fixed bg-white z-10 overflow-x-hidden overflow-y-scroll lg:w-64 lg:static"
           hidden={!showList}>
           <MemoList />
         </div>

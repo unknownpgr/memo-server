@@ -6,6 +6,18 @@
   display: none;
 }
 
+html,
+body {
+  overscroll-behavior: none;
+}
+
+body {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
 @media (max-width: 480px) {
   html {
     font-size: 14px;

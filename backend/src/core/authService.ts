@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import fs from "fs/promises";
 import { z } from "zod";
+import { ServiceUninitializedError, UnauthorizedError } from "./errors";
 
 const authSchema = z.object({
   passwordHash: z.string(),
@@ -75,7 +76,7 @@ export class AuthService {
    */
   private issueToken(duration: number = 7 * 24 * 60 * 60 * 1000) {
     if (!this.auth) {
-      throw new Error("Service is not initialized");
+      throw new ServiceUninitializedError();
     }
 
     const token = AuthService.randomString(32);
@@ -87,18 +88,18 @@ export class AuthService {
 
   private validateToken(token: string) {
     if (!this.auth) {
-      throw new Error("Service is not initialized");
+      throw new ServiceUninitializedError();
     }
 
     const session = this.auth.sessions.find((s) => s.token === token);
     if (!session || session.expiresAt < Date.now()) {
-      throw new Error("Unauthorized");
+      throw new UnauthorizedError();
     }
   }
 
   private extendToken(token: string, duration: number = 24 * 60 * 60 * 1000) {
     if (!this.auth) {
-      throw new Error("Service is not initialized");
+      throw new ServiceUninitializedError();
     }
 
     const session = this.auth.sessions.find((s) => s.token === token);
@@ -110,7 +111,7 @@ export class AuthService {
 
   public async login(password: string): Promise<string> {
     if (!this.auth) {
-      throw new Error("Service is not initialized");
+      throw new ServiceUninitializedError();
     }
 
     const hashed = await AuthService.hash(password, this.auth.salt);
@@ -124,7 +125,7 @@ export class AuthService {
 
     // Else, validate the password
     if (hashed !== this.auth.passwordHash) {
-      throw new Error("Unauthorized");
+      throw new UnauthorizedError();
     }
 
     return this.issueToken();
@@ -132,7 +133,7 @@ export class AuthService {
 
   public async logout(token: string) {
     if (!this.auth) {
-      throw new Error("Service is not initialized");
+      throw new ServiceUninitializedError();
     }
 
     this.validateToken(token);

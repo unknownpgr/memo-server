@@ -1,6 +1,7 @@
 import { Memo, memoSchema } from "./entity";
 import { Repository } from "./repository";
 import crypto from "crypto";
+import { HashMismatchError } from "./errors";
 
 export class MemoService {
   constructor(private readonly repository: Repository) {
@@ -47,7 +48,7 @@ export class MemoService {
     const originalMemo = await this.repository.findMemo({ memoId: memo.id });
 
     if (originalMemo.hash !== previousHash) {
-      throw new Error("Hash mismatch");
+      throw new HashMismatchError();
     }
 
     const updatedMemo: Memo = {

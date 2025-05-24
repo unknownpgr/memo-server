@@ -1,6 +1,11 @@
 import fs from "fs/promises";
 import { Memo, MemoSummary, memoSchema } from "../core/entity";
 import { Repository } from "../core/repository";
+import {
+  MemoDatabaseCorruptedError,
+  MemoNotFoundError,
+  ServiceUninitializedError,
+} from "../core/errors";
 
 export class JsonFileRepository implements Repository {
   private memoStorage: Memo[] | null = null;
@@ -25,14 +30,14 @@ export class JsonFileRepository implements Repository {
     } catch (e) {
       console.error(e);
       console.error(data);
-      throw new Error("Memo database is not a valid JSON file.");
+      throw new MemoDatabaseCorruptedError();
     }
 
     try {
       this.memoStorage = rawMemos.map((memo: any) => memoSchema.parse(memo));
     } catch (e) {
       console.error(e);
-      throw new Error("Memo database is corrupted.");
+      throw new MemoDatabaseCorruptedError();
     }
   }
 
@@ -44,7 +49,7 @@ export class JsonFileRepository implements Repository {
   }
 
   private createMemoId() {
-    if (!this.memoStorage) throw new Error("DB not loaded");
+    if (!this.memoStorage) throw new ServiceUninitializedError();
     let maxId = 0;
     for (const memo of this.memoStorage) {
       maxId = Math.max(maxId, memo.id);
@@ -53,14 +58,14 @@ export class JsonFileRepository implements Repository {
   }
 
   async findMemo({ memoId }: { memoId: number }): Promise<Memo> {
-    if (!this.memoStorage) throw new Error("DB not loaded");
+    if (!this.memoStorage) throw new ServiceUninitializedError();
     const memo = this.memoStorage.find((memo) => memo.id === memoId);
-    if (!memo) throw new Error("Not found");
+    if (!memo) throw new MemoNotFoundError();
     return memo;
   }
 
   async listMemo(): Promise<MemoSummary[]> {
-    if (!this.memoStorage) throw new Error("DB not loaded");
+    if (!this.memoStorage) throw new ServiceUninitializedError();
     const results = this.memoStorage.map((memo) => {
       return {
         id: memo.id,
@@ -75,7 +80,7 @@ export class JsonFileRepository implements Repository {
   }
 
   async createMemo(): Promise<Memo> {
-    if (!this.memoStorage) throw new Error("DB not loaded");
+    if (!this.memoStorage) throw new ServiceUninitializedError();
     const memo: Memo = {
       id: this.createMemoId(),
       parentId: 0,
@@ -91,9 +96,9 @@ export class JsonFileRepository implements Repository {
   }
 
   async updateMemo({ memo }: { userId: number; memo: Memo }): Promise<Memo> {
-    if (!this.memoStorage) throw new Error("DB not loaded");
+    if (!this.memoStorage) throw new ServiceUninitializedError();
     const index = this.memoStorage.findIndex((m) => m.id === memo.id);
-    if (index === -1) throw new Error("Not found");
+    if (index === -1) throw new MemoNotFoundError();
     this.memoStorage[index] = memo;
     await this.save();
     return memo;
@@ -105,9 +110,9 @@ export class JsonFileRepository implements Repository {
     userId: number;
     memoId: number;
   }): Promise<void> {
-    if (!this.memoStorage) throw new Error("DB not loaded");
+    if (!this.memoStorage) throw new ServiceUninitializedError();
     const index = this.memoStorage.findIndex((m) => m.id === memoId);
-    if (index === -1) throw new Error("Not found");
+    if (index === -1) throw new MemoNotFoundError();
     this.memoStorage.splice(index, 1);
     await this.save();
   }

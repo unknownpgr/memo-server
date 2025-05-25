@@ -17,9 +17,8 @@ export type MemoInstanceState =
 type MemoInstanceEvent =
   | "memoLoaded"
   | "memoLoadFailed"
-  | "userModifiedMemoContent"
-  | "userModifiedMemoTitle"
-  | "userModifiedMemoParentId"
+  | "contentModified"
+  | "metadataModified"
   | "debounceTimerExpired"
   | "memoSaved"
   | "memoSaveFailed"
@@ -63,45 +62,27 @@ export class MemoInstanceService extends Observable<MemoEvent> {
       memoLoadFailed: ["error", () => this.retryTimer.extend()],
     },
     idle: {
-      userModifiedMemoContent: [
-        "debouncingContent",
-        () => this.debounceTimer.extend(),
-      ],
-      userModifiedMemoTitle: [
-        "debouncingMetadata",
-        () => this.debounceTimer.extend(),
-      ],
-      userModifiedMemoParentId: [
+      contentModified: ["debouncingContent", () => this.debounceTimer.extend()],
+      metadataModified: [
         "debouncingMetadata",
         () => this.debounceTimer.extend(),
       ],
     },
     debouncingContent: {
       debounceTimerExpired: ["savingContent", () => this.saveMemo()],
-      userModifiedMemoContent: [
-        "debouncingContent",
-        () => this.debounceTimer.extend(),
-      ],
-      userModifiedMemoTitle: [
-        "debouncingMetadata",
-        () => this.debounceTimer.extend(),
-      ],
-      userModifiedMemoParentId: [
+      contentModified: ["debouncingContent", () => this.debounceTimer.extend()],
+      metadataModified: [
         "debouncingMetadata",
         () => this.debounceTimer.extend(),
       ],
     },
     debouncingMetadata: {
       debounceTimerExpired: ["savingMetadata", () => this.saveMemo()],
-      userModifiedMemoContent: [
+      contentModified: [
         "debouncingMetadata",
         () => this.debounceTimer.extend(),
       ],
-      userModifiedMemoTitle: [
-        "debouncingMetadata",
-        () => this.debounceTimer.extend(),
-      ],
-      userModifiedMemoParentId: [
+      metadataModified: [
         "debouncingMetadata",
         () => this.debounceTimer.extend(),
       ],
@@ -109,15 +90,11 @@ export class MemoInstanceService extends Observable<MemoEvent> {
     savingContent: {
       memoSaved: ["idle"],
       memoSaveFailed: ["error", () => this.retryTimer.extend()],
-      userModifiedMemoContent: [
+      contentModified: [
         "savingContentModified",
         () => this.debounceTimer.extend(),
       ],
-      userModifiedMemoTitle: [
-        "savingMetadataModified",
-        () => this.debounceTimer.extend(),
-      ],
-      userModifiedMemoParentId: [
+      metadataModified: [
         "savingMetadataModified",
         () => this.debounceTimer.extend(),
       ],
@@ -125,15 +102,11 @@ export class MemoInstanceService extends Observable<MemoEvent> {
     savingMetadata: {
       memoSaved: ["idle", () => this.notify("metadataUpdated")],
       memoSaveFailed: ["error", () => this.retryTimer.extend()],
-      userModifiedMemoContent: [
+      contentModified: [
         "savingMetadataModified",
         () => this.debounceTimer.extend(),
       ],
-      userModifiedMemoTitle: [
-        "savingMetadataModified",
-        () => this.debounceTimer.extend(),
-      ],
-      userModifiedMemoParentId: [
+      metadataModified: [
         "savingMetadataModified",
         () => this.debounceTimer.extend(),
       ],
@@ -141,8 +114,7 @@ export class MemoInstanceService extends Observable<MemoEvent> {
     savingContentModified: {
       memoSaved: ["debouncingContent", () => this.debounceTimer.extend()],
       memoSaveFailed: ["error", () => this.retryTimer.extend()],
-      userModifiedMemoTitle: ["savingMetadataModified"],
-      userModifiedMemoParentId: ["savingMetadataModified"],
+      metadataModified: ["savingMetadataModified"],
     },
     savingMetadataModified: {
       memoSaved: [
@@ -226,7 +198,7 @@ export class MemoInstanceService extends Observable<MemoEvent> {
     if (!this.memo) return;
     if (this.memo.title === title) return;
     this.memo.title = title;
-    this.event("userModifiedMemoTitle");
+    this.event("metadataModified");
   }
 
   public getContent() {
@@ -238,7 +210,7 @@ export class MemoInstanceService extends Observable<MemoEvent> {
     if (!this.memo) return;
     if (this.memo.content === content) return;
     this.memo.content = content;
-    this.event("userModifiedMemoContent");
+    this.event("contentModified");
   }
 
   public getParentId() {
@@ -250,7 +222,7 @@ export class MemoInstanceService extends Observable<MemoEvent> {
     if (!this.memo) return;
     if (this.memo.parentId === parentId) return;
     this.memo.parentId = parentId;
-    this.event("userModifiedMemoParentId");
+    this.event("metadataModified");
   }
 
   public getMemoState() {

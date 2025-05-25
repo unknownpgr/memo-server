@@ -48,13 +48,15 @@ export class MemoService extends Observable {
   }
 
   public async loadMemo(memoId: number) {
-    if (this.currentMemo) {
-      // If the memo is already loaded, do nothing
-      if (this.currentMemo.getId() === memoId) return;
+    // If the memo is already loaded, do nothing
+    if (this.currentMemo?.getId() === memoId) return;
 
+    // Remove all listeners from the current memo
+    if (this.currentMemo) {
       this.currentMemo.removeAllListeners();
     }
 
+    // Create a new memo instance
     this.currentMemo = new MemoInstanceService(
       this.authService,
       this.api,

@@ -10,7 +10,7 @@ export type MemoState =
   | "saving"
   | "error";
 
-export type MemoEvent =
+type MemoInstanceEvent =
   | "memo-loaded"
   | "memo-load-failed"
   | "user-modified-memo"
@@ -84,7 +84,7 @@ export class MemoInstanceService extends Observable {
     }
   }
 
-  private transition(event: MemoEvent) {
+  private transition(event: MemoInstanceEvent) {
     switch (this.memoState) {
       case "loading":
         {
@@ -178,6 +178,7 @@ export class MemoInstanceService extends Observable {
 
   public setContent(content: string) {
     if (!this.memo) return;
+    if (this.memo.content === content) return;
     this.memo.content = content;
     this.transition("user-modified-memo");
   }

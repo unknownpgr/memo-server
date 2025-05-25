@@ -2,21 +2,30 @@ import { AuthService } from "./model/auth";
 import { Memo, MemoRepository } from "./model/memo";
 import { Observable } from "./model/observable";
 
-export type MemoState =
+export type MemoInstanceState =
   | "loading"
   | "idle"
   | "debouncing"
-  | "saving-modified"
+  | "savingModified"
   | "saving"
   | "error";
 
 type MemoInstanceEvent =
-  | "memo-loaded"
-  | "memo-load-failed"
-  | "user-modified-memo"
-  | "debounce-timer-expired"
-  | "memo-saved"
-  | "memo-save-failed";
+  | "memoLoaded"
+  | "memoLoadFailed"
+  | "userModifiedMemo"
+  | "debounceTimerExpired"
+  | "memoSaved"
+  | "memoSaveFailed"
+  | "retryTimerExpired";
+
+type MemoInstanceStateMachine = {
+  [key in MemoInstanceState]: {
+    [key in MemoInstanceEvent]?:
+      | [MemoInstanceState]
+      | [MemoInstanceState, () => void];
+  };
+};
 
 class Timer extends Observable {
   private timer: number | null = null;
@@ -38,8 +47,37 @@ class Timer extends Observable {
 export class MemoInstanceService extends Observable {
   private memo: Memo | null = null;
   private error: string | null = null;
-  private memoState: MemoState = "loading";
-  private debounceTimer: Timer;
+  private memoState: MemoInstanceState = "loading";
+  private debounceTimer: Timer = new Timer(1000);
+  private retryTimer: Timer = new Timer(3000);
+
+  private stateMachine: MemoInstanceStateMachine = {
+    loading: {
+      memoLoaded: ["idle"],
+      memoLoadFailed: ["error", () => this.retryTimer.extend()],
+    },
+    idle: {
+      userModifiedMemo: ["debouncing", () => this.debounceTimer.extend()],
+    },
+    debouncing: {
+      debounceTimerExpired: ["saving", () => this.saveMemo()],
+      userModifiedMemo: ["debouncing", () => this.debounceTimer.extend()],
+    },
+    saving: {
+      memoSaved: ["idle"],
+      memoSaveFailed: ["error", () => this.retryTimer.extend()],
+      userModifiedMemo: ["savingModified"],
+    },
+    savingModified: {
+      memoSaved: ["debouncing", () => this.debounceTimer.extend()],
+      memoSaveFailed: ["error", () => this.retryTimer.extend()],
+    },
+    error: {
+      memoLoaded: ["idle"],
+      memoLoadFailed: ["error", () => this.retryTimer.extend()],
+      retryTimerExpired: ["error", () => this.loadMemo()],
+    },
+  };
 
   constructor(
     private readonly auth: AuthService,
@@ -47,10 +85,9 @@ export class MemoInstanceService extends Observable {
     private readonly memoId: number
   ) {
     super();
-    this.debounceTimer = new Timer(1000);
-    this.debounceTimer.addListener(() => {
-      this.transition("debounce-timer-expired");
-    });
+
+    this.debounceTimer.addListener(() => this.event("debounceTimerExpired"));
+    this.retryTimer.addListener(() => this.event("retryTimerExpired"));
 
     this.loadMemo();
   }
@@ -61,10 +98,10 @@ export class MemoInstanceService extends Observable {
         authorization: this.auth.getToken(),
         memoId: this.memoId,
       });
-      this.transition("memo-loaded");
+      this.event("memoLoaded");
     } catch (error) {
       this.error = `Failed to load memo: ${error}`;
-      this.transition("memo-load-failed");
+      this.event("memoLoadFailed");
     }
   }
 
@@ -77,81 +114,19 @@ export class MemoInstanceService extends Observable {
         previousHash: this.memo.hash,
       });
       this.memo.hash = newMemo.hash;
-      this.transition("memo-saved");
+      this.event("memoSaved");
     } catch (error) {
       this.error = `Failed to save memo: ${error}`;
-      this.transition("memo-save-failed");
+      this.event("memoSaveFailed");
     }
   }
 
-  private transition(event: MemoInstanceEvent) {
-    switch (this.memoState) {
-      case "loading":
-        {
-          switch (event) {
-            case "memo-loaded":
-              this.memoState = "idle";
-              break;
-            case "memo-load-failed":
-              this.memoState = "error";
-              break;
-          }
-        }
-        break;
-      case "idle":
-        {
-          switch (event) {
-            case "user-modified-memo":
-              this.debounceTimer.extend();
-              this.memoState = "debouncing";
-              break;
-          }
-        }
-        break;
-      case "debouncing":
-        {
-          switch (event) {
-            case "debounce-timer-expired":
-              this.memoState = "saving";
-              this.saveMemo();
-              break;
-            case "user-modified-memo":
-              this.debounceTimer.extend();
-              break;
-          }
-        }
-        break;
-      case "saving":
-        {
-          switch (event) {
-            case "memo-saved":
-              this.memoState = "idle";
-              break;
-            case "memo-save-failed":
-              this.memoState = "error";
-              break;
-            case "user-modified-memo":
-              this.memoState = "saving-modified";
-              break;
-          }
-        }
-        break;
-      case "saving-modified":
-        {
-          switch (event) {
-            case "memo-saved":
-              this.debounceTimer.extend();
-              this.memoState = "debouncing";
-              break;
-            case "memo-save-failed":
-              this.memoState = "error";
-              break;
-          }
-        }
-        break;
-      case "error":
-        break;
-    }
+  private event(event: MemoInstanceEvent) {
+    const transition = this.stateMachine[this.memoState][event];
+    if (!transition) return;
+    this.memoState = transition[0];
+    const nextState = transition[1];
+    nextState?.();
     this.notify();
   }
 
@@ -168,7 +143,7 @@ export class MemoInstanceService extends Observable {
   public setTitle(title: string) {
     if (!this.memo) return;
     this.memo.title = title;
-    this.transition("user-modified-memo");
+    this.event("userModifiedMemo");
   }
 
   public getContent() {
@@ -180,7 +155,7 @@ export class MemoInstanceService extends Observable {
     if (!this.memo) return;
     if (this.memo.content === content) return;
     this.memo.content = content;
-    this.transition("user-modified-memo");
+    this.event("userModifiedMemo");
   }
 
   public getParentId() {
@@ -191,7 +166,7 @@ export class MemoInstanceService extends Observable {
   public setParentId(parentId: number) {
     if (!this.memo) return;
     this.memo.parentId = parentId;
-    this.transition("user-modified-memo");
+    this.event("userModifiedMemo");
   }
 
   public getMemoState() {

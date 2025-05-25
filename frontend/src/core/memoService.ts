@@ -1,4 +1,4 @@
-import { MemoInstanceService, MemoState } from "./memoInstanceService";
+import { MemoInstanceService, MemoInstanceState } from "./memoInstanceService";
 import { AuthService } from "./model/auth";
 import { MemoRepository, MemoSummary } from "./model/memo";
 import { Observable } from "./model/observable";
@@ -9,7 +9,7 @@ export interface MemoNode {
   children: MemoNode[];
 }
 
-export type MemoServiceState = "uninitialized" | MemoState;
+export type MemoServiceState = "uninitialized" | MemoInstanceState;
 
 export class MemoService extends Observable {
   private currentMemo: MemoInstanceService | null = null;

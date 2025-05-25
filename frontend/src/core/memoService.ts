@@ -62,7 +62,10 @@ export class MemoService extends Observable {
       this.api,
       memoId
     );
-    this.currentMemo.addListener(() => this.notify());
+    this.currentMemo.addListener((event) => {
+      if (event === "metadataUpdated") this.loadMemoList();
+      this.notify();
+    });
 
     this.notify();
   }
@@ -107,13 +110,6 @@ export class MemoService extends Observable {
     if (!currentMemo) return;
     currentMemo.setTitle(title);
 
-    // Update memo title in the memo list
-    const memo = this.memoList.find((memo) => memo.id === currentMemo.getId());
-    if (memo) memo.title = title;
-
-    // Invalidate memo tree cache
-    this.memoTreeCache = null;
-
     this.notify();
   }
 
@@ -151,18 +147,10 @@ export class MemoService extends Observable {
       current = memo.parentId;
     }
 
-    // Update parent ID in the memo list
-    const memo = this.memoList.find((memo) => memo.id === currentMemo.getId());
-    if (memo) memo.parentId = parentId;
-
     // Set parent ID
     currentMemo.setParentId(parentId);
 
-    // Invalidate memo tree cache
-    this.memoTreeCache = null;
-
     this.notify();
-    this.loadMemoList();
   }
 
   public getPath() {

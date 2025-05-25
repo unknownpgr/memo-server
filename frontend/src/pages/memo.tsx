@@ -51,15 +51,21 @@ export function MemoView({ memoId }: { memoId: number }) {
   const memoState = service.getServiceState();
 
   const isEditable =
-    memoState === "debouncing" ||
     memoState === "idle" ||
-    memoState === "saving" ||
-    memoState === "saving-modified";
+    memoState === "debouncingContent" ||
+    memoState === "debouncingMetadata" ||
+    memoState === "savingContent" ||
+    memoState === "savingMetadata" ||
+    memoState === "savingContentModified" ||
+    memoState === "savingMetadataModified";
   const isError = memoState === "error";
   const isUpdating =
-    memoState === "debouncing" ||
-    memoState === "saving" ||
-    memoState === "saving-modified";
+    memoState === "debouncingContent" ||
+    memoState === "debouncingMetadata" ||
+    memoState === "savingContent" ||
+    memoState === "savingMetadata" ||
+    memoState === "savingContentModified" ||
+    memoState === "savingMetadataModified";
 
   const handleDeleteMemo = useCallback(async () => {
     const message = `Do you really want to delete memo [${service.getTitle()}]?`;

@@ -1,3 +1,4 @@
+import { MemoEvent } from "./event";
 import { AuthService } from "./model/auth";
 import { Memo, MemoRepository } from "./model/memo";
 import { Observable } from "./model/observable";
@@ -5,15 +6,20 @@ import { Observable } from "./model/observable";
 export type MemoInstanceState =
   | "loading"
   | "idle"
-  | "debouncing"
-  | "savingModified"
-  | "saving"
+  | "debouncingContent"
+  | "debouncingMetadata"
+  | "savingContent"
+  | "savingMetadata"
+  | "savingContentModified"
+  | "savingMetadataModified"
   | "error";
 
 type MemoInstanceEvent =
   | "memoLoaded"
   | "memoLoadFailed"
-  | "userModifiedMemo"
+  | "userModifiedMemoContent"
+  | "userModifiedMemoTitle"
+  | "userModifiedMemoParentId"
   | "debounceTimerExpired"
   | "memoSaved"
   | "memoSaveFailed"
@@ -44,7 +50,7 @@ class Timer extends Observable {
   }
 }
 
-export class MemoInstanceService extends Observable {
+export class MemoInstanceService extends Observable<MemoEvent> {
   private memo: Memo | null = null;
   private error: string | null = null;
   private memoState: MemoInstanceState = "loading";
@@ -57,19 +63,103 @@ export class MemoInstanceService extends Observable {
       memoLoadFailed: ["error", () => this.retryTimer.extend()],
     },
     idle: {
-      userModifiedMemo: ["debouncing", () => this.debounceTimer.extend()],
+      userModifiedMemoContent: [
+        "debouncingContent",
+        () => this.debounceTimer.extend(),
+      ],
+      userModifiedMemoTitle: [
+        "debouncingMetadata",
+        () => this.debounceTimer.extend(),
+      ],
+      userModifiedMemoParentId: [
+        "debouncingMetadata",
+        () => this.debounceTimer.extend(),
+      ],
     },
-    debouncing: {
-      debounceTimerExpired: ["saving", () => this.saveMemo()],
-      userModifiedMemo: ["debouncing", () => this.debounceTimer.extend()],
+    debouncingContent: {
+      debounceTimerExpired: ["savingContent", () => this.saveMemo()],
+      userModifiedMemoContent: [
+        "debouncingContent",
+        () => this.debounceTimer.extend(),
+      ],
+      userModifiedMemoTitle: [
+        "debouncingMetadata",
+        () => this.debounceTimer.extend(),
+      ],
+      userModifiedMemoParentId: [
+        "debouncingMetadata",
+        () => this.debounceTimer.extend(),
+      ],
     },
-    saving: {
+    debouncingMetadata: {
+      debounceTimerExpired: ["savingMetadata", () => this.saveMemo()],
+      userModifiedMemoContent: [
+        "debouncingMetadata",
+        () => this.debounceTimer.extend(),
+      ],
+      userModifiedMemoTitle: [
+        "debouncingMetadata",
+        () => this.debounceTimer.extend(),
+      ],
+      userModifiedMemoParentId: [
+        "debouncingMetadata",
+        () => this.debounceTimer.extend(),
+      ],
+    },
+    savingContent: {
       memoSaved: ["idle"],
       memoSaveFailed: ["error", () => this.retryTimer.extend()],
-      userModifiedMemo: ["savingModified"],
+      userModifiedMemoContent: [
+        "debouncingContent",
+        () => this.debounceTimer.extend(),
+      ],
+      userModifiedMemoTitle: [
+        "debouncingMetadata",
+        () => this.debounceTimer.extend(),
+      ],
+      userModifiedMemoParentId: [
+        "debouncingMetadata",
+        () => this.debounceTimer.extend(),
+      ],
     },
-    savingModified: {
-      memoSaved: ["debouncing", () => this.debounceTimer.extend()],
+    savingMetadata: {
+      memoSaved: ["idle", () => this.notify("metadataUpdated")],
+      memoSaveFailed: ["error", () => this.retryTimer.extend()],
+      userModifiedMemoContent: [
+        "debouncingContent",
+        () => this.debounceTimer.extend(),
+      ],
+      userModifiedMemoTitle: [
+        "debouncingMetadata",
+        () => this.debounceTimer.extend(),
+      ],
+      userModifiedMemoParentId: [
+        "debouncingContent",
+        () => this.debounceTimer.extend(),
+      ],
+    },
+    savingContentModified: {
+      memoSaved: ["debouncingContent", () => this.debounceTimer.extend()],
+      userModifiedMemoTitle: [
+        "debouncingMetadata",
+        () => this.debounceTimer.extend(),
+      ],
+      userModifiedMemoParentId: [
+        "debouncingMetadata",
+        () => this.debounceTimer.extend(),
+      ],
+      memoSaveFailed: ["error", () => this.retryTimer.extend()],
+    },
+    savingMetadataModified: {
+      memoSaved: ["debouncingMetadata", () => this.debounceTimer.extend()],
+      userModifiedMemoTitle: [
+        "debouncingMetadata",
+        () => this.debounceTimer.extend(),
+      ],
+      userModifiedMemoParentId: [
+        "debouncingContent",
+        () => this.debounceTimer.extend(),
+      ],
       memoSaveFailed: ["error", () => this.retryTimer.extend()],
     },
     error: {
@@ -127,7 +217,7 @@ export class MemoInstanceService extends Observable {
     this.memoState = transition[0];
     const nextState = transition[1];
     nextState?.();
-    this.notify();
+    this.notify(null);
   }
 
   public getId() {
@@ -142,8 +232,9 @@ export class MemoInstanceService extends Observable {
 
   public setTitle(title: string) {
     if (!this.memo) return;
+    if (this.memo.title === title) return;
     this.memo.title = title;
-    this.event("userModifiedMemo");
+    this.event("userModifiedMemoTitle");
   }
 
   public getContent() {
@@ -155,7 +246,7 @@ export class MemoInstanceService extends Observable {
     if (!this.memo) return;
     if (this.memo.content === content) return;
     this.memo.content = content;
-    this.event("userModifiedMemo");
+    this.event("userModifiedMemoContent");
   }
 
   public getParentId() {
@@ -165,8 +256,9 @@ export class MemoInstanceService extends Observable {
 
   public setParentId(parentId: number) {
     if (!this.memo) return;
+    if (this.memo.parentId === parentId) return;
     this.memo.parentId = parentId;
-    this.event("userModifiedMemo");
+    this.event("userModifiedMemoParentId");
   }
 
   public getMemoState() {

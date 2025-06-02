@@ -5,7 +5,7 @@ export const memoSchema = z.object({
   parentId: z.number(),
   title: z.string(),
   content: z.string(),
-  hash: z.string(),
+  hash: z.string().default(""),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });

@@ -1,3 +1,4 @@
+import { MemoEvent } from "./event";
 import { MemoInstanceService, MemoInstanceState } from "./memoInstanceService";
 import { AuthService } from "./model/auth";
 import { MemoRepository, MemoSummary } from "./model/memo";
@@ -47,6 +48,15 @@ export class MemoService extends Observable {
     this.notify();
   }
 
+  private async handleMemoEvent(event: MemoEvent) {
+    switch (event) {
+      case "metadataUpdated":
+        this.loadMemoList();
+        break;
+      }
+    this.notify();
+  }
+
   public async loadMemo(memoId: number) {
     // If the memo is already loaded, do nothing
     if (this.currentMemo?.getId() === memoId) return;
@@ -62,10 +72,7 @@ export class MemoService extends Observable {
       this.api,
       memoId
     );
-    this.currentMemo.addListener((event) => {
-      if (event === "metadataUpdated") this.loadMemoList();
-      this.notify();
-    });
+    this.currentMemo.addListener((event) => this.handleMemoEvent(event));
 
     this.notify();
   }
